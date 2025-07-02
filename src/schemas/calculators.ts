@@ -493,7 +493,8 @@ export const validateCalculatorResponse = (calculatorType: string, data: Record<
     const schema = getCalculatorSchema(calculatorType)
     schema.parse(data)
     return true
-  } catch {
+  } catch (error) {
+    console.error(`Validation failed for ${calculatorType}:`, error)
     return false
   }
 }
