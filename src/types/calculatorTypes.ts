@@ -8,7 +8,7 @@ export type CalculatorResponseValue = QuestionValue | QuestionValue[]
 export type RiskLevel = 'minimal' | 'low' | 'mild' | 'medium' | 'moderate' | 'high' | 'severe' | 'very_high' | 'unknown'
 
 // Chart data types
-export interface MedicalChartDataset extends ChartDataset<'bar' | 'line' | 'doughnut' | 'pie'> {
+export type MedicalChartDataset = ChartDataset<'bar' | 'line' | 'doughnut' | 'pie'> & {
   label: string
   data: number[]
   backgroundColor?: string | string[]
@@ -16,12 +16,12 @@ export interface MedicalChartDataset extends ChartDataset<'bar' | 'line' | 'doug
   borderWidth?: number
 }
 
-export interface MedicalChartData extends ChartData<'bar' | 'line' | 'doughnut' | 'pie'> {
+export type MedicalChartData = ChartData<'bar' | 'line' | 'doughnut' | 'pie'> & {
   labels: string[]
   datasets: MedicalChartDataset[]
 }
 
-export interface MedicalChartOptions extends ChartOptions<'bar' | 'line' | 'doughnut' | 'pie'> {
+export type MedicalChartOptions = ChartOptions<'bar' | 'line' | 'doughnut' | 'pie'> & {
   responsive?: boolean
   maintainAspectRatio?: boolean
   plugins?: {
@@ -57,7 +57,7 @@ export interface AuditResponses {
   question10: number // Has a relative, friend, doctor, or other health care worker been concerned about your drinking?
 }
 
-export interface AuditDetails {
+export interface AuditDetails extends CalculatorDetails {
   consumptionScore: number
   dependenceScore: number
   harmScore: number
@@ -81,7 +81,7 @@ export interface DanpssResponses {
   question12: number // Physical anxiety symptoms
 }
 
-export interface DanpssDetails {
+export interface DanpssDetails extends CalculatorDetails {
   depressionScore: number
   anxietyScore: number
   depressionLevel: 'none' | 'mild' | 'moderate' | 'severe'
@@ -103,7 +103,7 @@ export interface EpdsResponses {
   question10: number // Thought of harming myself
 }
 
-export interface EpdsDetails {
+export interface EpdsDetails extends CalculatorDetails {
   depressionRisk: RiskLevel
   suicidalThoughts: boolean
   urgentReferralNeeded: boolean
@@ -117,7 +117,7 @@ export interface GcsResponses {
   motorResponse: number  // 1-6: None, Extension, Flexion, Withdrawal, Localizes, Obeys
 }
 
-export interface GcsDetails {
+export interface GcsDetails extends CalculatorDetails {
   eyeScore: number
   verbalScore: number
   motorScore: number
@@ -137,7 +137,7 @@ export interface IpssResponses {
   qualityOfLife: number      // 0-6: Delighted to terrible
 }
 
-export interface IpssDetails {
+export interface IpssDetails extends CalculatorDetails {
   symptomScore: number
   qualityOfLifeScore: number
   symptomSeverity: 'mild' | 'moderate' | 'severe'
@@ -151,7 +151,7 @@ export interface PuqeResponses {
   retching: number  // 1-5: Number of retching episodes
 }
 
-export interface PuqeDetails {
+export interface PuqeDetails extends CalculatorDetails {
   nauseaHours: number
   vomitingEpisodes: number
   retchingEpisodes: number
@@ -168,7 +168,7 @@ export interface WestleyCroupResponses {
   retractions: number         // 0-3: None to severe
 }
 
-export interface WestleyCroupDetails {
+export interface WestleyCroupDetails extends CalculatorDetails {
   consciousnessScore: number
   respiratoryDistress: RiskLevel
   urgency: 'observe' | 'treat' | 'urgent' | 'critical'
@@ -183,7 +183,7 @@ export interface Who5Responses {
   question5: number  // My daily life has been filled with things that interest me
 }
 
-export interface Who5Details {
+export interface Who5Details extends CalculatorDetails {
   rawScore: number
   percentageScore: number
   wellBeingLevel: 'poor' | 'below_average' | 'average' | 'good' | 'excellent'
@@ -201,7 +201,7 @@ export interface LrtiResponses {
   consciousnessLevel?: number  // 0-4: Alert to unresponsive (optional)
 }
 
-export interface LrtiDetails {
+export interface LrtiDetails extends CalculatorDetails {
   riskFactors: number
   validatedInputs: {
     temperature: number
@@ -210,7 +210,7 @@ export interface LrtiDetails {
     bloodPressureSystolic: number
   }
   vitalSignsCategory: 'normal' | 'concerning' | 'critical'
-  antibiotiicRecommended: boolean
+  antibioticRecommended: boolean
 }
 
 // SCORE2 Calculator Types
@@ -224,7 +224,7 @@ export interface Score2Responses {
   region: 'low_risk' | 'moderate_risk' | 'high_risk' // CVD risk region
 }
 
-export interface Score2Details {
+export interface Score2Details extends CalculatorDetails {
   riskFactors: {
     smoking: boolean
     hypertension: boolean
@@ -249,7 +249,14 @@ export type CalculatorResponses =
   | LrtiResponses
   | Score2Responses
 
-export type CalculatorDetails = 
+// Base interface that all calculator details must extend
+export interface CalculatorDetails {
+  // Base properties that all calculators might have
+  [key: string]: any
+}
+
+// Union type for specific calculator details
+export type SpecificCalculatorDetails = 
   | AuditDetails
   | DanpssDetails
   | EpdsDetails
@@ -288,7 +295,7 @@ export interface CalculationResult {
   interpretation: string
   recommendations: string[]
   riskLevel: RiskLevel
-  details?: CalculatorDetails
+  details?: SpecificCalculatorDetails
   warnings?: string[]
   chartData?: MedicalChartData
 }
