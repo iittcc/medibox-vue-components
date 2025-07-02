@@ -230,18 +230,19 @@ import Button from 'primevue/button'
 import Tag from 'primevue/tag'
 import Chart from 'primevue/chart'
 import { useToast } from 'primevue/usetoast'
+import type { MedicalChartData, MedicalChartOptions, CalculatorDetails, RiskLevel } from '@/types/calculatorTypes'
 
 export interface ResultScore {
   value: number
   max?: number
   unit?: string
-  details?: Record<string, any>
+  details?: CalculatorDetails
 }
 
 export interface ChartConfig {
   type: 'bar' | 'line' | 'pie' | 'doughnut' | 'radar'
-  data: any
-  options?: any
+  data: MedicalChartData
+  options?: MedicalChartOptions
 }
 
 interface Props {
@@ -249,7 +250,7 @@ interface Props {
   score: number | ResultScore
   interpretation: string
   recommendations?: string[]
-  riskLevel?: string
+  riskLevel?: RiskLevel
   
   // Display options
   title?: string
@@ -266,9 +267,9 @@ interface Props {
   references?: string[]
   
   // Chart data
-  chartData?: any
+  chartData?: MedicalChartData
   chartType?: 'bar' | 'line' | 'pie' | 'doughnut' | 'radar'
-  chartOptions?: any
+  chartOptions?: MedicalChartOptions
   showChart?: boolean
   
   // Metadata
@@ -284,7 +285,7 @@ interface Props {
   showReferences?: boolean
   
   // Score details
-  scoreDetails?: Record<string, any>
+  scoreDetails?: CalculatorDetails
 }
 
 interface Emits {
@@ -441,7 +442,7 @@ const formatDetailKey = (key: string): string => {
   return keyLabels[key] || key.charAt(0).toUpperCase() + key.slice(1)
 }
 
-const formatDetailValue = (value: any): string => {
+const formatDetailValue = (value: string | number | boolean): string => {
   if (typeof value === 'boolean') {
     return value ? 'Ja' : 'Nej'
   }
@@ -451,7 +452,7 @@ const formatDetailValue = (value: any): string => {
   return String(value)
 }
 
-const getDetailValueClass = (key: string, value: any): string => {
+const getDetailValueClass = (key: string, value: string | number | boolean): string => {
   if (typeof value === 'number') {
     return 'text-blue-600'
   }

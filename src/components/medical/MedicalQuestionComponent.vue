@@ -229,9 +229,9 @@ import ToggleButton from 'primevue/togglebutton'
 import Slider from 'primevue/slider'
 import Button from 'primevue/button'
 
-export interface QuestionOption {
+export interface QuestionOption<T = string | number | boolean> {
   label: string
-  value: any
+  value: T
   description?: string
   points?: number
   disabled?: boolean
@@ -289,8 +289,8 @@ interface Props {
 }
 
 interface Emits {
-  (e: 'update:modelValue', value: any): void
-  (e: 'change', value: any): void
+  (e: 'update:modelValue', value: string | number | boolean | string[]): void
+  (e: 'change', value: string | number | boolean | string[]): void
   (e: 'focus'): void
   (e: 'blur'): void
 }
@@ -304,7 +304,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<Emits>()
 
-const modelValue = defineModel<any>()
+const modelValue = defineModel<string | number | boolean | string[]>()
 
 // Internal state
 const showHelp = ref(false)
@@ -329,7 +329,7 @@ const questionClasses = computed(() => ({
   'question-error': hasError.value
 }))
 
-const isOptionSelected = (value: any) => {
+const isOptionSelected = (value: string | number | boolean) => {
   if (Array.isArray(internalValue.value)) {
     return internalValue.value.includes(value)
   }

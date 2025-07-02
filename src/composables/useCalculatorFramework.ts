@@ -6,6 +6,15 @@ import { getCalculatorSchema, getScoreRange, type CalculatorResult } from '@/sch
 import { getPatientSchemaForCalculator } from '@/schemas/patient'
 import sendDataToServer, { type SendDataOptions } from '@/assets/sendDataToServer'
 import { nanoid } from 'nanoid'
+import type { 
+  CalculatorResponses, 
+  CalculationResult, 
+  CalculatorDetails, 
+  PatientData, 
+  QuestionValue,
+  RiskLevel,
+  MedicalChartData
+} from '@/types/calculatorTypes'
 
 export interface CalculatorConfig {
   type: string
@@ -44,15 +53,7 @@ export interface CalculatorState {
   sessionId: string
 }
 
-export interface CalculationResult {
-  score: number
-  interpretation: string
-  recommendations: string[]
-  riskLevel: string
-  details?: Record<string, any>
-  warnings?: string[]
-  chartData?: any
-}
+// CalculationResult is now imported from types/calculatorTypes.ts
 
 export function useCalculatorFramework(config: CalculatorConfig) {
   const {
@@ -86,8 +87,8 @@ export function useCalculatorFramework(config: CalculatorConfig) {
     sessionId: nanoid()
   })
 
-  const patientData = ref<Record<string, any>>({})
-  const calculatorData = ref<Record<string, any>>({})
+  const patientData = ref<Partial<PatientData>>({})
+  const calculatorData = ref<Partial<CalculatorResponses>>({})
   const result = ref<CalculationResult | null>(null)
   const steps = ref<CalculatorStep[]>([])
 
@@ -190,7 +191,7 @@ export function useCalculatorFramework(config: CalculatorConfig) {
   }
 
   // Data management
-  const updatePatientData = (data: Partial<Record<string, any>>) => {
+  const updatePatientData = (data: Partial<PatientData>) => {
     Object.assign(patientData.value, data)
     patientValidation.data.value = { ...patientValidation.data.value, ...data }
     
@@ -200,7 +201,7 @@ export function useCalculatorFramework(config: CalculatorConfig) {
     }, config.type)
   }
 
-  const updateCalculatorData = (data: Partial<Record<string, any>>) => {
+  const updateCalculatorData = (data: Partial<CalculatorResponses>) => {
     Object.assign(calculatorData.value, data)
     calculatorValidation.data.value = { ...calculatorValidation.data.value, ...data }
     
@@ -210,13 +211,13 @@ export function useCalculatorFramework(config: CalculatorConfig) {
     }, config.type)
   }
 
-  const setFieldValue = (section: 'patient' | 'calculator', field: string, value: any) => {
+  const setFieldValue = (section: 'patient' | 'calculator', field: string, value: QuestionValue) => {
     if (section === 'patient') {
       patientValidation.setFieldValue(field, value)
-      patientData.value[field] = value
+      ;(patientData.value as any)[field] = value
     } else {
       calculatorValidation.setFieldValue(field, value)
-      calculatorData.value[field] = value
+      ;(calculatorData.value as any)[field] = value
     }
     
     logUserAction('field_updated', {
@@ -228,7 +229,7 @@ export function useCalculatorFramework(config: CalculatorConfig) {
   }
 
   // Calculation logic
-  const calculateScore = (responses: Record<string, any>): CalculationResult => {
+  const calculateScore = (responses: CalculatorResponses): CalculationResult => {
     const startTime = Date.now()
     
     try {
@@ -238,10 +239,12 @@ export function useCalculatorFramework(config: CalculatorConfig) {
       let score = 0
       let interpretation = ''
       let recommendations: string[] = []
-      let riskLevel = 'unknown'
-      let details: Record<string, any> = {}
+      let riskLevel: RiskLevel = 'unknown'
+      let details: CalculatorDetails | undefined
 
       // Calculator-specific logic
+      // Note: Using temporary type assertions to maintain existing functionality 
+      // while transitioning to proper types
       switch (config.type) {
         case 'audit':
           score = calculateAuditScore(responses)
@@ -249,43 +252,43 @@ export function useCalculatorFramework(config: CalculatorConfig) {
           break
           
         case 'danpss':
-          ;({ score, interpretation, recommendations, riskLevel, details } = calculateDanpssScore(responses))
+          ;({ score, interpretation, recommendations, riskLevel, details } = calculateDanpssScore(responses as any) as any)
           break
           
         case 'epds':
-          score = calculateEpdsScore(responses)
-          ;({ interpretation, recommendations, riskLevel } = interpretEpdsScore(score, responses))
+          score = calculateEpdsScore(responses as any)
+          ;({ interpretation, recommendations, riskLevel } = interpretEpdsScore(score, responses as any) as any)
           break
           
         case 'gcs':
-          score = calculateGcsScore(responses)
-          ;({ interpretation, recommendations, riskLevel } = interpretGcsScore(score))
+          score = calculateGcsScore(responses as any)
+          ;({ interpretation, recommendations, riskLevel } = interpretGcsScore(score) as any)
           break
           
         case 'ipss':
-          ;({ score, interpretation, recommendations, riskLevel, details } = calculateIpssScore(responses))
+          ;({ score, interpretation, recommendations, riskLevel, details } = calculateIpssScore(responses as any) as any)
           break
           
         case 'puqe':
-          score = calculatePuqeScore(responses)
-          ;({ interpretation, recommendations, riskLevel } = interpretPuqeScore(score))
+          score = calculatePuqeScore(responses as any)
+          ;({ interpretation, recommendations, riskLevel } = interpretPuqeScore(score) as any)
           break
           
         case 'westleycroupscore':
-          score = calculateWestleyCroupScore(responses)
-          ;({ interpretation, recommendations, riskLevel } = interpretWestleyCroupScore(score))
+          score = calculateWestleyCroupScore(responses as any)
+          ;({ interpretation, recommendations, riskLevel } = interpretWestleyCroupScore(score) as any)
           break
           
         case 'who5':
-          ;({ score, interpretation, recommendations, riskLevel, details } = calculateWho5Score(responses))
+          ;({ score, interpretation, recommendations, riskLevel, details } = calculateWho5Score(responses as any) as any)
           break
           
         case 'lrti':
-          ;({ score, interpretation, recommendations, riskLevel, details } = calculateLrtiScore(responses))
+          ;({ score, interpretation, recommendations, riskLevel, details } = calculateLrtiScore(responses as any) as any)
           break
           
         case 'score2':
-          ;({ score, interpretation, recommendations, riskLevel, details } = calculateScore2(responses))
+          ;({ score, interpretation, recommendations, riskLevel, details } = calculateScore2(responses as any) as any)
           break
           
         default:
@@ -341,7 +344,7 @@ export function useCalculatorFramework(config: CalculatorConfig) {
       }
 
       // Calculate result
-      const calculationResult = calculateScore(calculatorData.value)
+      const calculationResult = calculateScore(calculatorData.value as CalculatorResponses)
       result.value = calculationResult
       
       // Prepare submission data
@@ -467,7 +470,17 @@ export function useCalculatorFramework(config: CalculatorConfig) {
     }
   }
 
-  const formatResultsAsText = (data: any): string => {
+  const formatResultsAsText = (data: {
+    calculator: CalculatorConfig
+    patient: Partial<PatientData>
+    responses: Partial<CalculatorResponses>
+    result: CalculationResult
+    metadata: {
+      sessionId: string
+      duration: number
+      exportTime: string
+    }
+  }): string => {
     return `
 ${data.calculator.name} - Resultat
 
@@ -553,9 +566,14 @@ Metadata:
 // Calculator-specific scoring functions (simplified implementations)
 // These would be imported from separate modules in a real implementation
 
-function calculateAuditScore(responses: Record<string, any>): number {
-  // Validate all responses are numbers 0-4 (AUDIT scale)
-  const values = Object.values(responses)
+function calculateAuditScore(responses: CalculatorResponses): number {
+  // Type guard to ensure we have AUDIT responses
+  if (!('question1' in responses) || !('question10' in responses)) {
+    throw new Error('Invalid AUDIT response format')
+  }
+  
+  const auditResponses = responses as any // Cast for now until we have proper type checking
+  const values = Object.values(auditResponses)
   const invalidValues = values.filter(v => {
     const num = Number(v)
     return isNaN(num) || num < 0 || num > 4
@@ -566,30 +584,30 @@ function calculateAuditScore(responses: Record<string, any>): number {
   return values.reduce((sum: number, value: any) => sum + Number(value), 0)
 }
 
-function interpretAuditScore(score: number) {
+function interpretAuditScore(score: number): { interpretation: string; recommendations: string[]; riskLevel: RiskLevel } {
   if (score <= 7) {
     return {
       interpretation: 'Lavt risiko for alkoholmisbrug',
       recommendations: ['Fortsæt med moderat alkoholforbrug', 'Regelmæssig sundhedskontrol'],
-      riskLevel: 'low'
+      riskLevel: 'low' as RiskLevel
     }
   } else if (score <= 15) {
     return {
       interpretation: 'Moderat risiko for alkoholmisbrug',
       recommendations: ['Overvej at reducere alkoholforbrug', 'Tal med din læge om alkoholvaner'],
-      riskLevel: 'medium'
+      riskLevel: 'medium' as RiskLevel
     }
   } else if (score <= 19) {
     return {
       interpretation: 'Høj risiko for alkoholmisbrug',
       recommendations: ['Anbefales at søge professionel hjælp', 'Overvej alkoholbehandling'],
-      riskLevel: 'high'
+      riskLevel: 'high' as RiskLevel
     }
   } else {
     return {
       interpretation: 'Meget høj risiko for alkoholmisbrug',
       recommendations: ['Søg øjeblikkelig professionel hjælp', 'Kontakt alkoholbehandling'],
-      riskLevel: 'very_high'
+      riskLevel: 'very_high' as RiskLevel
     }
   }
 }
