@@ -488,10 +488,10 @@ export const getCalculatorSchema = (calculatorType: string) => {
 }
 
 // Validation helpers for score calculation
-export const validateCalculatorResponse = (calculatorType: string, responses: Record<string, any>): boolean => {
+export const validateCalculatorResponse = (calculatorType: string, data: Record<string, any>): boolean => {
   try {
     const schema = getCalculatorSchema(calculatorType)
-    schema.parse({ responses })
+    schema.parse(data)
     return true
   } catch {
     return false
