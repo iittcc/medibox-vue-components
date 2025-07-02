@@ -58,15 +58,16 @@
               icon="pi pi-sync" 
               severity="secondary" 
               class="rounded-lg" 
-              @click="resetQuestions"
+              @click="resetQuestionsEnhanced"
             />
           <!--  <Button label="Random" icon="pi pi-ban" severity="secondary" class="mr-3" @click="randomlyCheckQuestions"/>-->
       
             <Button 
               type="submit" 
-              label="Beregn" 
+              :label="isSubmitting ? 'Beregner...' : 'Beregn'"
               class="pr-6 pl-6 rounded-lg" 
-              icon="pi pi-calculator"
+              :icon="isSubmitting ? 'pi pi-spin pi-spinner' : 'pi pi-calculator'"
+              :disabled="isSubmitting"
             />
           </div>
         </form>
@@ -86,7 +87,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, onMounted, onUnmounted } from "vue";
 
 import Button from '@/volt/Button.vue';
 import SecondaryButton from '@/volt/SecondaryButton.vue';
@@ -96,6 +97,13 @@ import SurfaceCard from "./SurfaceCard.vue";
 import PersonInfo from "./PersonInfo.vue";
 import Message from '@/volt/Message.vue';
 import sendDataToServer from '../assets/sendDataToServer.ts';
+
+// New imports for enhanced functionality
+import { useErrorHandler } from '@/composables/useErrorHandler';
+import { useLogging } from '@/composables/useLogging';
+import { useValidation } from '@/composables/useValidation';
+import { AuditSchema } from '@/schemas/calculators';
+import { PatientPsychologySchema } from '@/schemas/patient';
 
 export interface Option {
   text: string;
@@ -125,16 +133,44 @@ export interface Result {
   score: number;
 }
 
+// Enhanced system integration
+const {
+  handleError,
+  showSuccess,
+  showWarning,
+  showInfo,
+  clearErrors
+} = useErrorHandler({
+  showToasts: true,
+  autoRetry: true,
+  calculatorType: 'audit'
+});
+
+const {
+  logCalculation,
+  logUserAction,
+  logValidationError,
+  logError,
+  logInfo,
+  newCorrelationId
+} = useLogging();
+
+const patientValidation = useValidation(PatientPsychologySchema);
+const auditValidation = useValidation(AuditSchema);
+
+// API Configuration
 const apiUrlServer = import.meta.env.VITE_API_URL;
 const apiUrl = apiUrlServer+'/index.php/callback/LogCB/log';
 const keyUrl = apiUrlServer+'/index.php/KeyServer/getPublicKey';
 
+// Component state
 const resultsSection = ref<HTMLDivElement | null>(null);
 const name = ref<string>("");
 const gender = ref<string>("Mand");
 const age = ref<number>(50);
 
 const formSubmitted = ref<boolean>(false);
+const isSubmitting = ref<boolean>(false);
 
 const resultsSection1 = ref<Result[]>([]);
 
@@ -143,6 +179,10 @@ const totalScore = ref<number>(0);
 const conclusion = ref<string>('');
 const conclusionSeverity = ref<string>('');
 const validationMessage = ref<string>('');
+
+// Session tracking
+const sessionId = ref<string>(newCorrelationId());
+const calculationStartTime = ref<Date | null>(null);
 
 const options1 = ref<Option[]>([
   { text: "Aldrig", value: 0 },
@@ -277,23 +317,48 @@ const getOptions = (type: keyof OptionsSets): Option[] => {
   return optionsSets[type].value;
 }
 
-const handleSubmit = () => {
+const handleSubmit = async () => {
+  if (isSubmitting.value) return;
 
   formSubmitted.value = true;
-
-  if (validateQuestions()) {
-    calculateResults();
-    scrollToResults();
-    sendDataToServer(apiUrl, keyUrl, generatePayload())
-    .then((data) => {
-      //console.log('Data successfully sent:', data);
-    })
-    .catch((error) => {
-      //console.error('Failed to send data:', error.message);
-    });
-  }
-
+  isSubmitting.value = true;
+  calculationStartTime.value = new Date();
   
+  clearErrors();
+
+  try {
+    logUserAction('form_submitted', {
+      sessionId: sessionId.value,
+      patientAge: age.value,
+      patientGender: gender.value
+    }, 'audit');
+
+    // Enhanced validation
+    if (!await validateQuestionsEnhanced()) {
+      return;
+    }
+
+    // Calculate results with logging
+    calculateResults();
+    
+    // Scroll to results
+    scrollToResults();
+
+    // Enhanced data submission
+    await submitDataEnhanced();
+
+    showSuccess('AUDIT beregning fuldført', 'Resultatet er beregnet og gemt.');
+    
+  } catch (error) {
+    await handleError(error as Error, {
+      component: 'AuditScore',
+      action: 'handleSubmit',
+      calculator: 'audit',
+      data: { sessionId: sessionId.value }
+    });
+  } finally {
+    isSubmitting.value = false;
+  }
 };
 
 const validateQuestions = (): boolean => {
@@ -392,6 +457,172 @@ const generatePayload = () => {
       scores: {
         totalScore: totalScore.value
       },
+      metadata: {
+        sessionId: sessionId.value,
+        calculationType: 'audit',
+        timestamp: new Date().toISOString(),
+        duration: calculationStartTime.value 
+          ? Math.round((new Date().getTime() - calculationStartTime.value.getTime()) / 1000)
+          : 0
+      }
     };
 }
+
+// Enhanced validation function
+const validateQuestionsEnhanced = async (): Promise<boolean> => {
+  try {
+    // Basic question validation
+    const allQuestions = [...questionsSection1.value];
+    const unansweredQuestions = allQuestions.filter(
+      (question) => question.answer === null
+    );
+    
+    if (unansweredQuestions.length > 0) {
+      validationMessage.value = 'Alle spørgsmål skal udfyldes.';
+      
+      logValidationError('missing_answers', 'Ikke alle spørgsmål er besvaret', {
+        unansweredCount: unansweredQuestions.length,
+        totalQuestions: allQuestions.length
+      }, 'audit');
+      
+      showWarning('Manglende svar', 'Alle spørgsmål skal besvares før beregning.');
+      return false;
+    }
+
+    // Patient information validation
+    const patientData = {
+      name: name.value,
+      age: age.value,
+      gender: gender.value === 'Mand' ? 'male' : 'female'
+    };
+
+    const patientValidationResult = await patientValidation.validateAll(patientData);
+    if (!patientValidationResult) {
+      logValidationError('patient_validation_failed', 'Patient information validation failed', {
+        errors: patientValidation.state.errors
+      }, 'audit');
+      
+      showWarning('Ugyldig patientinformation', 'Kontroller patientoplysningerne.');
+      return false;
+    }
+
+    // AUDIT-specific validation
+    const auditData = {
+      patient: patientData,
+      responses: {
+        question1: questionsSection1.value[0]?.answer ?? 0,
+        question2: questionsSection1.value[1]?.answer ?? 0,
+        question3: questionsSection1.value[2]?.answer ?? 0,
+        question4: questionsSection1.value[3]?.answer ?? 0,
+        question5: questionsSection1.value[4]?.answer ?? 0,
+        question6: questionsSection1.value[5]?.answer ?? 0,
+        question7: questionsSection1.value[6]?.answer ?? 0,
+        question8: questionsSection1.value[7]?.answer ?? 0,
+        question9: questionsSection1.value[8]?.answer ?? 0,
+        question10: questionsSection1.value[9]?.answer ?? 0
+      },
+      totalScore: totalScore.value,
+      riskLevel: conclusion.value.includes('alkoholafhængighed') ? 'high' : 'low'
+    };
+
+    // Clear validation message on success
+    validationMessage.value = '';
+    
+    logInfo('Validation successful', {
+      sessionId: sessionId.value,
+      patientAge: age.value
+    }, 'audit');
+    
+    return true;
+    
+  } catch (error) {
+    logValidationError('validation_error', 'Validation failed with error', {
+      error: error instanceof Error ? error.message : 'Unknown error'
+    }, 'audit');
+    
+    validationMessage.value = 'Der opstod en fejl under validering.';
+    return false;
+  }
+};
+
+// Enhanced data submission function
+const submitDataEnhanced = async (): Promise<void> => {
+  try {
+    const payload = generatePayload();
+    const correlationId = newCorrelationId();
+    
+    logInfo('Starting data submission', {
+      sessionId: sessionId.value,
+      correlationId,
+      payloadSize: JSON.stringify(payload).length
+    }, 'audit');
+
+    await sendDataToServer(apiUrl, keyUrl, payload, {
+      calculatorType: 'audit',
+      correlationId,
+      maxRetries: 3,
+      timeout: 30000,
+      onProgress: (attempt, maxRetries) => {
+        showInfo(`Sender data (forsøg ${attempt}/${maxRetries})`);
+      },
+      onError: (error, attempt) => {
+        logError('Data submission attempt failed', {
+          error: error.message,
+          attempt,
+          correlationId,
+          sessionId: sessionId.value
+        }, 'audit');
+      }
+    });
+
+    logCalculation('audit', {
+      answers: questionsSection1.value.map(q => q.answer),
+      patientInfo: { age: age.value, gender: gender.value }
+    }, {
+      totalScore: totalScore.value,
+      conclusion: conclusion.value,
+      severity: conclusionSeverity.value
+    });
+
+  } catch (error) {
+    logError('Data submission failed', {
+      error: error instanceof Error ? error.message : 'Unknown error',
+      sessionId: sessionId.value
+    }, 'audit');
+    
+    throw error; // Re-throw to be handled by the main error handler
+  }
+};
+
+// Enhanced reset function
+const resetQuestionsEnhanced = () => {
+  logUserAction('questions_reset', {
+    sessionId: sessionId.value
+  }, 'audit');
+  
+  resetQuestions();
+  clearErrors();
+  
+  // Generate new session
+  sessionId.value = newCorrelationId();
+  calculationStartTime.value = null;
+  
+  showInfo('Formular nulstillet', 'Alle felter er blevet nulstillet.');
+};
+
+// Lifecycle hooks
+onMounted(() => {
+  logUserAction('audit_calculator_opened', {
+    sessionId: sessionId.value
+  }, 'audit');
+});
+
+onUnmounted(() => {
+  if (calculationStartTime.value && !resultsSection1.value.length) {
+    logUserAction('audit_calculator_abandoned', {
+      sessionId: sessionId.value,
+      timeSpent: Math.round((new Date().getTime() - calculationStartTime.value.getTime()) / 1000)
+    }, 'audit');
+  }
+});
 </script>

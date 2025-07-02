@@ -1,12 +1,17 @@
-// src/main.ts
-import { createApp } from 'vue';               // Icons           // PrimeFlex
+// src/audit.ts - AUDIT Calculator Entry Point
+import { createApp } from 'vue';
 import 'material-design-icons-iconfont/dist/material-design-icons.css';
 import './assets/teal.css';
 import App from './Audit.vue';
 import PrimeVue from 'primevue/config';
+import ToastService from 'primevue/toastservice';
+
+// Enhanced error handling
+import { withErrorBoundary } from '@/utils/errorBoundary';
 
 const app = createApp(App);
 
+// Configure PrimeVue with Danish locale
 app.use(PrimeVue, {
     unstyled: true,
     locale: {
@@ -18,4 +23,22 @@ app.use(PrimeVue, {
         dateFormat : "dd/mm/yy" 
     }
 });
+
+// Add Toast service for notifications
+app.use(ToastService);
+
+// Wrap with error boundary for enhanced error handling
+withErrorBoundary(app, {
+    enableAutoRecovery: true,
+    maxRetries: 3,
+    showToast: true,
+    onError: (error, errorInfo) => {
+        console.error('AUDIT Calculator Error:', {
+            error: error.message,
+            errorInfo,
+            timestamp: new Date().toISOString()
+        });
+    }
+});
+
 app.mount('#app');
