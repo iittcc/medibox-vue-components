@@ -1,4 +1,4 @@
-import { ref, computed } from 'vue'
+import { ref, computed, readonly } from 'vue'
 import { nanoid } from 'nanoid'
 
 export interface LogEntry {
@@ -34,6 +34,13 @@ export enum LogCategory {
   AUDIT_TRAIL = 'audit_trail'
 }
 
+export interface MaskingRule {
+  keepLast?: number
+  keepFirst?: number
+  replacement?: string
+  customMask?: (value: string) => string
+}
+
 export interface LoggingConfig {
   maxLocalEntries?: number
   batchSize?: number
@@ -43,6 +50,9 @@ export interface LoggingConfig {
   logLevels?: LogLevel[]
   anonymizeData?: boolean
   remoteEndpoint?: string
+  sensitiveFields?: string[]
+  maskingRules?: Record<string, MaskingRule>
+  defaultMaskingRule?: MaskingRule
 }
 
 const DEFAULT_CONFIG: LoggingConfig = {
@@ -53,7 +63,16 @@ const DEFAULT_CONFIG: LoggingConfig = {
   enableRemoteLogging: true,
   logLevels: [LogLevel.ERROR, LogLevel.WARN, LogLevel.INFO, LogLevel.AUDIT],
   anonymizeData: true,
-  remoteEndpoint: '/api/logs'
+  remoteEndpoint: '/api/logs',
+  sensitiveFields: [
+    'cpr', 'personnummer', 'phone', 'telefon', 'email', 'navn', 'name',
+    'adresse', 'address', 'password', 'token', 'ssn', 'birthdate', 'fødselsdato'
+  ],
+  maskingRules: {},
+  defaultMaskingRule: {
+    keepLast: 2,
+    replacement: '*'
+  }
 }
 
 export function useLogging(config: Partial<LoggingConfig> = {}) {
@@ -65,7 +84,7 @@ export function useLogging(config: Partial<LoggingConfig> = {}) {
   const pendingBatch = ref<LogEntry[]>([])
   const isOnline = ref(navigator.onLine)
   
-  let flushTimer: NodeJS.Timeout | null = null
+  let flushTimer: ReturnType<typeof setTimeout> | null = null
 
   // Computed properties
   const errorLogs = computed(() => 
@@ -75,37 +94,94 @@ export function useLogging(config: Partial<LoggingConfig> = {}) {
     logEntries.value.filter(entry => entry.level === LogLevel.AUDIT)
   )
 
-  // Data anonymization
-  const anonymizeUserData = (data: Record<string, any>): Record<string, any> => {
+  // Data anonymization with configurable rules
+  const anonymizeUserData = (
+    data: Record<string, any>, 
+    customSensitiveFields?: string[],
+    customMaskingRules?: Record<string, MaskingRule>
+  ): Record<string, any> => {
     if (!finalConfig.anonymizeData) {
       return data
     }
 
-    const sensitiveFields = [
-      'name', 'navn', 'email', 'telefon', 'phone', 'address', 'adresse',
-      'cpr', 'ssn', 'personnummer', 'patient_id', 'patientId'
-    ]
+    const sensitiveFields = customSensitiveFields ?? finalConfig.sensitiveFields ?? []
+    const maskingRules = customMaskingRules ?? finalConfig.maskingRules ?? {}
+    const defaultRule = finalConfig.defaultMaskingRule ?? { keepLast: 2, replacement: '*' }
 
     const anonymized = { ...data }
     
-    for (const [key, value] of Object.entries(anonymized)) {
-      const lowerKey = key.toLowerCase()
+    const maskValue = (value: string, fieldKey: string): string => {
+      // Check for field-specific masking rule
+      const rule = maskingRules[fieldKey.toLowerCase()] ?? defaultRule
       
-      if (sensitiveFields.some(field => lowerKey.includes(field))) {
-        if (typeof value === 'string' && value.length > 0) {
-          anonymized[key] = `***${value.slice(-2)}` // Keep last 2 chars
+      if (rule.customMask) {
+        return rule.customMask(value)
+      }
+      
+      if (value.length === 0) return value
+      
+      const keepFirst = rule.keepFirst ?? 0
+      const keepLast = rule.keepLast ?? 2
+      const replacement = rule.replacement ?? '*'
+      
+      if (value.length <= keepFirst + keepLast) {
+        return replacement.repeat(Math.max(2, value.length))
+      }
+      
+      const start = keepFirst > 0 ? value.slice(0, keepFirst) : ''
+      const end = keepLast > 0 ? value.slice(-keepLast) : ''
+      const middleLength = value.length - keepFirst - keepLast
+      const middle = replacement.repeat(Math.max(1, middleLength))
+      
+      return start + middle + end
+    }
+
+    const processValue = (value: any, key: string): any => {
+      if (value === null || value === undefined) {
+        return value
+      }
+      
+      if (Array.isArray(value)) {
+        return value.map((item, index) => 
+          processValue(item, `${key}[${index}]`)
+        )
+      }
+      
+      if (typeof value === 'object') {
+        return processObject(value)
+      }
+      
+      return value
+    }
+
+    const processObject = (obj: Record<string, any>): Record<string, any> => {
+      const result: Record<string, any> = {}
+      
+      for (const [key, value] of Object.entries(obj)) {
+        const lowercaseKey = key.toLowerCase()
+        
+        // Check if field is sensitive
+        const isSensitive = sensitiveFields.some(field => 
+          lowercaseKey.includes(field.toLowerCase())
+        )
+        
+        if (isSensitive) {
+          if (typeof value === 'string') {
+            result[key] = maskValue(value, key)
+          } else if (typeof value === 'number') {
+            result[key] = maskValue(value.toString(), key)
+          } else {
+            result[key] = '[REDACTED]'
+          }
         } else {
-          anonymized[key] = '***'
+          result[key] = processValue(value, key)
         }
       }
       
-      // Anonymize nested objects
-      if (typeof value === 'object' && value !== null) {
-        anonymized[key] = anonymizeUserData(value)
-      }
+      return result
     }
-    
-    return anonymized
+
+    return processObject(anonymized)
   }
 
   // Core logging functions
@@ -139,8 +215,9 @@ export function useLogging(config: Partial<LoggingConfig> = {}) {
     logEntries.value.push(entry)
     
     // Maintain max local entries
-    if (logEntries.value.length > finalConfig.maxLocalEntries!) {
-      logEntries.value = logEntries.value.slice(-finalConfig.maxLocalEntries!)
+    const maxEntries = finalConfig.maxLocalEntries ?? 1000
+    if (logEntries.value.length > maxEntries) {
+      logEntries.value = logEntries.value.slice(-maxEntries)
     }
     
     // Add to pending batch for remote logging
@@ -148,7 +225,8 @@ export function useLogging(config: Partial<LoggingConfig> = {}) {
       pendingBatch.value.push(entry)
       
       // Flush if batch is full
-      if (pendingBatch.value.length >= finalConfig.batchSize!) {
+      const batchSize = finalConfig.batchSize ?? 10
+      if (pendingBatch.value.length >= batchSize) {
         flushLogs()
       }
     }
