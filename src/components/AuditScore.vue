@@ -49,6 +49,7 @@
                 AUDIT Score {{ framework.result.value?.score }} : {{ framework.result.value?.interpretation }}
               </template>
             </CopyDialog>
+
             <SecondaryButton
               label="Reset"
               icon="pi pi-sync"
@@ -62,6 +63,7 @@
               class="pr-6 pl-6 rounded-lg"
               :icon="framework.state.isSubmitting ? 'pi pi-spin pi-spinner' : 'pi pi-calculator'"
               :disabled="framework.state.isSubmitting || !framework.canProceed.value"
+
             />
           </div>
         </template>
@@ -85,7 +87,9 @@
 </template>
 
 <script setup lang="ts">
+
 import { ref } from "vue";
+
 import Button from '@/volt/Button.vue';
 import SecondaryButton from '@/volt/SecondaryButton.vue';
 import QuestionSingleComponent from "./QuestionSingleComponent.vue";
@@ -94,6 +98,13 @@ import SurfaceCard from "./SurfaceCard.vue";
 import PersonInfo from "./PersonInfo.vue";
 import Message from '@/volt/Message.vue';
 import { useCalculatorFramework, type CalculatorConfig, type CalculatorStep } from '@/composables/useCalculatorFramework';
+
+// New imports for enhanced functionality
+import { useErrorHandler } from '@/composables/useErrorHandler';
+import { useLogging } from '@/composables/useLogging';
+import { useValidation } from '@/composables/useValidation';
+import { AuditSchema } from '@/schemas/calculators';
+import { PatientPsychologySchema } from '@/schemas/patient';
 
 export interface Option {
   text: string;
@@ -123,6 +134,10 @@ const steps: CalculatorStep[] = [
   { id: 'calculator', title: 'AUDIT Questionnaire', order: 1, validation: true },
 ];
 framework.initializeSteps(steps);
+
+// Session tracking
+const sessionId = ref<string>(newCorrelationId());
+const calculationStartTime = ref<Date | null>(null);
 
 const options1 = ref<Option[]>([
   { text: "Aldrig", value: 0 },
@@ -256,6 +271,7 @@ const optionsSets = {
 const getOptions = (type: keyof OptionsSets): Option[] => {
   return optionsSets[type].value;
 }
+
 
 const resultsSection1 = ref(questionsSection1);
 

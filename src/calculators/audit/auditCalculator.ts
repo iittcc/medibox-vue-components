@@ -63,3 +63,4 @@ export class AuditCalculator extends BaseCalculator<CalculatorResponses> {
 }
 
 export const auditCalculator = new AuditCalculator();
+
