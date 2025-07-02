@@ -10,7 +10,7 @@ const app = createApp(App);
 app.use(PrimeVue, {
     unstyled: true,
     locale: {
-        monthNames : ['Januar','Februar','Marts','Arpil','Maj','Juni','Juli','August','September','Oktober','November','December'],
+        monthNames : ['Januar','Februar','Marts','April','Maj','Juni','Juli','August','September','Oktober','November','December'],
         monthNamesShort : ['Jan','Feb', 'Mar','Apr','Maj','Jun','Jul','Aug','Sep','Okt','Nov','Dev'],
         firstDayOfWeek : 1,
         dayNamesMin : ['Sø','Ma','Ti','On','To','Fr','Lø'],
