@@ -1,4 +1,4 @@
-import { type App, createApp, h, ref, type Component } from 'vue'
+import { type App, createApp, h, ref, onErrorCaptured, type Component } from 'vue'
 import { useToast } from 'primevue/usetoast'
 
 export interface ErrorInfo {
@@ -306,60 +306,54 @@ export const ErrorBoundary = {
       error.value = null
     }
 
-    return {
-      hasError,
-      error,
-      resetError,
-      render: () => {
-        if (hasError.value && props.fallback) {
-          return h(props.fallback, {
-            error: error.value,
-            resetError
-          })
-        }
-        
-        if (hasError.value) {
-          return h('div', {
-            class: 'medical-calculator-container p-4 text-center'
-          }, [
-            h('div', {
-              class: 'bg-red-50 border border-red-200 rounded-md p-4'
-            }, [
-              h('h3', {
-                class: 'text-lg font-medium text-red-800 mb-2'
-              }, 'Der opstod en fejl'),
-              h('p', {
-                class: 'text-red-700 mb-4'
-              }, 'Prøv at genindlæse siden eller kontakt support hvis problemet fortsætter.'),
-              h('button', {
-                class: 'bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700',
-                onClick: resetError
-              }, 'Prøv igen')
-            ])
-          ])
-        }
-
-        return slots.default?.()
+    // Use onErrorCaptured hook instead of errorCaptured method
+    onErrorCaptured((err: Error, instance: any) => {
+      const componentName = instance?.$options?.name || 'Unknown'
+      const context = { component: componentName, vueInstance: true }
+      
+      errorBoundaryManager.handleError(err, componentName, undefined, context)
+      
+      hasError.value = true
+      error.value = err
+      
+      if (props.onError) {
+        props.onError(err, { componentName })
       }
+      
+      return false
+    })
+
+    return () => {
+      if (hasError.value && props.fallback) {
+        return h(props.fallback, {
+          error: error.value,
+          resetError
+        })
+      }
+      
+      if (hasError.value) {
+        return h('div', {
+          class: 'medical-calculator-container p-4 text-center'
+        }, [
+          h('div', {
+            class: 'bg-red-50 border border-red-200 rounded-md p-4'
+          }, [
+            h('h3', {
+              class: 'text-lg font-medium text-red-800 mb-2'
+            }, 'Der opstod en fejl'),
+            h('p', {
+              class: 'text-red-700 mb-4'
+            }, 'Prøv at genindlæse siden eller kontakt support hvis problemet fortsætter.'),
+            h('button', {
+              class: 'bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700',
+              onClick: resetError
+            }, 'Prøv igen')
+          ])
+        ])
+      }
+
+      return slots.default?.()
     }
-  },
-  errorCaptured(error: Error, instance: any) {
-    const componentName = instance?.$options?.name || 'Unknown'
-    const context = { component: componentName, vueInstance: true }
-    
-    errorBoundaryManager.handleError(error, componentName, undefined, context)
-    
-    this.hasError = true
-    this.error = error
-    
-    if (this.onError) {
-      this.onError(error, { componentName })
-    }
-    
-    return false
-  },
-  render() {
-    return this.render()
   }
 }
 
