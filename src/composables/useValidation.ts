@@ -1,4 +1,4 @@
-import { ref, computed, reactive, watch, readonly, type Ref } from 'vue'
+import { ref, computed, reactive, watch, readonly, onUnmounted, type Ref } from 'vue'
 import { z, type ZodSchema, type ZodIssue } from 'zod'
 
 export interface ValidationRule<T = any> {
@@ -332,6 +332,9 @@ export function useValidation<T extends Record<string, any>>(
     validationTimeouts.forEach(timeout => clearTimeout(timeout))
     validationTimeouts.clear()
   }
+
+  // Automatic cleanup on component unmount
+  onUnmounted(cleanup)
 
   return {
     // State
