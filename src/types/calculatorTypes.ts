@@ -311,7 +311,10 @@ export const isDanpssResponses = (responses: CalculatorResponses): responses is 
 }
 
 export const isEpdsResponses = (responses: CalculatorResponses): responses is EpdsResponses => {
-  return 'question1' in responses && 'question10' in responses && Object.keys(responses).length === 10
+  return 'question1' in responses
+    && 'question10' in responses
+    && Object.keys(responses).length === 10
+    && !('question11' in responses)
 }
 
 export const isGcsResponses = (responses: CalculatorResponses): responses is GcsResponses => {
@@ -320,6 +323,26 @@ export const isGcsResponses = (responses: CalculatorResponses): responses is Gcs
 
 export const isLrtiResponses = (responses: CalculatorResponses): responses is LrtiResponses => {
   return 'temperature' in responses && 'respiratoryRate' in responses
+}
+
+export const isPuqeResponses = (responses: CalculatorResponses): responses is PuqeResponses => {
+  return 'nausea' in responses && 'vomiting' in responses && 'retching' in responses
+}
+
+export const isIpssResponses = (responses: CalculatorResponses): responses is IpssResponses => {
+  return 'incompleteEmptying' in responses && 'qualityOfLife' in responses
+}
+
+export const isWho5Responses = (responses: CalculatorResponses): responses is Who5Responses => {
+  return 'question1' in responses && 'question5' in responses && Object.keys(responses).length === 5
+}
+
+export const isWestleyCroupResponses = (responses: CalculatorResponses): responses is WestleyCroupResponses => {
+  return 'levelOfConsciousness' in responses && 'cyanosis' in responses
+}
+
+export const isScore2Responses = (responses: CalculatorResponses): responses is Score2Responses => {
+  return 'age' in responses && 'gender' in responses && 'region' in responses
 }
 
 // Export specific calculator types by name for easier imports
