@@ -87,7 +87,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from "vue";
+import { ref, computed, onMounted, onUnmounted } from "vue";
 
 import Button from '@/volt/Button.vue';
 import SecondaryButton from '@/volt/SecondaryButton.vue';
@@ -142,8 +142,7 @@ const {
   clearErrors
 } = useErrorHandler({
   showToasts: true,
-  autoRetry: true,
-  calculatorType: 'audit'
+  autoRetry: true
 });
 
 const {
@@ -468,6 +467,19 @@ const generatePayload = () => {
     };
 }
 
+// Helper function to map AUDIT score to risk level according to schema
+const getAuditRiskLevel = (score: number): 'low' | 'medium' | 'high' | 'very_high' => {
+  if (score <= 7) {
+    return 'low'
+  } else if (score <= 15) {
+    return 'medium'
+  } else if (score <= 19) {
+    return 'high'
+  } else {
+    return 'very_high'
+  }
+}
+
 // Enhanced validation function
 const validateQuestionsEnhanced = async (): Promise<boolean> => {
   try {
@@ -493,7 +505,7 @@ const validateQuestionsEnhanced = async (): Promise<boolean> => {
     const patientData = {
       name: name.value,
       age: age.value,
-      gender: gender.value === 'Mand' ? 'male' : 'female'
+      gender: gender.value === 'Mand' ? 'male' as const : 'female' as const
     };
 
     const patientValidationResult = await patientValidation.validateAll(patientData);
@@ -506,31 +518,16 @@ const validateQuestionsEnhanced = async (): Promise<boolean> => {
       return false;
     }
 
-    // AUDIT-specific validation
-    const auditData = {
-      patient: patientData,
-      responses: {
-        question1: questionsSection1.value[0]?.answer ?? 0,
-        question2: questionsSection1.value[1]?.answer ?? 0,
-        question3: questionsSection1.value[2]?.answer ?? 0,
-        question4: questionsSection1.value[3]?.answer ?? 0,
-        question5: questionsSection1.value[4]?.answer ?? 0,
-        question6: questionsSection1.value[5]?.answer ?? 0,
-        question7: questionsSection1.value[6]?.answer ?? 0,
-        question8: questionsSection1.value[7]?.answer ?? 0,
-        question9: questionsSection1.value[8]?.answer ?? 0,
-        question10: questionsSection1.value[9]?.answer ?? 0
-      },
-      totalScore: totalScore.value,
-      riskLevel: conclusion.value.includes('alkoholafhængighed') ? 'high' : 'low'
-    };
+    // Note: AUDIT-specific schema validation would be done here if needed
+    // Currently using component's own validation logic for backward compatibility
 
     // Clear validation message on success
     validationMessage.value = '';
     
     logInfo('Validation successful', {
       sessionId: sessionId.value,
-      patientAge: age.value
+      patientAge: age.value,
+      riskLevel: getAuditRiskLevel(totalScore.value)
     }, 'audit');
     
     return true;

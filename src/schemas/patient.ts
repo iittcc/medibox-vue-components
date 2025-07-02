@@ -3,9 +3,10 @@ import { z } from 'zod'
 // Base patient information schema
 export const PatientBaseSchema = z.object({
   name: z.string()
-    .min(1, 'Navn er påkrævet')
     .max(100, 'Navn må højst være 100 tegn')
-    .regex(/^[a-zA-ZæøåÆØÅ\s\-'\.]+$/, 'Navn må kun indeholde bogstaver, mellemrum, bindestreg, apostrof og punktum'),
+    .regex(/^[\p{L}\s\-'\.]*$/u, 'Navn må kun indeholde bogstaver, mellemrum, bindestreg, apostrof og punktum')
+    .optional()
+    .or(z.literal('')),
     
   age: z.number()
     .min(0, 'Alder skal være mindst 0')
