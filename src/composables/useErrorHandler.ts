@@ -1,4 +1,4 @@
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, readonly, onMounted, onUnmounted } from 'vue'
 import { useToast } from 'primevue/usetoast'
 import { errorBoundaryManager, type ErrorInfo, ErrorType } from '@/utils/errorBoundary'
 
@@ -252,42 +252,43 @@ export function useErrorHandler(options: ErrorHandlerOptions = {}) {
     }
   }
 
+  // Store event listener functions for proper cleanup
+  const handleMedicalCalculatorError = ((event: CustomEvent) => {
+    const errorInfo = event.detail as ErrorInfo
+    errors.value.push(errorInfo)
+    
+    if (showToasts) {
+      showErrorToast(errorInfo)
+    }
+  }) as EventListener
+
+  const handleMedicalCalculatorRecovery = ((event: CustomEvent) => {
+    const errorInfo = event.detail as ErrorInfo
+    if (onRecovery) {
+      onRecovery(errorInfo)
+    }
+  }) as EventListener
+
+  const handleShowErrorToast = ((event: CustomEvent) => {
+    const toastOptions = event.detail
+    toast.add(toastOptions)
+  }) as EventListener
+
   // Lifecycle hooks
   onMounted(() => {
     window.addEventListener('online', handleOnlineStatusChange)
     window.addEventListener('offline', handleOnlineStatusChange)
-    
-    // Listen for error boundary events
-    window.addEventListener('medicalCalculatorError', ((event: CustomEvent) => {
-      const errorInfo = event.detail as ErrorInfo
-      errors.value.push(errorInfo)
-      
-      if (showToasts) {
-        showErrorToast(errorInfo)
-      }
-    }) as EventListener)
-    
-    // Listen for recovery events
-    window.addEventListener('medicalCalculatorRecovery', ((event: CustomEvent) => {
-      const errorInfo = event.detail as ErrorInfo
-      if (onRecovery) {
-        onRecovery(errorInfo)
-      }
-    }) as EventListener)
-    
-    // Listen for toast events from error boundary
-    window.addEventListener('showErrorToast', ((event: CustomEvent) => {
-      const toastOptions = event.detail
-      toast.add(toastOptions)
-    }) as EventListener)
+    window.addEventListener('medicalCalculatorError', handleMedicalCalculatorError)
+    window.addEventListener('medicalCalculatorRecovery', handleMedicalCalculatorRecovery)
+    window.addEventListener('showErrorToast', handleShowErrorToast)
   })
 
   onUnmounted(() => {
     window.removeEventListener('online', handleOnlineStatusChange)
     window.removeEventListener('offline', handleOnlineStatusChange)
-    window.removeEventListener('medicalCalculatorError', handleOnlineStatusChange)
-    window.removeEventListener('medicalCalculatorRecovery', handleOnlineStatusChange)
-    window.removeEventListener('showErrorToast', handleOnlineStatusChange)
+    window.removeEventListener('medicalCalculatorError', handleMedicalCalculatorError)
+    window.removeEventListener('medicalCalculatorRecovery', handleMedicalCalculatorRecovery)
+    window.removeEventListener('showErrorToast', handleShowErrorToast)
   })
 
   return {
