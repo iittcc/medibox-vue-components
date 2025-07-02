@@ -13,8 +13,10 @@ import type {
   PatientData, 
   QuestionValue,
   RiskLevel,
-  MedicalChartData
+  MedicalChartData,
+  SpecificCalculatorDetails
 } from '@/types/calculatorTypes'
+import { calculateMedicalScore, isCalculatorImplemented } from '@/calculators'
 
 export interface CalculatorConfig {
   type: string
@@ -26,7 +28,7 @@ export interface CalculatorConfig {
   theme: 'sky' | 'teal' | 'orange'
   minAge?: number
   maxAge?: number
-  allowedGenders?: string[]
+  allowedGenders?: readonly string[]
   requiredFields?: string[]
   estimatedDuration?: number // in minutes
 }
@@ -55,7 +57,34 @@ export interface CalculatorState {
 
 // CalculationResult is now imported from types/calculatorTypes.ts
 
-export function useCalculatorFramework(config: CalculatorConfig) {
+export interface UseCalculatorFrameworkReturn {
+  config: Readonly<CalculatorConfig>
+  state: Readonly<CalculatorState>
+  steps: Readonly<Ref<CalculatorStep[]>>
+  patientData: Readonly<Ref<Partial<PatientData>>>
+  calculatorData: Readonly<Ref<Partial<CalculatorResponses>>>
+  result: Readonly<Ref<CalculationResult | null>>
+  progress: Ref<number>
+  canProceed: Ref<boolean>
+  isLastStep: Ref<boolean>
+  isFirstStep: Ref<boolean>
+  duration: Ref<number>
+  patientValidation: ReturnType<typeof useFormValidation>
+  calculatorValidation: ReturnType<typeof useFormValidation>
+  initializeSteps: (stepConfig: CalculatorStep[]) => void
+  nextStep: () => Promise<boolean>
+  previousStep: () => boolean
+  goToStep: (stepIndex: number) => boolean
+  updatePatientData: (data: Partial<PatientData>) => void
+  updateCalculatorData: (data: Partial<CalculatorResponses>) => void
+  setFieldValue: (section: 'patient' | 'calculator', field: string, value: QuestionValue) => void
+  calculateScore: (responses: CalculatorResponses) => CalculationResult
+  submitCalculation: () => Promise<boolean>
+  resetCalculator: () => void
+  exportResults: (format?: 'json' | 'pdf' | 'text') => string | object | null
+}
+
+export function useCalculatorFramework(config: CalculatorConfig): UseCalculatorFrameworkReturn {
   const {
     logCalculation,
     logUserAction,
@@ -232,94 +261,32 @@ export function useCalculatorFramework(config: CalculatorConfig) {
     }, config.type)
   }
 
-  // Calculation logic
+  // Calculation logic - now simplified and type-safe
   const calculateScore = (responses: CalculatorResponses): CalculationResult => {
     const startTime = Date.now()
     
     try {
-      // Get score range for validation
-      const { min, max } = getScoreRange(config.type)
+      let result: CalculationResult
       
-      let score = 0
-      let interpretation = ''
-      let recommendations: string[] = []
-      let riskLevel: RiskLevel = 'unknown'
-      let details: CalculatorDetails | undefined
-
-      // Calculator-specific logic
-      // Note: Using temporary type assertions to maintain existing functionality 
-      // while transitioning to proper types
-      switch (config.type) {
-        case 'audit':
-          score = calculateAuditScore(responses)
-          ;({ interpretation, recommendations, riskLevel } = interpretAuditScore(score))
-          break
-          
-        case 'danpss':
-          ;({ score, interpretation, recommendations, riskLevel, details } = calculateDanpssScore(responses as any) as any)
-          break
-          
-        case 'epds':
-          score = calculateEpdsScore(responses as any)
-          ;({ interpretation, recommendations, riskLevel } = interpretEpdsScore(score, responses as any) as any)
-          break
-          
-        case 'gcs':
-          score = calculateGcsScore(responses as any)
-          ;({ interpretation, recommendations, riskLevel } = interpretGcsScore(score) as any)
-          break
-          
-        case 'ipss':
-          ;({ score, interpretation, recommendations, riskLevel, details } = calculateIpssScore(responses as any) as any)
-          break
-          
-        case 'puqe':
-          score = calculatePuqeScore(responses as any)
-          ;({ interpretation, recommendations, riskLevel } = interpretPuqeScore(score) as any)
-          break
-          
-        case 'westleycroupscore':
-          score = calculateWestleyCroupScore(responses as any)
-          ;({ interpretation, recommendations, riskLevel } = interpretWestleyCroupScore(score) as any)
-          break
-          
-        case 'who5':
-          ;({ score, interpretation, recommendations, riskLevel, details } = calculateWho5Score(responses as any) as any)
-          break
-          
-        case 'lrti':
-          ;({ score, interpretation, recommendations, riskLevel, details } = calculateLrtiScore(responses as any) as any)
-          break
-          
-        case 'score2':
-          ;({ score, interpretation, recommendations, riskLevel, details } = calculateScore2(responses as any) as any)
-          break
-          
-        default:
-          throw new Error(`Unknown calculator type: ${config.type}`)
-      }
-
-      // Validate calculated score
-      if (score < min || score > max) {
-        throw new Error(`Calculated score ${score} is outside valid range ${min}-${max}`)
+      // Use new type-safe calculator modules if available
+      if (isCalculatorImplemented(config.type)) {
+        // Use the new modular calculator system - no unsafe casts!
+        result = calculateMedicalScore(config.type, responses)
+      } else {
+        // Fallback to legacy implementation for calculators not yet migrated
+        result = calculateScoreLegacy(responses)
       }
 
       const duration = Date.now() - startTime
       
       logCalculation(config.type, responses, {
-        score,
-        interpretation,
-        riskLevel,
+        score: result.score,
+        interpretation: result.interpretation,
+        riskLevel: result.riskLevel,
         duration
       }, duration)
 
-      return {
-        score,
-        interpretation,
-        recommendations,
-        riskLevel,
-        details
-      }
+      return result
     } catch (error) {
       logError('Calculation failed', {
         error: error instanceof Error ? error.message : 'Unknown error',
@@ -328,6 +295,70 @@ export function useCalculatorFramework(config: CalculatorConfig) {
       }, config.type)
       
       throw error
+    }
+  }
+
+  // Legacy calculation function for calculators not yet migrated
+  // TODO: Remove this function once all calculators are extracted
+  const calculateScoreLegacy = (responses: CalculatorResponses): CalculationResult => {
+    // Get score range for validation
+    const { min, max } = getScoreRange(config.type)
+    
+    let score = 0
+    let interpretation = ''
+    let recommendations: string[] = []
+    let riskLevel: RiskLevel = 'unknown'
+    let details: SpecificCalculatorDetails | undefined
+
+    // Legacy calculator-specific logic with unsafe casts
+    // Note: This will be removed as calculators are migrated
+    switch (config.type) {
+      case 'epds':
+        score = calculateEpdsScore(responses as any)
+        ;({ interpretation, recommendations, riskLevel } = interpretEpdsScore(score, responses as any) as any)
+        break
+        
+      case 'ipss':
+        ;({ score, interpretation, recommendations, riskLevel, details } = calculateIpssScore(responses as any) as any)
+        break
+        
+      case 'puqe':
+        score = calculatePuqeScore(responses as any)
+        ;({ interpretation, recommendations, riskLevel } = interpretPuqeScore(score) as any)
+        break
+        
+      case 'westleycroupscore':
+        score = calculateWestleyCroupScore(responses as any)
+        ;({ interpretation, recommendations, riskLevel } = interpretWestleyCroupScore(score) as any)
+        break
+        
+      case 'who5':
+        ;({ score, interpretation, recommendations, riskLevel, details } = calculateWho5Score(responses as any) as any)
+        break
+        
+      case 'lrti':
+        ;({ score, interpretation, recommendations, riskLevel, details } = calculateLrtiScore(responses as any) as any)
+        break
+        
+      case 'score2':
+        ;({ score, interpretation, recommendations, riskLevel, details } = calculateScore2(responses as any) as any)
+        break
+        
+      default:
+        throw new Error(`Calculator type '${config.type}' is not implemented in either new or legacy system`)
+    }
+
+    // Validate calculated score
+    if (score < min || score > max) {
+      throw new Error(`Calculated score ${score} is outside valid range ${min}-${max}`)
+    }
+
+    return {
+      score,
+      interpretation,
+      recommendations: Array.from(recommendations),
+      riskLevel,
+      details
     }
   }
 
@@ -526,14 +557,14 @@ Metadata:
 
   return {
     // Configuration
-    config: readonly(config),
+    config: readonly(config) as Readonly<CalculatorConfig>,
     
     // State
-    state: readonly(state),
-    steps: readonly(steps),
-    patientData: readonly(patientData),
-    calculatorData: readonly(calculatorData),
-    result: readonly(result),
+    state: readonly(state) as Readonly<CalculatorState>,
+    steps: readonly(steps) as Readonly<Ref<CalculatorStep[]>>,
+    patientData: readonly(patientData) as Readonly<Ref<Partial<PatientData>>>,
+    calculatorData: readonly(calculatorData) as Readonly<Ref<Partial<CalculatorResponses>>>,
+    result: readonly(result) as Readonly<Ref<CalculationResult | null>>,
     
     // Computed
     progress,
@@ -567,74 +598,8 @@ Metadata:
   }
 }
 
-// Calculator-specific scoring functions (simplified implementations)
-// These would be imported from separate modules in a real implementation
-
-function calculateAuditScore(responses: CalculatorResponses): number {
-  // Type guard to ensure we have AUDIT responses
-  if (!('question1' in responses) || !('question10' in responses)) {
-    throw new Error('Invalid AUDIT response format')
-  }
-  
-  const auditResponses = responses as any // Cast for now until we have proper type checking
-  const values = Object.values(auditResponses)
-  const invalidValues = values.filter(v => {
-    const num = Number(v)
-    return isNaN(num) || num < 0 || num > 4
-  })
-  if (invalidValues.length > 0) {
-    throw new Error('Invalid AUDIT response values')
-  }
-  return values.reduce((sum: number, value: any) => sum + Number(value), 0)
-}
-
-function interpretAuditScore(score: number): { interpretation: string; recommendations: string[]; riskLevel: RiskLevel } {
-  if (score <= 7) {
-    return {
-      interpretation: 'Lavt risiko for alkoholmisbrug',
-      recommendations: ['Fortsæt med moderat alkoholforbrug', 'Regelmæssig sundhedskontrol'],
-      riskLevel: 'low' as RiskLevel
-    }
-  } else if (score <= 15) {
-    return {
-      interpretation: 'Moderat risiko for alkoholmisbrug',
-      recommendations: ['Overvej at reducere alkoholforbrug', 'Tal med din læge om alkoholvaner'],
-      riskLevel: 'medium' as RiskLevel
-    }
-  } else if (score <= 19) {
-    return {
-      interpretation: 'Høj risiko for alkoholmisbrug',
-      recommendations: ['Anbefales at søge professionel hjælp', 'Overvej alkoholbehandling'],
-      riskLevel: 'high' as RiskLevel
-    }
-  } else {
-    return {
-      interpretation: 'Meget høj risiko for alkoholmisbrug',
-      recommendations: ['Søg øjeblikkelig professionel hjælp', 'Kontakt alkoholbehandling'],
-      riskLevel: 'very_high' as RiskLevel
-    }
-  }
-}
-
-function calculateDanpssScore(responses: Record<string, any>) {
-  const depressionQuestions = [1, 2, 3, 4, 5, 6, 7]
-  const anxietyQuestions = [8, 9, 10, 11, 12]
-  
-  const depressionScore = depressionQuestions.reduce((sum, q) => sum + (Number(responses[`question${q}`]) || 0), 0)
-  const anxietyScore = anxietyQuestions.reduce((sum, q) => sum + (Number(responses[`question${q}`]) || 0), 0)
-  const totalScore = depressionScore + anxietyScore
-  
-  const depressionLevel = depressionScore <= 5 ? 'none' : depressionScore <= 10 ? 'mild' : depressionScore <= 15 ? 'moderate' : 'severe'
-  const anxietyLevel = anxietyScore <= 3 ? 'none' : anxietyScore <= 6 ? 'mild' : anxietyScore <= 9 ? 'moderate' : 'severe'
-  
-  return {
-    score: totalScore,
-    interpretation: `Depression: ${depressionLevel}, Angst: ${anxietyLevel}`,
-    recommendations: ['Konsulter din læge', 'Overvej psykologisk støtte'],
-    riskLevel: totalScore <= 8 ? 'low' : totalScore <= 16 ? 'medium' : 'high',
-    details: { depressionScore, anxietyScore, depressionLevel, anxietyLevel }
-  }
-}
+// Legacy calculator functions for calculators not yet migrated to new system
+// TODO: Remove these functions as calculators are extracted to separate modules
 
 function calculateEpdsScore(responses: Record<string, any>): number {
   return Object.values(responses).reduce((sum: number, value: any) => sum + (Number(value) || 0), 0)
@@ -666,31 +631,6 @@ function interpretEpdsScore(score: number, responses: Record<string, any>) {
   }
 }
 
-function calculateGcsScore(responses: Record<string, any>): number {
-  return (responses.eyeOpening || 0) + (responses.verbalResponse || 0) + (responses.motorResponse || 0)
-}
-
-function interpretGcsScore(score: number) {
-  if (score <= 8) {
-    return {
-      interpretation: 'Alvorlig bevidsthedspåvirkning',
-      recommendations: ['Øjeblikkelig intensiv behandling', 'Neurolog konsultation'],
-      riskLevel: 'severe'
-    }
-  } else if (score <= 12) {
-    return {
-      interpretation: 'Moderat bevidsthedspåvirkning',
-      recommendations: ['Tæt observation', 'Neurolog vurdering'],
-      riskLevel: 'moderate'
-    }
-  } else {
-    return {
-      interpretation: 'Let bevidsthedspåvirkning',
-      recommendations: ['Observation', 'Follow-up efter behov'],
-      riskLevel: 'mild'
-    }
-  }
-}
 
 function calculateIpssScore(responses: Record<string, any>) {
   const symptomQuestions = ['incompleteEmptying', 'frequency', 'intermittency', 'urgency', 'weakStream', 'straining', 'nocturia']
