@@ -481,15 +481,57 @@ const copyResults = async () => {
   const resultText = generateResultText()
   
   try {
-    await navigator.clipboard.writeText(resultText)
-    toast.add({
-      severity: 'success',
-      summary: 'Kopieret',
-      detail: 'Resultatet er kopieret til udklipsholderen',
-      life: 3000
-    })
-    emit('copy')
+    // Try modern clipboard API first
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      try {
+        await navigator.clipboard.writeText(resultText)
+        toast.add({
+          severity: 'success',
+          summary: 'Kopieret',
+          detail: 'Resultatet er kopieret til udklipsholderen',
+          life: 3000
+        })
+        emit('copy')
+        return
+      } catch (clipboardError) {
+        console.warn('Clipboard API failed, falling back to textarea method:', clipboardError)
+      }
+    }
+    
+    // Fallback to textarea method for unsupported browsers or HTTPS issues
+    const textarea = document.createElement('textarea')
+    textarea.value = resultText
+    textarea.style.position = 'fixed'
+    textarea.style.left = '-9999px'
+    textarea.style.top = '-9999px'
+    textarea.style.opacity = '0'
+    textarea.setAttribute('readonly', '')
+    textarea.setAttribute('aria-hidden', 'true')
+    
+    document.body.appendChild(textarea)
+    
+    try {
+      textarea.select()
+      textarea.setSelectionRange(0, textarea.value.length)
+      
+      const successful = document.execCommand('copy')
+      if (successful) {
+        toast.add({
+          severity: 'success',
+          summary: 'Kopieret',
+          detail: 'Resultatet er kopieret til udklipsholderen',
+          life: 3000
+        })
+        emit('copy')
+      } else {
+        throw new Error('Document.execCommand copy failed')
+      }
+    } finally {
+      document.body.removeChild(textarea)
+    }
+    
   } catch (error) {
+    console.error('All copy methods failed:', error)
     toast.add({
       severity: 'error',
       summary: 'Fejl',
