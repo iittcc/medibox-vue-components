@@ -890,3 +890,4 @@ function calculateScore2(responses: Record<string, any>) {
     details: { riskFactors: { smoking: responses.smoking, hypertension: responses.systolicBP > 140 } }
   }
 }
+}
