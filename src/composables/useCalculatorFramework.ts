@@ -214,20 +214,16 @@ export function useCalculatorFramework(config: CalculatorConfig) {
   const setFieldValue = (section: 'patient' | 'calculator', field: string, value: QuestionValue) => {
     if (section === 'patient') {
       patientValidation.setFieldValue(field, value)
-   const setFieldValue = (section: 'patient' | 'calculator', field: string, value: QuestionValue) => {
-     if (section === 'patient') {
-       patientValidation.setFieldValue(field, value)
-       if (field in patientData.value || typeof patientData.value === 'object') {
-         Object.assign(patientData.value, { [field]: value })
-       }
-     } else {
-       calculatorValidation.setFieldValue(field, value)
-       if (typeof calculatorData.value === 'object') {
-         Object.assign(calculatorData.value, { [field]: value })
-       }
-     }
-   }
-    
+      if (field in patientData.value || typeof patientData.value === 'object') {
+        Object.assign(patientData.value, { [field]: value })
+      }
+    } else {
+      calculatorValidation.setFieldValue(field, value)
+      if (typeof calculatorData.value === 'object') {
+        Object.assign(calculatorData.value, { [field]: value })
+      }
+    }
+
     logUserAction('field_updated', {
       section,
       field,
