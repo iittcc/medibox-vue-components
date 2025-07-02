@@ -554,7 +554,16 @@ Metadata:
 // These would be imported from separate modules in a real implementation
 
 function calculateAuditScore(responses: Record<string, any>): number {
-  return Object.values(responses).reduce((sum: number, value: any) => sum + (Number(value) || 0), 0)
+  // Validate all responses are numbers 0-4 (AUDIT scale)
+  const values = Object.values(responses)
+  const invalidValues = values.filter(v => {
+    const num = Number(v)
+    return isNaN(num) || num < 0 || num > 4
+  })
+  if (invalidValues.length > 0) {
+    throw new Error('Invalid AUDIT response values')
+  }
+  return values.reduce((sum: number, value: any) => sum + Number(value), 0)
 }
 
 function interpretAuditScore(score: number) {
