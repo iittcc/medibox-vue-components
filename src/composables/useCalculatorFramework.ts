@@ -2,7 +2,7 @@ import { ref, computed, reactive, watch, onMounted, onUnmounted, readonly, type 
 import { useValidation, useFormValidation } from './useValidation'
 import { useErrorHandler } from './useErrorHandler'
 import { useLogging } from './useLogging'
-import { getCalculatorSchema, getScoreRange, type CalculatorResult } from '@/schemas/calculators'
+import { getCalculatorQuestionSchema, getScoreRange } from '@/schemas/calculators'
 import { getPatientSchemaForCalculator } from '@/schemas/patient'
 import sendDataToServer, { type SendDataOptions } from '@/assets/sendDataToServer'
 import { nanoid } from 'nanoid'
@@ -123,7 +123,7 @@ export function useCalculatorFramework(config: CalculatorConfig): UseCalculatorF
 
   // Validation setup
   const patientSchema = getPatientSchemaForCalculator(config.type)
-  const calculatorSchema = getCalculatorSchema(config.type)
+  const calculatorSchema = getCalculatorQuestionSchema(config.type)
   
   const patientValidation = useFormValidation(patientSchema)
   const calculatorValidation = useFormValidation(calculatorSchema)

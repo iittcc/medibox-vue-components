@@ -487,6 +487,24 @@ export const getCalculatorSchema = (calculatorType: string) => {
   return schemas[calculatorType] || z.object({})
 }
 
+// Utility function to get only question/response schema for calculator type
+export const getCalculatorQuestionSchema = (calculatorType: string) => {
+  const schemas: Record<string, z.ZodSchema> = {
+    'audit': AuditQuestionSchema,
+    'danpss': DanpssQuestionSchema,
+    'epds': EpdsQuestionSchema,
+    'gcs': GcsSchema, // GCS doesn't have a separate question schema
+    'ipss': IpssQuestionSchema,
+    'lrti': LrtiSchema, // LRTI has a different structure
+    'puqe': PuqeQuestionSchema,
+    'westleycroupscore': WestleyCroupSchema, // Different structure
+    'who5': Who5QuestionSchema,
+    'score2': Score2Schema // Different structure
+  }
+  
+  return schemas[calculatorType] || z.object({})
+}
+
 // Validation helpers for score calculation
 export const validateCalculatorResponse = (calculatorType: string, data: Record<string, any>): boolean => {
   try {

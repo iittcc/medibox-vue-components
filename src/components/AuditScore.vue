@@ -5,11 +5,11 @@
       <SurfaceCard title="Patient">
         <template #content>
           <PersonInfo
-            :name="framework.patientData.value.name"
-            :age="framework.patientData.value.age"
+            :name="framework.patientData.value.name || ''"
+            :age="framework.patientData.value.age || 50"
             :minAge="10"
             :maxAge="110"
-            :gender="framework.patientData.value.gender"
+            :gender="framework.patientData.value.gender || 'Mand'"
             genderdisplay="block"
             @update:name="framework.setFieldValue('patient', 'name', $event)"
             @update:age="framework.setFieldValue('patient', 'age', $event)"
@@ -20,17 +20,21 @@
 
       <SurfaceCard :title="config.name">
         <template #content>
-          <QuestionSingleComponent
-            v-for="(question, index) in questionsSection1"
-            :key="index"
-            :question="question"
-            :options="getOptions(question.optionsType as keyof OptionsSets)"
-            :index="index"
-            :answer="framework.calculatorData.value[question.id]"
-            @update:answer="framework.setFieldValue('calculator', question.id, $event)"
-          />
+          <form @submit.prevent="handleSubmit">
+            <QuestionSingleComponent
+              v-for="(question, index) in questionsSection1"
+              :key="index"
+              :name="question.id"
+              :question="question"
+              :options="getOptions(question.optionsType as keyof OptionsSets)"
+              :index="index"
+              :is-unanswered="formSubmitted && isUnanswered(question)"
+            />
+            <div v-if="validationMessage" class="text-red-500 mt-5 font-bold">
+              {{ validationMessage }}
+            </div>
 
-          <div class="flex justify-end mt-5 gap-3">
+            <div class="flex justify-end mt-5 gap-3">
             <CopyDialog
               title="Kopier til Clipboard"
               icon="pi pi-clipboard"
@@ -44,7 +48,7 @@
                 Navn: {{ framework.patientData.value.name }} <br />
                 Køn: {{ framework.patientData.value.gender }} <br />
                 Alder: {{ framework.patientData.value.age }} år<br /><br />
-                <div v-for="(question, index) in resultsSection1" >{{ question.text }} {{ framework.calculatorData.value[question.id] }}</div />
+                <div v-for="question in resultsSection1" :key="question.id" >{{ question.text }} {{ (framework.calculatorData.value as any)[question.id] }}</div>
                 <br /><br />
                 AUDIT Score {{ framework.result.value?.score }} : {{ framework.result.value?.interpretation }}
               </template>
@@ -55,17 +59,17 @@
               icon="pi pi-sync"
               severity="secondary"
               class="rounded-lg"
-              @click="framework.resetCalculator"
+              @click="handleReset"
             />
             <Button
-              @click="framework.submitCalculation"
+              type="submit"
               :label="framework.state.isSubmitting ? 'Beregner...' : 'Beregn'"
               class="pr-6 pl-6 rounded-lg"
               :icon="framework.state.isSubmitting ? 'pi pi-spin pi-spinner' : 'pi pi-calculator'"
-              :disabled="framework.state.isSubmitting || !framework.canProceed.value"
-
+              :disabled="framework.state.isSubmitting"
             />
-          </div>
+            </div>
+          </form>
         </template>
       </SurfaceCard>
 
@@ -87,9 +91,7 @@
 </template>
 
 <script setup lang="ts">
-
-import { ref } from "vue";
-
+import { ref, watch, reactive } from "vue";
 import Button from '@/volt/Button.vue';
 import SecondaryButton from '@/volt/SecondaryButton.vue';
 import QuestionSingleComponent from "./QuestionSingleComponent.vue";
@@ -130,14 +132,18 @@ const config: CalculatorConfig = {
 
 const framework = useCalculatorFramework(config);
 
+// Form validation state
+const formSubmitted = ref(false);
+const validationMessage = ref('');
+
 const steps: CalculatorStep[] = [
   { id: 'calculator', title: 'AUDIT Questionnaire', order: 1, validation: true },
 ];
 framework.initializeSteps(steps);
 
-// Session tracking
-const sessionId = ref<string>(newCorrelationId());
-const calculationStartTime = ref<Date | null>(null);
+// Initialize with default patient data
+framework.setFieldValue('patient', 'age', 50);
+framework.setFieldValue('patient', 'gender', 'Mand');
 
 const options1 = ref<Option[]>([
   { text: "Aldrig", value: 0 },
@@ -178,86 +184,96 @@ const options5 = ref<Option[]>([
 ]);
 
 const questionsSection1 = [
-  {
+  reactive({
     id: 'question1',
     type: 'Listbox',
     bg: '--p-primary-100',
     text: "1. Hvor tit drikker du alkohol?",
     description: "",
     optionsType: 'options1',
-  },
-  {
+    answer: null,
+  }),
+  reactive({
     id: 'question2',
     type: 'Listbox',
     bg: '--p-primary-50',
     text: "2. Hvor mange genstande drikker du almindeligvis, når du drikker noget?",
     description: "",
     optionsType: 'options2',
-  },
-  {
+    answer: null,
+  }),
+  reactive({
     id: 'question3',
     type: 'Listbox',
     bg: '--p-primary-100',
     text: "3. Hvor tit drikker du fem genstande eller flere ved samme lejlighed?",
     description: "",
     optionsType: 'options3',
-  },
-  {
+    answer: null,
+  }),
+  reactive({
     id: 'question4',
     type: 'Listbox',
     bg: '--p-primary-50',
     text: "4. Har du inden for det seneste år oplevet, at du ikke kunne stoppe, når du først var begyndt at drikke?",
     description: "",
     optionsType: 'options3',
-  },
-  {
+    answer: null,
+  }),
+  reactive({
     id: 'question5',
     type: 'Listbox',
     bg: '--p-primary-100',
     text: "5. Har du inden for det seneste år oplevet, at du ikke kunne gøre det, du skulle, fordi du havde drukket?",
     description: "",
     optionsType: 'options4',
-  },
-  {
+    answer: null,
+  }),
+  reactive({
     id: 'question6',
     type: 'Listbox',
     bg: '--p-primary-50',
     text: "6. Har du inden for det seneste år måttet have en lille én om morgenen, efter at du havde drukket meget dagen før?",
     description: "",
     optionsType: 'options4',
-  },
-  {
+    answer: null,
+  }),
+  reactive({
     id: 'question7',
     type: 'Listbox',
     bg: '--p-primary-100',
     text: "7. Har du inden for det seneste år haft dårlig samvittighed eller fortrudt, efter du har drukket?",
     description: "",
     optionsType: 'options4',
-  },
-  {
+    answer: null,
+  }),
+  reactive({
     id: 'question8',
     type: 'Listbox',
     bg: '--p-primary-50',
     text: "8. Har du inden for det seneste år oplevet, at du ikke kunne huske, hvad der skete aftenen før, fordi du havde drukket?",
     description: "",
     optionsType: 'options4',
-  },
-  {
+    answer: null,
+  }),
+  reactive({
     id: 'question9',
     type: 'Listbox',
     bg: '--p-primary-100',
     text: "9. Er du selv eller andre nogensinde kommet til skade ved en ulykke, fordi du havde drukket?",
     description: "",
     optionsType: 'options5',
-  },
-  {
+    answer: null,
+  }),
+  reactive({
     id: 'question10',
     type: 'Listbox',
     bg: '--p-primary-50',
-    text: "10. Har nogen i familien, en ven, en læge eller andre været bekymret over dine alkoholvaner eller foreslået dig at sætte forbruget ned?",
+    text: "10. Har nogen i familien, en ven, en læge eller andre været bekymred over dine alkoholvaner eller foreslået dig at sætte forbruget ned?",
     description: "",
     optionsType: 'options5',
-  }
+    answer: null,
+  })
 ];
 
 const optionsSets = {
@@ -272,7 +288,52 @@ const getOptions = (type: keyof OptionsSets): Option[] => {
   return optionsSets[type].value;
 }
 
+const resultsSection1 = questionsSection1;
 
-const resultsSection1 = ref(questionsSection1);
+// Sync question answers to framework data
+questionsSection1.forEach(question => {
+  watch(() => question.answer, (newValue) => {
+    if (newValue !== null) {
+      framework.setFieldValue('calculator', question.id, newValue)
+    }
+  })
+})
+
+// Validation functions
+const isUnanswered = (question: any): boolean => {
+  return question.answer === null || question.answer === undefined;
+};
+
+const validateQuestions = (): boolean => {
+  const unansweredQuestions = questionsSection1.filter(isUnanswered);
+  
+  if (unansweredQuestions.length > 0) {
+    validationMessage.value = `Udfyld venligst alle spørgsmål før beregning (${unansweredQuestions.length} mangler)`;
+    return false;
+  }
+  
+  validationMessage.value = '';
+  return true;
+};
+
+const handleSubmit = async () => {
+  formSubmitted.value = true;
+  
+  if (validateQuestions()) {
+    // All questions answered, proceed with calculation
+    try {
+      await framework.submitCalculation();
+    } catch (error) {
+      console.error('Submit error:', error);
+      validationMessage.value = 'Der opstod en fejl ved beregning. Prøv igen.';
+    }
+  }
+};
+
+const handleReset = () => {
+  formSubmitted.value = false;
+  validationMessage.value = '';
+  framework.resetCalculator();
+};
 
 </script>
