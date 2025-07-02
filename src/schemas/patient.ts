@@ -223,76 +223,65 @@ export const validateBMI = (bmi: number): { isValid: boolean; category: string; 
   }
 }
 
-// Danish CPR validation with checksum
 export const validateDanishCPR = (cpr: string): { isValid: boolean; error?: string } => {
   // Remove any dashes or spaces
   const cleanCpr = cpr.replace(/[-\s]/g, '')
-  
+
   // Check basic format
   if (!/^\d{10}$/.test(cleanCpr)) {
     return { isValid: false, error: 'CPR skal være 10 cifre (DDMMYYXXXX)' }
   }
-  
+
   // Extract date parts
   const day = parseInt(cleanCpr.substring(0, 2))
   const month = parseInt(cleanCpr.substring(2, 4))
   const year = parseInt(cleanCpr.substring(4, 6))
-  
+
   // Basic date validation
   if (day < 1 || day > 31) {
     return { isValid: false, error: 'Ugyldig dag i CPR nummer' }
   }
-  
   if (month < 1 || month > 12) {
     return { isValid: false, error: 'Ugyldig måned i CPR nummer' }
   }
-  
+
   // Determine century and full year
   const centuryDigit = parseInt(cleanCpr.substring(6, 7))
   let fullYear: number
-  
   if (centuryDigit <= 3) {
     fullYear = 1900 + year
   } else if (centuryDigit === 4 || centuryDigit === 9) {
-    if (year <= 36) {
-      fullYear = 2000 + year
-    } else {
-      fullYear = 1900 + year
-    }
+    fullYear = year <= 36 ? 2000 + year : 1900 + year
   } else {
-    if (year <= 57) {
-      fullYear = 2000 + year
-    } else {
-      fullYear = 1800 + year
-    }
+    fullYear = year <= 57 ? 2000 + year : 1800 + year
   }
-  
+
   // Check if date is valid
   const testDate = new Date(fullYear, month - 1, day)
-  if (testDate.getFullYear() !== fullYear || 
-      testDate.getMonth() !== month - 1 || 
-      testDate.getDate() !== day) {
+  if (
+    testDate.getFullYear() !== fullYear ||
+    testDate.getMonth() !== month - 1 ||
+    testDate.getDate() !== day
+  ) {
     return { isValid: false, error: 'Ugyldig dato i CPR nummer' }
   }
-  
+
   // Check if future date
   if (testDate > new Date()) {
     return { isValid: false, error: 'CPR nummer kan ikke være en fremtidig dato' }
   }
-  
-  // Simple checksum validation (simplified version)
+
   // Note: Full CPR validation includes complex checksum rules that vary by period
+  // Conditional checksum validation: only enforce for legacy CPRs (pre-2007)
   const weights = [4, 3, 2, 7, 6, 5, 4, 3, 2, 1]
-  let sum = 0
-  
-  for (let i = 0; i < 10; i++) {
-    sum += parseInt(cleanCpr[i]) * weights[i]
+  const sum = cleanCpr
+    .split('')
+    .reduce((acc, digit, idx) => acc + parseInt(digit) * weights[idx], 0)
+  const legacyThresholdYear = 2007
+  if (fullYear < legacyThresholdYear && sum % 11 !== 0) {
+    return { isValid: false, error: 'Ugyldig CPR nummer checksum (legacy rule)' }
   }
-  
-  if (sum % 11 !== 0) {
-    return { isValid: false, error: 'Ugyldig CPR nummer checksum' }
-  }
-  
+
   return { isValid: true }
 }
 
