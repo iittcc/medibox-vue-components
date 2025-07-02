@@ -1,7 +1,8 @@
 import { ref, computed, reactive, watch, readonly, onUnmounted, type Ref } from 'vue'
 import { z, type ZodSchema, type ZodIssue } from 'zod'
+import type { QuestionValue } from '@/types/calculatorTypes'
 
-export interface ValidationRule<T = any> {
+export interface ValidationRule<T = QuestionValue> {
   schema: ZodSchema<T>
   message?: string
   trigger?: 'change' | 'blur' | 'submit'
@@ -13,7 +14,7 @@ export interface ValidationError {
   message: string
   code: string
   path: (string | number)[]
-  received?: any
+  received?: QuestionValue
 }
 
 export interface ValidationState {
@@ -83,7 +84,7 @@ export function useValidation<T extends Record<string, any>>(
   // Validation methods
   const validateField = async (
     fieldName: string, 
-    value: any,
+    value: QuestionValue,
     options: { debounce?: number; silent?: boolean } = {}
   ): Promise<boolean> => {
     const { debounce = 0, silent = false } = options
@@ -112,7 +113,7 @@ export function useValidation<T extends Record<string, any>>(
 
   const performFieldValidation = async (
     fieldName: string, 
-    value: any, 
+    value: QuestionValue, 
     silent: boolean = false
   ): Promise<boolean> => {
     if (!silent) {
@@ -218,7 +219,7 @@ export function useValidation<T extends Record<string, any>>(
     }
   }
 
-  const setFieldValue = (fieldName: string, value: any, options: {
+  const setFieldValue = (fieldName: string, value: QuestionValue, options: {
     validate?: boolean
     touch?: boolean
     markDirty?: boolean
