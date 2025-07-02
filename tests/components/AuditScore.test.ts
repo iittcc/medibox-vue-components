@@ -2,12 +2,13 @@ import { describe, expect, test, vi, beforeEach } from 'vitest';
 import { mount } from '@vue/test-utils';
 import AuditScore from '@/components/AuditScore.vue';
 import { ref } from 'vue';
+import type { CalculationResult } from '@/types/calculatorTypes'; // adjust path as needed
 
 // Mock the framework
 const mockFramework = {
-  patientData: ref({ name: 'Test Patient', age: 45, gender: 'male' }),
+  patientData: ref({ name: 'Test Patient', age: 45, gender: 'Mand' }),
   calculatorData: ref({ question1: 1, question2: 2 }),
-  result: ref(null),
+  result: ref<CalculationResult | null>(null),
   state: ref({ isSubmitting: false, isComplete: false }),
   canProceed: ref(true),
   setFieldValue: vi.fn(),
