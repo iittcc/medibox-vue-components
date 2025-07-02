@@ -1,4 +1,4 @@
-import { ref, computed, reactive, watch, type Ref } from 'vue'
+import { ref, computed, reactive, watch, readonly, type Ref } from 'vue'
 import { z, type ZodSchema, type ZodIssue } from 'zod'
 
 export interface ValidationRule<T = any> {
@@ -441,7 +441,7 @@ export function useFormValidation<T extends Record<string, any>>(
     if (isValid) {
       await onValid(validation.data.value as T)
     } else if (onInvalid) {
-      onInvalid(validation.state.errors)
+      onInvalid(validation.state.errors as ValidationError[])
     }
   }
   
