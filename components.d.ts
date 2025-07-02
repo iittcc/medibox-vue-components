@@ -10,7 +10,6 @@ declare module 'vue' {
   export interface GlobalComponents {
     AuditScore: typeof import('./src/components/AuditScore.vue')['default']
     Button: typeof import('primevue/button')['default']
-    Chart: typeof import('primevue/chart')['default']
     CopyDialog: typeof import('./src/components/CopyDialog.vue')['default']
     CustomIcon: typeof import('./src/components/CustomIcon.vue')['default']
     CustomSlider: typeof import('./src/components/CustomSlider.vue')['default']
@@ -39,7 +38,6 @@ declare module 'vue' {
     RiskAssessment: typeof import('./src/components/RiskAssessment.vue')['default']
     SurfaceCard: typeof import('./src/components/SurfaceCard.vue')['default']
     SurfaceCardItem: typeof import('./src/components/SurfaceCardItem.vue')['default']
-    ToggleButton: typeof import('primevue/togglebutton')['default']
     WestleyCroupScore: typeof import('./src/components/WestleyCroupScore.vue')['default']
     Who5Score: typeof import('./src/components/Who-5Score.vue')['default']
   }
