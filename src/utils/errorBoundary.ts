@@ -16,7 +16,61 @@ export enum ErrorType {
   NETWORK = 'network',
   CALCULATION = 'calculation',
   VALIDATION = 'validation',
+  UI = 'ui',
+  SECURITY = 'security',
+  DATA = 'data',
   UNKNOWN = 'unknown'
+}
+
+// Custom error classes for reliable categorization
+export class MedicalCalculatorError extends Error {
+  public readonly errorType: ErrorType
+  public readonly errorCode?: string
+  public readonly context?: Record<string, any>
+
+  constructor(message: string, errorType: ErrorType, errorCode?: string, context?: Record<string, any>) {
+    super(message)
+    this.name = this.constructor.name
+    this.errorType = errorType
+    this.errorCode = errorCode
+    this.context = context
+  }
+}
+
+export class NetworkError extends MedicalCalculatorError {
+  constructor(message: string, errorCode?: string, context?: Record<string, any>) {
+    super(message, ErrorType.NETWORK, errorCode, context)
+  }
+}
+
+export class CalculationError extends MedicalCalculatorError {
+  constructor(message: string, errorCode?: string, context?: Record<string, any>) {
+    super(message, ErrorType.CALCULATION, errorCode, context)
+  }
+}
+
+export class ValidationError extends MedicalCalculatorError {
+  constructor(message: string, errorCode?: string, context?: Record<string, any>) {
+    super(message, ErrorType.VALIDATION, errorCode, context)
+  }
+}
+
+export class UIError extends MedicalCalculatorError {
+  constructor(message: string, errorCode?: string, context?: Record<string, any>) {
+    super(message, ErrorType.UI, errorCode, context)
+  }
+}
+
+export class SecurityError extends MedicalCalculatorError {
+  constructor(message: string, errorCode?: string, context?: Record<string, any>) {
+    super(message, ErrorType.SECURITY, errorCode, context)
+  }
+}
+
+export class DataError extends MedicalCalculatorError {
+  constructor(message: string, errorCode?: string, context?: Record<string, any>) {
+    super(message, ErrorType.DATA, errorCode, context)
+  }
 }
 
 export interface ErrorBoundaryConfig {
@@ -41,20 +95,89 @@ class ErrorBoundaryManager {
   }
 
   categorizeError(error: Error): ErrorType {
-    const message = error.message.toLowerCase()
-    
-    if (message.includes('network') || message.includes('fetch') || message.includes('cors')) {
+    // Check if it's one of our custom error classes first
+    if (error instanceof MedicalCalculatorError) {
+      return error.errorType
+    }
+
+    // Check for specific error types by constructor name
+    if (error instanceof TypeError && error.message.includes('fetch')) {
       return ErrorType.NETWORK
     }
-    
-    if (message.includes('calculation') || message.includes('score') || message.includes('invalid result')) {
-      return ErrorType.CALCULATION
+
+    // Check for error codes or properties
+    const errorWithCode = error as any
+    if (errorWithCode.code) {
+      switch (errorWithCode.code) {
+        case 'NETWORK_ERROR':
+        case 'ENOTFOUND':
+        case 'ECONNREFUSED':
+        case 'TIMEOUT':
+          return ErrorType.NETWORK
+        case 'VALIDATION_ERROR':
+        case 'INVALID_INPUT':
+          return ErrorType.VALIDATION
+        case 'CALCULATION_ERROR':
+        case 'MATH_ERROR':
+          return ErrorType.CALCULATION
+        case 'SECURITY_ERROR':
+        case 'UNAUTHORIZED':
+        case 'FORBIDDEN':
+          return ErrorType.SECURITY
+        case 'DATA_ERROR':
+        case 'PARSE_ERROR':
+          return ErrorType.DATA
+        default:
+          break
+      }
     }
-    
-    if (message.includes('validation') || message.includes('required') || message.includes('invalid input')) {
+
+    // Fallback to message-based categorization for third-party errors
+    const message = error.message.toLowerCase()
+    const stack = error.stack?.toLowerCase() || ''
+
+    // Network errors
+    if (message.includes('network') || message.includes('fetch') || 
+        message.includes('timeout') || message.includes('connection') ||
+        message.includes('cors') || message.includes('xhr')) {
+      return ErrorType.NETWORK
+    }
+
+    // Validation errors
+    if (message.includes('validation') || message.includes('invalid') || 
+        message.includes('required') || message.includes('format') ||
+        message.includes('schema') || message.includes('constraint')) {
       return ErrorType.VALIDATION
     }
-    
+
+    // Calculation errors
+    if (message.includes('calculation') || message.includes('score') || 
+        message.includes('math') || message.includes('division') ||
+        message.includes('nan') || message.includes('infinity')) {
+      return ErrorType.CALCULATION
+    }
+
+    // UI errors
+    if (message.includes('render') || message.includes('component') || 
+        stack.includes('vue') || stack.includes('render') ||
+        message.includes('template') || message.includes('directive')) {
+      return ErrorType.UI
+    }
+
+    // Security errors
+    if (message.includes('unauthorized') || message.includes('forbidden') || 
+        message.includes('security') || message.includes('permission') ||
+        message.includes('csrf') || message.includes('xss')) {
+      return ErrorType.SECURITY
+    }
+
+    // Data errors
+    if (message.includes('data') || message.includes('parse') || 
+        message.includes('json') || message.includes('corrupt') ||
+        message.includes('serialize') || message.includes('deserialize')) {
+      return ErrorType.DATA
+    }
+
     return ErrorType.UNKNOWN
   }
 
@@ -248,14 +371,32 @@ export function withErrorBoundary(app: App, config?: ErrorBoundaryConfig) {
     errorBoundaryManager.handleError(error, componentName)
   }
 
-  // Global error handler for unhandled promises
-  window.addEventListener('unhandledrejection', (event) => {
+  // Store global event handler for proper cleanup
+  const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
     errorBoundaryManager.handleError(
       new Error(event.reason?.message || 'Unhandled Promise Rejection'),
       'Global',
       'Promise'
     )
-  })
+  }
+
+  // Global error handler for unhandled promises
+  window.addEventListener('unhandledrejection', handleUnhandledRejection)
+
+  // Store cleanup function on the app instance for later use
+  ;(app as any).__errorBoundaryCleanup = () => {
+    window.removeEventListener('unhandledrejection', handleUnhandledRejection)
+  }
 
   return app
+}
+
+// Cleanup function for removing global event listeners
+export const cleanupErrorBoundary = () => {
+  const apps = document.querySelectorAll('[data-v-app]') as NodeListOf<any>
+  apps.forEach(app => {
+    if (app.__errorBoundaryCleanup) {
+      app.__errorBoundaryCleanup()
+    }
+  })
 }
