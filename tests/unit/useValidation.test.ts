@@ -43,15 +43,15 @@ describe('useValidation', () => {
       wrapper = mount(TestComponent)
       const { validation } = wrapper.vm
 
-      expect(validation.data).toEqual({})
+      expect(validation.data.value).toEqual({})
       expect(validation.state.isValid).toBe(false)
       expect(validation.state.isValidating).toBe(false)
       expect(validation.state.errors).toEqual([])
       expect(validation.state.touched).toEqual({})
       expect(validation.state.dirty).toEqual({})
-      expect(validation.hasErrors).toBe(false)
-      expect(validation.isFormTouched).toBe(false)
-      expect(validation.isFormDirty).toBe(false)
+      expect(validation.hasErrors.value).toBe(false)
+      expect(validation.isFormTouched.value).toBe(false)
+      expect(validation.isFormDirty.value).toBe(false)
     })
 
     it('should initialize with custom options', () => {
@@ -210,9 +210,9 @@ describe('useValidation', () => {
       wrapper = mount(TestComponent)
       const { validation } = wrapper.vm
 
-      validation.data.name = 'John Doe'
-      validation.data.age = 30
-      validation.data.email = 'john@example.com'
+      validation.data.value.name = 'John Doe'
+      validation.data.value.age = 30
+      validation.data.value.email = 'john@example.com'
 
       const isValid = await validation.validateAll()
       
@@ -238,15 +238,15 @@ describe('useValidation', () => {
       wrapper = mount(TestComponent)
       const { validation } = wrapper.vm
 
-      validation.data.name = 'J'
-      validation.data.age = 16
+      validation.data.value.name = 'J'
+      validation.data.value.age = 16
 
       const isValid = await validation.validateAll()
       
       expect(isValid).toBe(false)
       expect(validation.state.isValid).toBe(false)
       expect(validation.state.errors.length).toBe(2)
-      expect(validation.hasErrors).toBe(true)
+      expect(validation.hasErrors.value).toBe(true)
     })
 
     it('should abort early when configured', async () => {
@@ -266,8 +266,8 @@ describe('useValidation', () => {
       wrapper = mount(TestComponent)
       const { validation } = wrapper.vm
 
-      validation.data.name = 'J'
-      validation.data.age = 16
+      validation.data.value.name = 'J'
+      validation.data.value.age = 16
 
       const isValid = await validation.validateAll()
       
@@ -323,11 +323,11 @@ describe('useValidation', () => {
         markDirty: true
       })
 
-      expect(validation.data.name).toBe('John')
+      expect(validation.data.value.name).toBe('John')
       expect(validation.state.touched.name).toBe(true)
       expect(validation.state.dirty.name).toBe(true)
-      expect(validation.isFormTouched).toBe(true)
-      expect(validation.isFormDirty).toBe(true)
+      expect(validation.isFormTouched.value).toBe(true)
+      expect(validation.isFormDirty.value).toBe(true)
     })
 
     it('should set field touched state', () => {
@@ -346,11 +346,11 @@ describe('useValidation', () => {
 
       validation.setFieldTouched('name', true)
       expect(validation.state.touched.name).toBe(true)
-      expect(validation.touchedFields).toEqual(['name'])
+      expect(validation.touchedFields.value).toEqual(['name'])
 
       validation.setFieldTouched('name', false)
       expect(validation.state.touched.name).toBeUndefined()
-      expect(validation.touchedFields).toEqual([])
+      expect(validation.touchedFields.value).toEqual([])
     })
 
     it('should set field dirty state', () => {
@@ -369,11 +369,11 @@ describe('useValidation', () => {
 
       validation.setFieldDirty('name', true)
       expect(validation.state.dirty.name).toBe(true)
-      expect(validation.dirtyFields).toEqual(['name'])
+      expect(validation.dirtyFields.value).toEqual(['name'])
 
       validation.setFieldDirty('name', false)
       expect(validation.state.dirty.name).toBeUndefined()
-      expect(validation.dirtyFields).toEqual([])
+      expect(validation.dirtyFields.value).toEqual([])
     })
   })
 
@@ -401,7 +401,7 @@ describe('useValidation', () => {
       validation.setFieldDirty('name', true)
       await validation.validateField('name', 'J') // Create error
 
-      expect(validation.data.name).toBe('John')
+      expect(validation.data.value.name).toBe('John')
       expect(validation.state.touched.name).toBe(true)
       expect(validation.state.dirty.name).toBe(true)
       expect(validation.hasFieldError('name')).toBe(true)
@@ -409,7 +409,7 @@ describe('useValidation', () => {
       // Reset field
       validation.resetField('name')
 
-      expect(validation.data.name).toBeUndefined()
+      expect(validation.data.value.name).toBeUndefined()
       expect(validation.state.touched.name).toBeUndefined()
       expect(validation.state.dirty.name).toBeUndefined()
       expect(validation.hasFieldError('name')).toBe(false)
@@ -437,20 +437,20 @@ describe('useValidation', () => {
       validation.setFieldValue('age', 25)
       await validation.validateField('name', 'J') // Create error
 
-      expect(validation.data.name).toBe('John')
+      expect(validation.data.value.name).toBe('John')
       expect(validation.state.errors.length).toBeGreaterThan(0)
-      expect(validation.hasErrors).toBe(true)
+      expect(validation.hasErrors.value).toBe(true)
 
       // Reset everything
       validation.resetValidation()
 
-      expect(validation.data).toEqual({})
+      expect(validation.data.value).toEqual({})
       expect(validation.state.isValid).toBe(false)
       expect(validation.state.isValidating).toBe(false)
       expect(validation.state.errors).toEqual([])
       expect(validation.state.touched).toEqual({})
       expect(validation.state.dirty).toEqual({})
-      expect(validation.hasErrors).toBe(false)
+      expect(validation.hasErrors.value).toBe(false)
     })
   })
 
@@ -509,7 +509,7 @@ describe('useValidation', () => {
 
       validation.clearErrors()
       expect(validation.state.errors).toEqual([])
-      expect(validation.hasErrors).toBe(false)
+      expect(validation.hasErrors.value).toBe(false)
     })
 
     it('should clear field-specific errors', async () => {
@@ -654,8 +654,8 @@ describe('useValidation', () => {
       expect(validation.state.isValid).toBe(false)
 
       // Update data
-      validation.data.name = 'John'
-      validation.data.age = 30
+      validation.data.value.name = 'John'
+      validation.data.value.age = 30
 
       await nextTick()
       // Should automatically validate
@@ -784,8 +784,8 @@ describe('useFormValidation', () => {
     wrapper = mount(TestComponent)
     const { formValidation } = wrapper.vm
 
-    expect(formValidation.data.name).toBe('John')
-    expect(formValidation.data.age).toBe(30)
+    expect(formValidation.data.value.name).toBe('John')
+    expect(formValidation.data.value.age).toBe(30)
   })
 
   it('should handle form submission with valid data', async () => {
@@ -808,8 +808,8 @@ describe('useFormValidation', () => {
     wrapper = mount(TestComponent)
     const { formValidation, onValid: onValidMock, onInvalid: onInvalidMock } = wrapper.vm
 
-    formValidation.data.name = 'John'
-    formValidation.data.age = 25
+    formValidation.data.value.name = 'John'
+    formValidation.data.value.age = 25
 
     await formValidation.handleSubmit(onValidMock, onInvalidMock)
 
@@ -837,8 +837,8 @@ describe('useFormValidation', () => {
     wrapper = mount(TestComponent)
     const { formValidation, onValid: onValidMock, onInvalid: onInvalidMock } = wrapper.vm
 
-    formValidation.data.name = 'J'
-    formValidation.data.age = 16
+    formValidation.data.value.name = 'J'
+    formValidation.data.value.age = 16
 
     await formValidation.handleSubmit(onValidMock, onInvalidMock)
 
@@ -869,7 +869,7 @@ describe('useFormValidation', () => {
     wrapper = mount(TestComponent)
     const { formValidation, onValid: onValidMock } = wrapper.vm
 
-    formValidation.data.name = 'John'
+    formValidation.data.value.name = 'John'
 
     await formValidation.handleSubmit(onValidMock)
 
