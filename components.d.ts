@@ -26,6 +26,8 @@ declare module 'vue' {
     IconTooling: typeof import('./src/components/icons/IconTooling.vue')['default']
     IPSSScore: typeof import('./src/components/IPSSScore.vue')['default']
     LRTIScore: typeof import('./src/components/LRTIScore.vue')['default']
+    MedicalQuestionComponent: typeof import('./src/components/medical/MedicalQuestionComponent.vue')['default']
+    MedicalResultsComponent: typeof import('./src/components/medical/MedicalResultsComponent.vue')['default']
     MedicinBoernScore: typeof import('./src/components/MedicinBoernScore.vue')['default']
     Message: typeof import('primevue/message')['default']
     NumberSliderInput: typeof import('./src/components/NumberSliderInput.vue')['default']
