@@ -3,6 +3,95 @@ import { mount } from '@vue/test-utils'
 import { nextTick } from 'vue'
 import AuditScore from '@/components/AuditScore.vue'
 
+// Mock environment variables
+Object.defineProperty(import.meta, 'env', {
+  value: {
+    VITE_API_URL: 'http://test.example.com'
+  }
+})
+
+// Mock composables
+vi.mock('@/composables/useErrorHandler', () => ({
+  useErrorHandler: vi.fn(() => ({
+    handleError: vi.fn(),
+    showSuccess: vi.fn(),
+    showWarning: vi.fn(),
+    showInfo: vi.fn(),
+    clearErrors: vi.fn(),
+    errors: { value: [] },
+    hasErrors: { value: false },
+    isOnline: { value: true },
+    networkErrors: { value: [] },
+    validationErrors: { value: [] },
+    calculationErrors: { value: [] }
+  }))
+}))
+
+vi.mock('@/composables/useLogging', () => ({
+  useLogging: vi.fn(() => ({
+    logCalculation: vi.fn(),
+    logUserAction: vi.fn(),
+    logValidationError: vi.fn(),
+    logError: vi.fn(),
+    logInfo: vi.fn(),
+    newCorrelationId: vi.fn(() => 'test-correlation-id')
+  }))
+}))
+
+vi.mock('@/composables/useValidation', () => ({
+  useValidation: vi.fn(() => ({
+    validateAll: vi.fn().mockResolvedValue(true),
+    state: {
+      errors: []
+    }
+  }))
+}))
+
+// Mock sendDataToServer
+vi.mock('@/assets/sendDataToServer.ts', () => ({
+  default: vi.fn().mockResolvedValue({
+    success: true,
+    data: { message: 'Success' }
+  })
+}))
+
+// Mock schemas
+vi.mock('@/schemas/calculators', () => ({
+  AuditSchema: {
+    parse: vi.fn(),
+    parseAsync: vi.fn()
+  }
+}))
+
+vi.mock('@/schemas/patient', () => ({
+  PatientPsychologySchema: {
+    parse: vi.fn(),
+    parseAsync: vi.fn()
+  }
+}))
+
+// Mock PrimeVue useToast
+vi.mock('primevue/usetoast', () => ({
+  useToast: vi.fn(() => ({
+    add: vi.fn()
+  }))
+}))
+
+// Mock error boundary
+vi.mock('@/utils/errorBoundary', () => ({
+  errorBoundaryManager: {
+    categorizeError: vi.fn(),
+    getUserFriendlyMessage: vi.fn(),
+    reportError: vi.fn()
+  },
+  ErrorType: {
+    NETWORK: 'network',
+    VALIDATION: 'validation',
+    CALCULATION: 'calculation',
+    UNKNOWN: 'unknown'
+  }
+}))
+
 // Mock all the volt components
 vi.mock('@/volt/Button.vue', () => ({
   default: {
@@ -127,7 +216,20 @@ describe('AuditScore Component', () => {
   let wrapper: any
 
   beforeEach(() => {
-    wrapper = mount(AuditScore)
+    // Mock window for event dispatching used by composables
+    Object.defineProperty(window, 'dispatchEvent', {
+      value: vi.fn(),
+      writable: true
+    })
+    
+    wrapper = mount(AuditScore, {
+      global: {
+        stubs: {
+          // Stub any remaining components that might cause issues
+          teleport: true
+        }
+      }
+    })
   })
 
   describe('Basic Rendering', () => {
@@ -289,7 +391,7 @@ describe('AuditScore Component', () => {
       // Mock calculateResults to verify it's not called
       const calculateSpy = vi.spyOn(component, 'calculateResults')
       
-      component.handleSubmit()
+      await component.handleSubmit()
       
       expect(component.formSubmitted).toBe(true)
       expect(component.validationMessage).toBe('Alle spørgsmål skal udfyldes.')
@@ -422,7 +524,7 @@ describe('AuditScore Component', () => {
       
       // All questions already have valid answers (0)
       // Call handleSubmit directly to test functionality
-      component.handleSubmit()
+      await component.handleSubmit()
       
       expect(component.formSubmitted).toBe(true)
       expect(component.totalScore).toBeGreaterThanOrEqual(0) // Score calculated

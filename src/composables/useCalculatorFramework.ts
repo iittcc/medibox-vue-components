@@ -1,4 +1,4 @@
-import { ref, computed, reactive, watch, onMounted, onUnmounted, type Ref } from 'vue'
+import { ref, computed, reactive, watch, onMounted, onUnmounted, readonly, type Ref } from 'vue'
 import { useValidation, useFormValidation } from './useValidation'
 import { useErrorHandler } from './useErrorHandler'
 import { useLogging } from './useLogging'
@@ -71,8 +71,7 @@ export function useCalculatorFramework(config: CalculatorConfig) {
     showInfo
   } = useErrorHandler({
     showToasts: true,
-    autoRetry: true,
-    calculatorType: config.type
+    autoRetry: true
   })
 
   // State management
@@ -762,13 +761,70 @@ function calculateWho5Score(responses: Record<string, any>) {
 }
 
 function calculateLrtiScore(responses: Record<string, any>) {
-  // Simplified LRTI risk calculation
+  // Input validation for required fields
+  const validationErrors: string[] = []
+  
+  // Check for required fields
+  if (responses.temperature === undefined || responses.temperature === null) {
+    validationErrors.push('Temperatur er påkrævet')
+  }
+  if (responses.respiratoryRate === undefined || responses.respiratoryRate === null) {
+    validationErrors.push('Respirationsfrekvens er påkrævet')
+  }
+  if (responses.heartRate === undefined || responses.heartRate === null) {
+    validationErrors.push('Puls er påkrævet')
+  }
+  if (responses.bloodPressureSystolic === undefined || responses.bloodPressureSystolic === null) {
+    validationErrors.push('Systolisk blodtryk er påkrævet')
+  }
+  
+  // Validate physiological ranges
+  if (responses.temperature !== undefined && responses.temperature !== null) {
+    if (responses.temperature < 30 || responses.temperature > 45) {
+      validationErrors.push('Temperatur skal være mellem 30°C og 45°C')
+    }
+  }
+  if (responses.respiratoryRate !== undefined && responses.respiratoryRate !== null) {
+    if (responses.respiratoryRate < 5 || responses.respiratoryRate > 60) {
+      validationErrors.push('Respirationsfrekvens skal være mellem 5 og 60 per minut')
+    }
+  }
+  if (responses.heartRate !== undefined && responses.heartRate !== null) {
+    if (responses.heartRate < 30 || responses.heartRate > 250) {
+      validationErrors.push('Puls skal være mellem 30 og 250 slag per minut')
+    }
+  }
+  if (responses.bloodPressureSystolic !== undefined && responses.bloodPressureSystolic !== null) {
+    if (responses.bloodPressureSystolic < 50 || responses.bloodPressureSystolic > 250) {
+      validationErrors.push('Systolisk blodtryk skal være mellem 50 og 250 mmHg')
+    }
+  }
+  
+  // If validation errors exist, return error state
+  if (validationErrors.length > 0) {
+    return {
+      score: 0,
+      interpretation: 'Ugyldig input - kan ikke beregne LRTI score',
+      recommendations: ['Ret inputfejl og prøv igen'],
+      riskLevel: 'unknown' as const,
+      details: { validationErrors, riskFactors: 0 },
+      error: true
+    }
+  }
+  
+  // Use validated values with safe defaults
+  const temperature = Number(responses.temperature) || 36.5
+  const respiratoryRate = Number(responses.respiratoryRate) || 16
+  const heartRate = Number(responses.heartRate) || 70
+  const bloodPressureSystolic = Number(responses.bloodPressureSystolic) || 120
+  
+  // LRTI risk calculation with validated inputs
   let score = 0
   
-  if (responses.temperature > 38.5) score += 2
-  if (responses.respiratoryRate > 25) score += 1
-  if (responses.heartRate > 100) score += 1
-  if (responses.bloodPressureSystolic < 100) score += 2
+  if (temperature > 38.5) score += 2
+  if (respiratoryRate > 25) score += 1
+  if (heartRate > 100) score += 1
+  if (bloodPressureSystolic < 100) score += 2
   
   const riskLevel = score <= 1 ? 'low' : score <= 3 ? 'moderate' : score <= 5 ? 'high' : 'very_high'
   
@@ -777,7 +833,10 @@ function calculateLrtiScore(responses: Record<string, any>) {
     interpretation: `LRTI risiko: ${riskLevel}`,
     recommendations: ['Antibiotika behandling', 'Symptomatisk behandling'],
     riskLevel,
-    details: { riskFactors: score }
+    details: { 
+      riskFactors: score,
+      validatedInputs: { temperature, respiratoryRate, heartRate, bloodPressureSystolic }
+    }
   }
 }
 

@@ -218,7 +218,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import RadioButton from 'primevue/radiobutton'
 import Checkbox from 'primevue/checkbox'
 import InputNumber from 'primevue/inputnumber'
@@ -352,10 +352,6 @@ onMounted(() => {
   }
 })
 
-// Watch for changes to emit events
-watch(internalValue, (newValue) => {
-  emit('change', newValue)
-})
 </script>
 
 <style scoped>
