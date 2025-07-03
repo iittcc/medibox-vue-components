@@ -28,7 +28,7 @@
               :question="question"
               :options="getOptions(question.optionsType as keyof OptionsSets)"
               :index="index"
-              :is-unanswered="formSubmitted && isUnanswered(question)"
+              :is-unanswered="formSubmitted && (question.answer === null || question.answer === undefined)"
               @update:answer="framework.setFieldValue('calculator', question.id, $event)"
             />
             <div v-if="validationMessage" class="text-red-500 mt-5 font-bold">
@@ -295,40 +295,27 @@ questionsSection1.forEach(question => {
   })
 })
 
-// Validation functions
-const isUnanswered = (question: any): boolean => {
-  return question.answer === null || question.answer === undefined;
-};
-
-const validateQuestions = (): boolean => {
-  const unansweredQuestions = questionsSection1.filter(isUnanswered);
-  
-  if (unansweredQuestions.length > 0) {
-    validationMessage.value = `Udfyld venligst alle spørgsmål før beregning (${unansweredQuestions.length} mangler)`;
-    return false;
-  }
-  
-  validationMessage.value = '';
-  return true;
-};
-
 const handleSubmit = async () => {
   formSubmitted.value = true;
+  validationMessage.value = '';
   
-  if (validateQuestions()) {
-    // All questions answered, proceed with calculation
-    try {
-      await framework.submitCalculation();
-    } catch (error) {
-      console.error('Submit error:', error);
-      validationMessage.value = 'Der opstod en fejl ved beregning. Prøv igen.';
-    }
+  try {
+    await framework.submitCalculation();
+  } catch (error) {
+    console.error('Submit error:', error);
+    validationMessage.value = 'Der opstod en fejl ved beregning. Prøv igen.';
   }
 };
 
 const handleReset = () => {
   formSubmitted.value = false;
   validationMessage.value = '';
+  
+  // Reset local question state
+  questionsSection1.forEach(question => {
+    question.answer = null;
+  });
+  
   framework.resetCalculator();
 };
 

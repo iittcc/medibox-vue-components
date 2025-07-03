@@ -114,9 +114,16 @@ export function useCalculatorFramework(config: CalculatorConfig): CalculatorFram
     completionTime: null
   })
 
-  // Data storage
-  const patientData = ref<Partial<PatientData>>({})
-  const calculatorData = ref<Partial<CalculatorResponses>>({})
+  // Validation setup (single source of truth)
+  const patientSchema = getPatientSchemaForCalculator(config.type)
+  const calculatorSchema = getCalculatorQuestionSchema(config.type)
+  
+  const patientValidation = useFormValidation(patientSchema)
+  const calculatorValidation = useFormValidation(calculatorSchema)
+  
+  // Data refs that point to validation instance data (single source of truth)
+  const patientData = patientValidation.data
+  const calculatorData = calculatorValidation.data
   const result = ref<CalculationResult | null>(null)
 
   // Computed properties
@@ -137,13 +144,6 @@ export function useCalculatorFramework(config: CalculatorConfig): CalculatorFram
            result.value !== null &&
            state.value.isValid
   })
-
-  // Validation setup
-  const patientSchema = getPatientSchemaForCalculator(config.type)
-  const calculatorSchema = getCalculatorQuestionSchema(config.type)
-  
-  const patientValidation = useFormValidation(patientSchema, patientData.value)
-  const calculatorValidation = useFormValidation(calculatorSchema, calculatorData.value)
 
   // Watch for validation state changes
   watch([patientValidation.state.isValid, calculatorValidation.state.isValid], ([patientValid, calculatorValid]) => {
@@ -276,8 +276,9 @@ export function useCalculatorFramework(config: CalculatorConfig): CalculatorFram
 
   // Reset functionality
   const resetCalculator = () => {
-    patientData.value = {}
-    calculatorData.value = {}
+    // Reset validation instances (which clears the data)
+    patientValidation.resetValidation()
+    calculatorValidation.resetValidation()
     result.value = null
     
     state.value.currentStep = 0
@@ -362,9 +363,9 @@ export function useCalculatorFramework(config: CalculatorConfig): CalculatorFram
   // Field value setter
   const setFieldValue = (section: 'patient' | 'calculator', field: string, value: any) => {
     if (section === 'patient') {
-      patientData.value = { ...patientData.value, [field]: value }
+      patientValidation.setFieldValue(field, value)
     } else if (section === 'calculator') {
-      calculatorData.value = { ...calculatorData.value, [field]: value }
+      calculatorValidation.setFieldValue(field, value)
     }
   }
 
