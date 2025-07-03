@@ -1,4 +1,3 @@
-<!-- src/Danpss.vue -->
 <template>
   <div id="app">
     <PUQEScore />
