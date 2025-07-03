@@ -108,15 +108,6 @@ const updateAge = (value: number | number[]) => {
     emit('update:age', Array.isArray(value) ? value[0] : value);
 };
 
-watch(localAge, (newAge) => {
-    // Gender values remain standard 'male'/'female' - no conversion needed
-    // The display mapping handles the UI presentation
-    if (newAge <= 16 && (localGender.value === "male" || localGender.value === "female")) {
-        // Already using standard values, no change needed
-    } else if (newAge >= 16 && (localGender.value === "male" || localGender.value === "female")) {
-        // Already using standard values, no change needed
-    }
-});
 </script>
 <style scoped>
 html {
