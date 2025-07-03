@@ -25,7 +25,7 @@ export class AuditCalculator extends BaseCalculator<CalculatorResponses> {
 
     for (let i = 1; i <= 10; i++) {
       const field = `question${i}`;
-      const value = responses[field];
+      const value = responses[field as keyof CalculatorResponses];
       const fieldErrors = this.validateNumericRange(field, value, 0, 4, true);
       errors.push(...fieldErrors);
     }

@@ -1,5 +1,4 @@
-import { type App, createApp, h, ref, onErrorCaptured, type Component } from 'vue'
-import { useToast } from 'primevue/usetoast'
+import { type App, h, ref, onErrorCaptured, type Component } from 'vue'
 
 export interface ErrorInfo {
   componentName?: string
@@ -363,7 +362,8 @@ export function withErrorBoundary(app: App, config?: ErrorBoundaryConfig) {
     errorBoundaryManager.configure(config)
   }
 
-  app.config.errorHandler = (error: Error, instance: any, info: string) => {
+  app.config.errorHandler = (err: unknown, instance: any, info: string) => {
+    const error = err instanceof Error ? err : new Error(String(err));
     const componentName = instance?.$options?.name || 'Unknown'
     const context = { component: componentName, vueInfo: info, globalHandler: true }
     errorBoundaryManager.handleError(error, componentName, undefined, context)
