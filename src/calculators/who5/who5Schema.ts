@@ -6,23 +6,23 @@ export const Who5QuestionSchema = z.object({
   question1: z.number()
     .min(0, 'Score skal være mindst 0')
     .max(5, 'Score skal være højst 5')
-    .int('Score skal være et helt tal'),
+    .int(),
   question2: z.number()
     .min(0, 'Score skal være mindst 0')
     .max(5, 'Score skal være højst 5')
-    .int('Score skal være et helt tal'),
+    .int(),
   question3: z.number()
     .min(0, 'Score skal være mindst 0')
     .max(5, 'Score skal være højst 5')
-    .int('Score skal være et helt tal'),
+    .int(),
   question4: z.number()
     .min(0, 'Score skal være mindst 0')
     .max(5, 'Score skal være højst 5')
-    .int('Score skal være et helt tal'),
+    .int(),
   question5: z.number()
     .min(0, 'Score skal være mindst 0')
     .max(5, 'Score skal være højst 5')
-    .int('Score skal være et helt tal')
+    .int()
 })
 
 export const Who5Schema = z.object({
@@ -31,7 +31,7 @@ export const Who5Schema = z.object({
   rawScore: z.number()
     .min(0, 'Råscore skal være mindst 0')
     .max(25, 'Råscore skal være højst 25')
-    .int('Råscore skal være et helt tal'),
+    .int(),
   percentageScore: z.number()
     .min(0, 'Procentscore skal være mindst 0')
     .max(100, 'Procentscore skal være højst 100'),
