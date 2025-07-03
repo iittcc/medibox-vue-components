@@ -39,20 +39,19 @@ export class LrtiCalculator extends BaseCalculator<LrtiResponses, LrtiDetails> {
   }
 
   protected calculateScore(responses: LrtiResponses): CalculationResult<LrtiDetails> {
-    // Use validated values with safe defaults
-    const temperature = Number(responses.temperature) || 36.5
-    const respiratoryRate = Number(responses.respiratoryRate) || 16
-    const heartRate = Number(responses.heartRate) || 70
-    const bloodPressureSystolic = Number(responses.bloodPressureSystolic) || 120
-    
+    // Use validated values (validation ensures these are present)
+    const temperature = Number(responses.temperature)
+    const respiratoryRate = Number(responses.respiratoryRate)
+    const heartRate = Number(responses.heartRate)
+    const bloodPressureSystolic = Number(responses.bloodPressureSystolic)
+
     // LRTI risk calculation with validated inputs
     let score = 0
-    
+
     if (temperature > 38.5) score += 2
     if (respiratoryRate > 25) score += 1
     if (heartRate > 100) score += 1
     if (bloodPressureSystolic < 100) score += 2
-    
     const riskLevel = score <= 1 ? 'low' : score <= 3 ? 'moderate' : score <= 5 ? 'high' : 'very_high'
     
     let vitalSignsCategory: 'normal' | 'concerning' | 'critical'
