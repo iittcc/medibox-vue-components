@@ -142,11 +142,11 @@ export function useCalculatorFramework(config: CalculatorConfig): CalculatorFram
   const patientSchema = getPatientSchemaForCalculator(config.type)
   const calculatorSchema = getCalculatorQuestionSchema(config.type)
   
-  const patientValidation = useFormValidation(patientData, patientSchema)
-  const calculatorValidation = useFormValidation(calculatorData, calculatorSchema)
+  const patientValidation = useFormValidation(patientSchema, patientData.value)
+  const calculatorValidation = useFormValidation(calculatorSchema, calculatorData.value)
 
   // Watch for validation state changes
-  watch([patientValidation.isValid, calculatorValidation.isValid], ([patientValid, calculatorValid]) => {
+  watch([patientValidation.state.isValid, calculatorValidation.state.isValid], ([patientValid, calculatorValid]) => {
     state.value.isValid = patientValid && calculatorValid
   })
 
