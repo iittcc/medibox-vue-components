@@ -44,13 +44,14 @@ import { ref, computed, watch } from "vue";
 import InputText from '@/volt/InputText.vue';
 import SelectButton from '@/volt/SelectButton.vue';
 import NumberSliderInput from './NumberSliderInput.vue';
+import { genderDisplayMap, childGenderDisplayMap, type GenderValue } from '@/utils/genderUtils'
 
 export interface Props {
     name: string,
     age: number,
     minAge: number,
     maxAge: number,
-    gender: string,
+    gender: GenderValue,
     genderdisplay?: string;
     sliderType?: string;
 }
@@ -59,40 +60,27 @@ const props = withDefaults(defineProps<Props>(), {
     sliderType: "prime"
 });
 
-// Gender values for internal use (standard types)
-const genderOptions = ref(["male", "female"]);
-const genderOptionsChild = ref(["male", "female"]);
-
-// Display mapping for Danish UI
-const genderDisplayMap = {
-    "male": "Mand",
-    "female": "Kvinde"
-};
-
-const childGenderDisplayMap = {
-    "male": "Dreng", 
-    "female": "Pige"
-};
-
 const localName = ref<string>(props.name);
 
 const localAge = ref<number>(props.age);
 
-// Display options for SelectButton (Danish labels)
+// Display options for SelectButton (Danish labels with English values)
 const currentGenderOptions = computed(() => {
     if (localAge.value <= 16) {
-        return genderOptionsChild.value.map(value => ({
-            label: childGenderDisplayMap[value as keyof typeof childGenderDisplayMap],
-            value: value
+        return Object.entries(childGenderDisplayMap).map(([key, label]) => ({
+            label: label,
+            value: key
         }));
     } else {
-        return genderOptions.value.map(value => ({
-            label: genderDisplayMap[value as keyof typeof genderDisplayMap],
-            value: value
+        return Object.entries(genderDisplayMap).map(([key, label]) => ({
+            label: label,
+            value: key
         }));
     }
 });
-const localGender = ref<string>(props.gender);
+
+const localGender = ref<GenderValue>(props.gender as GenderValue);
+
 const emit = defineEmits(['update:name', 'update:age', 'update:gender']);
 
 const updateName = (event: Event) => {
@@ -100,7 +88,7 @@ const updateName = (event: Event) => {
     emit('update:name', target.value);
 };
 
-const updateGender = (value: string) => {
+const updateGender = (value: GenderValue) => {
     emit('update:gender', value);
 };
 
