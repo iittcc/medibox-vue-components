@@ -146,7 +146,7 @@ export function useCalculatorFramework(config: CalculatorConfig): CalculatorFram
   })
 
   // Watch for validation state changes
-  watch([patientValidation.state.isValid, calculatorValidation.state.isValid], ([patientValid, calculatorValid]) => {
+  watch([() => patientValidation.state.isValid, () => calculatorValidation.state.isValid], ([patientValid, calculatorValid]) => {
     state.value.isValid = patientValid && calculatorValid
   })
 
