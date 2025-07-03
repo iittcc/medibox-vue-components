@@ -39,7 +39,7 @@
               title="Kopier til Clipboard"
               icon="pi pi-clipboard"
               severity="secondary"
-              class="mr-3 rounded-lg"
+              class="mr-3"
               :disabled="!framework.state.isComplete"
             >
               <template #container>
@@ -58,13 +58,12 @@
               label="Reset"
               icon="pi pi-sync"
               severity="secondary"
-              class="rounded-lg"
               @click="handleReset"
             />
             <Button
               type="submit"
-              :label="framework.state.isSubmitting ? 'Beregner...' : 'Beregn'"
-              class="pr-6 pl-6 rounded-lg"
+              :label="framework.state.isSubmitting ? '' : 'Beregn'"
+              class="pr-6 pl-6"
               :icon="framework.state.isSubmitting ? 'pi pi-spin pi-spinner' : 'pi pi-calculator'"
               :disabled="framework.state.isSubmitting"
             />
@@ -126,7 +125,7 @@ const config: CalculatorConfig = {
   name: 'AUDIT Alkoholafhængighedstest',
   version: '2.0.0',
   category: 'psychology',
-  theme: 'teal',
+  theme: 'sky',
   estimatedDuration: 2,
 };
 

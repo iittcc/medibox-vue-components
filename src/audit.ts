@@ -1,7 +1,7 @@
 // src/audit.ts - AUDIT Calculator Entry Point
 import { createApp } from 'vue';
 import 'material-design-icons-iconfont/dist/material-design-icons.css';
-import './assets/teal.css';
+import './assets/sky.css';
 import App from './Audit.vue';
 import PrimeVue from 'primevue/config';
 import ToastService from 'primevue/toastservice';
