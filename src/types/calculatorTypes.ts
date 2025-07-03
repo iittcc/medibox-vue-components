@@ -273,7 +273,7 @@ export interface PatientData {
   // Basic information
   name?: string
   age: number
-  gender: 'male' | 'female' | 'other'
+  gender: 'male' | 'female'
   cpr?: string
   
   // Contact information (optional)

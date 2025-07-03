@@ -418,8 +418,8 @@ export const medicalValidationSchemas = {
     .regex(/^\d{6}-?\d{4}$/, 'CPR nummer skal have formatet DDMMYY-XXXX'),
     
   // Gender
-  gender: z.enum(['male', 'female', 'other'], {
-    errorMap: () => ({ message: 'Køn skal være mand, kvinde eller andet' })
+  gender: z.enum(['male', 'female'], {
+    errorMap: () => ({ message: 'Køn skal være mand eller kvinde' })
   })
 }
 

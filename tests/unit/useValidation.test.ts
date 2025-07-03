@@ -570,7 +570,6 @@ describe('useValidation', () => {
       // Test gender schema
       expect(() => medicalValidationSchemas.gender.parse('male')).not.toThrow()
       expect(() => medicalValidationSchemas.gender.parse('female')).not.toThrow()
-      expect(() => medicalValidationSchemas.gender.parse('other')).not.toThrow()
       expect(() => medicalValidationSchemas.gender.parse('invalid')).toThrow()
     })
   })

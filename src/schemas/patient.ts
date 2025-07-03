@@ -13,8 +13,8 @@ export const PatientBaseSchema = z.object({
     .max(150, 'Alder skal være højst 150')
     .int('Alder skal være et helt tal'),
     
-  gender: z.enum(['male', 'female', 'other'], {
-    errorMap: () => ({ message: 'Vælg køn: mand, kvinde eller andet' })
+  gender: z.enum(['male', 'female'], {
+    errorMap: () => ({ message: 'Vælg køn: mand eller kvinde' })
   }),
   
   weight: z.number()
