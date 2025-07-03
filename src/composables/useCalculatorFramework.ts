@@ -80,6 +80,8 @@ export interface CalculatorFrameworkReturn {
   submitCalculation: () => Promise<boolean>
   exportResults: (format?: 'json' | 'text' | 'pdf' | 'csv') => Promise<string | null>
   resetCalculator: () => void
+  setFieldValue: (section: 'patient' | 'calculator', field: string, value: any) => void
+  initializeSteps: (steps: CalculatorStep[]) => void
   
   // Navigation
   nextStep: () => void
@@ -357,6 +359,21 @@ export function useCalculatorFramework(config: CalculatorConfig): CalculatorFram
     }
   })
 
+  // Field value setter
+  const setFieldValue = (section: 'patient' | 'calculator', field: string, value: any) => {
+    if (section === 'patient') {
+      patientData.value = { ...patientData.value, [field]: value }
+    } else if (section === 'calculator') {
+      calculatorData.value = { ...calculatorData.value, [field]: value }
+    }
+  }
+
+  // Steps initialization
+  const initializeSteps = (steps: CalculatorStep[]) => {
+    state.value.totalSteps = steps.length
+    // Additional step initialization logic can be added here
+  }
+
   // Return the framework API
   return {
     // State
@@ -381,6 +398,8 @@ export function useCalculatorFramework(config: CalculatorConfig): CalculatorFram
     submitCalculation,
     exportResults,
     resetCalculator,
+    setFieldValue,
+    initializeSteps,
     
     // Navigation
     nextStep,
