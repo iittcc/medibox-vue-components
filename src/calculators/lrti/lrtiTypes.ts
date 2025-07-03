@@ -6,8 +6,8 @@ export interface LrtiResponses {
   respiratoryRate: number       // Breaths per minute
   heartRate: number            // Beats per minute
   bloodPressureSystolic: number // Systolic BP in mmHg
-  oxygenSaturation?: number    // SpO2 percentage (optional)
-  consciousnessLevel?: number  // 0-4: Alert to unresponsive (optional)
+  oxygenSaturation?: number    // SpO2 percentage 70-100% (optional)
+  consciousnessLevel?: 0 | 1 | 2 | 3 | 4  // 0-4: Alert to unresponsive (optional)
 }
 
 export interface LrtiDetails extends CalculatorDetails {
