@@ -75,8 +75,8 @@
               <div v-if="scoreDetails && Object.keys(scoreDetails).length > 0" class="score-details">
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div v-for="(value, key) in scoreDetails" :key="key" class="detail-item">
-                    <div class="text-sm font-medium text-gray-700">{{ formatDetailKey(key) }}</div>
-                    <div class="text-lg font-semibold" :class="getDetailValueClass(key, value)">
+                    <div class="text-sm font-medium text-gray-700">{{ formatDetailKey(key as string) }}</div>
+                    <div class="text-lg font-semibold" :class="getDetailValueClass(key as string, value)">
                       {{ formatDetailValue(value) }}
                     </div>
                   </div>

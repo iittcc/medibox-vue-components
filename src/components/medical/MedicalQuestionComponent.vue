@@ -97,7 +97,7 @@
         <div v-else-if="type === 'numeric'" class="space-y-3">
           <div class="numeric-input">
             <InputNumber
-              v-model="internalValue"
+              v-model="internalValue as number"
               :min="min"
               :max="max"
               :step="step"
@@ -118,7 +118,7 @@
         <!-- Text Input -->
         <div v-else-if="type === 'text'" class="space-y-3">
           <InputText
-            v-model="internalValue"
+            v-model="internalValue as string"
             :disabled="disabled"
             :placeholder="placeholder"
             :maxlength="maxLength"
@@ -126,14 +126,14 @@
             class="w-full"
           />
           <div v-if="maxLength" class="text-xs text-gray-500 text-right">
-            {{ (internalValue?.length || 0) }}/{{ maxLength }} tegn
+            {{ (internalValue as string)?.length || 0 }}/{{ maxLength }} tegn
           </div>
         </div>
 
         <!-- Textarea -->
         <div v-else-if="type === 'textarea'" class="space-y-3">
           <Textarea
-            v-model="internalValue"
+            v-model="internalValue as string"
             :disabled="disabled"
             :placeholder="placeholder"
             :maxlength="maxLength"
@@ -143,14 +143,14 @@
             auto-resize
           />
           <div v-if="maxLength" class="text-xs text-gray-500 text-right">
-            {{ (internalValue?.length || 0) }}/{{ maxLength }} tegn
+            {{ (internalValue as string)?.length || 0 }}/{{ maxLength }} tegn
           </div>
         </div>
 
         <!-- Date Input -->
         <div v-else-if="type === 'date'" class="space-y-3">
           <Calendar
-            v-model="internalValue"
+            v-model="internalValue as unknown as Date"
             :disabled="disabled"
             :placeholder="placeholder"
             :class="{ 'p-invalid': hasError }"
@@ -166,7 +166,7 @@
         <div v-else-if="type === 'boolean'" class="space-y-3">
           <div class="flex items-center gap-3">
             <ToggleButton
-              v-model="internalValue"
+              v-model="internalValue as boolean"
               :disabled="disabled"
               :on-label="booleanLabels?.true || 'Ja'"
               :off-label="booleanLabels?.false || 'Nej'"
@@ -179,7 +179,7 @@
         <div v-else-if="type === 'slider'" class="space-y-3">
           <div class="slider-container">
             <Slider
-              v-model="internalValue"
+              v-model="internalValue as number"
               :min="min"
               :max="max"
               :step="step"
@@ -189,7 +189,7 @@
             />
             <div class="flex justify-between text-xs text-gray-500 mt-2">
               <span>{{ min }}</span>
-              <span class="font-medium">{{ internalValue }}</span>
+              <span class="font-medium">{{ internalValue as number }}</span>
               <span>{{ max }}</span>
             </div>
             <div v-if="sliderLabels" class="flex justify-between text-xs text-gray-600 mt-1">
@@ -312,8 +312,8 @@ const internalValue = computed({
   get: () => modelValue.value,
   set: (value) => {
     modelValue.value = value
-    emit('update:modelValue', value)
-    emit('change', value)
+    emit('update:modelValue', value as string | number | boolean | string[])
+    emit('change', value as string | number | boolean | string[])
   }
 })
 
@@ -331,7 +331,7 @@ const questionClasses = computed(() => ({
 
 const isOptionSelected = (value: string | number | boolean) => {
   if (Array.isArray(internalValue.value)) {
-    return internalValue.value.includes(value)
+    return internalValue.value.includes(value as string)
   }
   return false
 }
