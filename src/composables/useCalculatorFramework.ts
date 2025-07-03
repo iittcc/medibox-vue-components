@@ -228,22 +228,26 @@ export function useCalculatorFramework(config: CalculatorConfig): CalculatorFram
       const calculationResult = calculateScore(calculatorData.value as CalculatorResponses)
       result.value = calculationResult
       
-      // Submit using the service
-      const success = await submissionService.submitCalculation(
-        config,
-        patientData.value,
-        calculatorData.value,
-        calculationResult,
-        state.value.sessionId,
-        duration.value
-      )
+      // Mark as complete since calculation succeeded
+      state.value.isComplete = true
+      state.value.completionTime = new Date()
 
-      if (success) {
-        state.value.isComplete = true
-        state.value.completionTime = new Date()
+      // Submit using the service (optional - don't fail if submission fails)
+      try {
+        const success = await submissionService.submitCalculation(
+          config,
+          patientData.value,
+          calculatorData.value,
+          calculationResult,
+          state.value.sessionId,
+          duration.value
+        )
+        return success
+      } catch (submissionError) {
+        // Log submission error but don't fail the calculation
+        console.warn('Submission failed but calculation completed:', submissionError)
+        return true // Return true since calculation succeeded
       }
-      
-      return success
     } catch (error) {
       await handleError(error as Error, {
         component: 'CalculatorFramework',
