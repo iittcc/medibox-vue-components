@@ -33,6 +33,31 @@ export const useExportService = (dependencies: ExportDependencies) => {
   const { useLogging } = dependencies
   const { logUserAction } = useLogging()
 
+  // Helper function for text formatting
+  const formatResultsAsText = (data: ExportData): string => {
+    return `
+${data.calculator.name} - Resultat
+
+Patient Information:
+${Object.entries(data.patient).map(([key, value]) => `  ${key}: ${value}`).join('
+')}
+
+Resultat:
+  Score: ${data.result.score}
+  Risiko niveau: ${data.result.riskLevel}
+  Fortolkning: ${data.result.interpretation}
+
+Anbefalinger:
+${data.result.recommendations.map((rec: string) => `  - ${rec}`).join('
+')}
+
+Metadata:
+  Session ID: ${data.metadata.sessionId}
+  Varighed: ${data.metadata.duration} sekunder
+  Eksporteret: ${data.metadata.exportTime}
+    `.trim()
+  }
+
   // Built-in export plugins
   const builtInPlugins: ExportPlugin[] = [
     {
@@ -57,27 +82,7 @@ export const useExportService = (dependencies: ExportDependencies) => {
     plugins.set(plugin.format, plugin)
   })
 
-  const formatResultsAsText = (data: ExportData): string => {
-    return `
-${data.calculator.name} - Resultat
 
-Patient Information:
-${Object.entries(data.patient).map(([key, value]) => `  ${key}: ${value}`).join('\n')}
-
-Resultat:
-  Score: ${data.result.score}
-  Risiko niveau: ${data.result.riskLevel}
-  Fortolkning: ${data.result.interpretation}
-
-Anbefalinger:
-${data.result.recommendations.map((rec: string) => `  - ${rec}`).join('\n')}
-
-Metadata:
-  Session ID: ${data.metadata.sessionId}
-  Varighed: ${data.metadata.duration} sekunder
-  Eksporteret: ${data.metadata.exportTime}
-    `.trim()
-  }
 
   const prepareExportData = (
     config: CalculatorConfig,
