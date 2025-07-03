@@ -1,4 +1,3 @@
-<!-- src/Audit.vue -->
 <template>
   <div id="app">
     <PasswordResetComponent :visible="true" />
