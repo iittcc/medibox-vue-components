@@ -18,31 +18,11 @@ export class LrtiCalculator extends BaseCalculator<LrtiResponses, LrtiDetails> {
   }
 
   validate(responses: LrtiResponses): ValidationResult {
-    const errors = []
-
-    // Check for required fields
-    if (responses.temperature === undefined || responses.temperature === null) {
-      errors.push(this.createValidationError('temperature', 'Temperatur er påkrævet', 'REQUIRED'))
-    }
-    if (responses.respiratoryRate === undefined || responses.respiratoryRate === null) {
-      errors.push(this.createValidationError('respiratoryRate', 'Respirationsfrekvens er påkrævet', 'REQUIRED'))
-    }
-    if (responses.heartRate === undefined || responses.heartRate === null) {
-      errors.push(this.createValidationError('heartRate', 'Puls er påkrævet', 'REQUIRED'))
-    }
-    if (responses.bloodPressureSystolic === undefined || responses.bloodPressureSystolic === null) {
-      errors.push(this.createValidationError('bloodPressureSystolic', 'Systolisk blodtryk er påkrævet', 'REQUIRED'))
-    }
-
-    // If required fields are missing, return early
-    if (errors.length > 0) {
-      return { isValid: false, errors }
-    }
-
-    // Validate using Zod schema
     try {
       LrtiQuestionSchema.parse(responses)
+      return { isValid: true, errors: [] }
     } catch (error: any) {
+      const errors = []
       const zodErrors = error.errors?.map((err: any) => ({
         field: err.path.join('.'),
         message: err.message,
@@ -50,11 +30,11 @@ export class LrtiCalculator extends BaseCalculator<LrtiResponses, LrtiDetails> {
         value: err.input
       })) || []
       errors.push(...zodErrors)
-    }
 
-    return {
-      isValid: errors.length === 0,
-      errors
+      return {
+        isValid: false,
+        errors
+      }
     }
   }
 
