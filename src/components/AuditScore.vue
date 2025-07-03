@@ -9,7 +9,7 @@
             :age="framework.patientData.value.age || 50"
             :minAge="10"
             :maxAge="110"
-            :gender="framework.patientData.value.gender || 'male'"
+            :gender="framework.patientData.value.gender as GenderValue || 'male'"
             genderdisplay="block"
             @update:name="framework.setFieldValue('patient', 'name', $event)"
             @update:age="framework.setFieldValue('patient', 'age', $event)"

@@ -9,7 +9,7 @@
           :age="age"
           :minAge="0"
           :maxAge="120"
-          :gender="gender"
+          :gender="gender as GenderValue"
           genderdisplay="none"
           @update:name="name = $event"
           @update:age="age = $event"
@@ -211,6 +211,7 @@ import SurfaceCard from "./SurfaceCard.vue";
 import PersonInfo from "./PersonInfo.vue";
 import Message from '@/volt/Message.vue';
 import sendDataToServer from '../assets/sendDataToServer.ts';
+import { type GenderValue } from '@/utils/genderUtils';
 
 export interface Option {
   text: string;

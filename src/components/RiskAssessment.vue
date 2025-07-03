@@ -38,7 +38,7 @@
           :age="age"
           :minAge="40"
           :maxAge="90"
-          :gender="gender"
+          :gender="gender as GenderValue"
           genderdisplay="block"
           @update:name="name = $event"
           @update:age="age = $event"
@@ -246,7 +246,7 @@ export interface Option {
 }
 
 const name = ref<string>("");
-const gender = ref<"male" | "female">("male");
+const gender = ref<GenderValue>("male");
 const age = ref<number>(55);
 const sysBP = ref<number>(140);
 const minSysBP = ref(90); // Minimum value for the slider

@@ -217,6 +217,10 @@ import {
 } from '@/assets/medicinBoern'
 import sendDataToServer from '@/assets/sendDataToServer'
 
+const apiUrlServer = import.meta.env.VITE_API_URL;
+const apiUrl = apiUrlServer+'/index.php/callback/LogCB/log';
+const keyUrl = apiUrlServer+'/index.php/KeyServer/getPublicKey';
+
 // Form state
 const selectedIndholdsstof = ref<string>(mainarray[0].indholdsstofnavn)
 const selectedDispensering = ref<string>('')
@@ -388,7 +392,7 @@ const calculate = async () => {
   }
   
   try {
-    await sendDataToServer(data)
+    await sendDataToServer(apiUrl, keyUrl, data)
   } catch (error) {
     console.error('Failed to send data:', error)
   }

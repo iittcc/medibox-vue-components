@@ -9,7 +9,7 @@
           :age="age"
           :minAge="12"
           :maxAge="70"
-          :gender="gender"
+          :gender="gender as GenderValue"
           genderdisplay="block"
           @update:name="name = $event"
           @update:age="age = $event"
@@ -136,7 +136,7 @@ const keyUrl = apiUrlServer+'/index.php/KeyServer/getPublicKey';
 
 const resultsSection = ref<HTMLDivElement | null>(null);
 const name = ref<string>("");
-const gender = ref<string>("female");
+const gender = ref<GenderValue>("female");
 const age = ref<number>(35);
 
 const formSubmitted = ref<boolean>(false);
