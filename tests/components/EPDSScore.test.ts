@@ -165,7 +165,7 @@ describe('EPDSScore Component', () => {
       
       // Patient info defaults (different from AUDIT)
       expect(component.name).toBe('')
-      expect(component.gender).toBe('Kvinde') // Female for postnatal depression
+      expect(component.gender).toBe('female') // Female for postnatal depression
       expect(component.age).toBe(35) // Different from AUDIT's 50
       
       // Form state defaults

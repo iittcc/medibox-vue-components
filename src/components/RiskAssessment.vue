@@ -12,7 +12,7 @@
             <b>10 års risiko for fatal hændelse pga. iskæmisk hjerte-karsygdom</b>
             <br /><br />
             Navn: {{ name }} <br />
-            Køn: {{ gender }} <br />
+            Køn: {{ getGenderLabel(gender as GenderValue) }} <br />
             Alder: {{ age }} år<br /><br />
 
             <b>Undersøgelse</b><br /><br />
@@ -38,7 +38,7 @@
           :age="age"
           :minAge="40"
           :maxAge="90"
-          :gender="gender"
+          :gender="gender as GenderValue"
           genderdisplay="block"
           @update:name="name = $event"
           @update:age="age = $event"
@@ -238,16 +238,15 @@ import CustomIcon from "./CustomIcon.vue";
 import { calculateRisk, filterByAgeGroup } from "../assets/riskCalculator.ts";
 import PersonInfo from "./PersonInfo.vue";
 import NumberSliderInput from './NumberSliderInput.vue';
+import { getGenderLabel, type GenderValue } from '@/utils/genderUtils';
 
 export interface Option {
   label: string;
   value: string | number;
 }
 
-const genderOptions = ref(["Mand", "Kvinde"]);
-
 const name = ref<string>("");
-const gender = ref<"Mand" | "Kvinde">("Mand");
+const gender = ref<GenderValue>("male");
 const age = ref<number>(55);
 const sysBP = ref<number>(140);
 const minSysBP = ref(90); // Minimum value for the slider
@@ -372,8 +371,6 @@ const chartPieOptions = ref({
     },
   },
 });
-
-const ageGroupData = filterByAgeGroup("Mand", "Ikke-ryger", "40-44");
 
 // Function to update the chart data based on sysBP and age
 const calcRisk = () => {
@@ -548,7 +545,7 @@ const updateMinMaxRanges = () => {
       50 år og ældre: 2,0 - 5,3 mmol/L
   */
 
-  if (gender.value == "Mand") {
+  if (gender.value == "male") {
     minSysBP.value = 90;
     maxSysBP.value = 140;
 

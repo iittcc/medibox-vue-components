@@ -9,7 +9,7 @@
           :age="age"
           :minAge="0"
           :maxAge="120"
-          :gender="gender"
+          :gender="gender as GenderValue"
           genderdisplay="none"
           @update:name="name = $event"
           @update:age="age = $event"
@@ -211,6 +211,7 @@ import SurfaceCard from "./SurfaceCard.vue";
 import PersonInfo from "./PersonInfo.vue";
 import Message from '@/volt/Message.vue';
 import sendDataToServer from '../assets/sendDataToServer.ts';
+import { type GenderValue } from '@/utils/genderUtils';
 
 export interface Option {
   text: string;
@@ -253,7 +254,7 @@ const keyUrl = apiUrlServer+'/index.php/KeyServer/getPublicKey';
 
 const resultsSection = ref<HTMLDivElement | null>(null);
 const name = ref<string>("");
-const gender = ref<string>("Mand");
+const gender = ref<string>("male");
 const age = ref<number>(55);
 const formSubmitted = ref<boolean>(false);
 

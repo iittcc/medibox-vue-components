@@ -9,7 +9,7 @@
           :age="age"
           :minAge="12"
           :maxAge="60"
-          :gender="gender"
+          :gender="gender as GenderValue"
           genderdisplay="none"
           @update:name="name = $event"
           @update:age="age = $event"
@@ -84,6 +84,7 @@ import Message from '@/volt/Message.vue';
 import Button from '@/volt/Button.vue';
 import SecondaryButton from '@/volt/SecondaryButton.vue';
 import sendDataToServer from '../assets/sendDataToServer.ts';
+import { type GenderValue } from '@/utils/genderUtils';
 
 export interface Option {
   text: string;
@@ -117,7 +118,7 @@ const keyUrl = apiUrlServer+'/index.php/KeyServer/getPublicKey';
 
 const resultsSection = ref<HTMLDivElement | null>(null);
 const name = ref<string>("");
-const gender = ref<string>("Kvinde");
+const gender = ref<GenderValue>("female");
 const age = ref<number>(28);
 
 const formSubmitted = ref<boolean>(false);

@@ -1,5 +1,5 @@
 {
-    "Kvinde": {
+    "female": {
         "Ikke-ryger": {
             "LDL-kolesterol": {
                 "2.2-3.1": {
@@ -506,7 +506,7 @@
             }
         }
     },
-    "Mand": {
+    "male": {
         "Ikke-ryger": {
             "LDL-kolesterol": {
                 "2.2-3.1": {

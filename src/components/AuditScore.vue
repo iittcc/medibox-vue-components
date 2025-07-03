@@ -9,7 +9,7 @@
             :age="framework.patientData.value.age || 50"
             :minAge="10"
             :maxAge="110"
-            :gender="framework.patientData.value.gender || 'Mand'"
+            :gender="framework.patientData.value.gender as GenderValue || 'male'"
             genderdisplay="block"
             @update:name="framework.setFieldValue('patient', 'name', $event)"
             @update:age="framework.setFieldValue('patient', 'age', $event)"
@@ -29,6 +29,7 @@
               :options="getOptions(question.optionsType as keyof OptionsSets)"
               :index="index"
               :is-unanswered="formSubmitted && isUnanswered(question)"
+              @update:answer="framework.setFieldValue('calculator', question.id, $event)"
             />
             <div v-if="validationMessage" class="text-red-500 mt-5 font-bold">
               {{ validationMessage }}
@@ -46,7 +47,7 @@
                 <b>{{ config.name }}</b>
                 <br /><br />
                 Navn: {{ framework.patientData.value.name }} <br />
-                Køn: {{ framework.patientData.value.gender }} <br />
+                Køn: {{ getGenderLabelByAge(framework.patientData.value.gender as GenderValue, framework.patientData.value.age || 50) }} <br />
                 Alder: {{ framework.patientData.value.age }} år<br /><br />
                 <div v-for="question in resultsSection1" :key="question.id" >{{ question.text }} {{ (framework.calculatorData.value as any)[question.id] }}</div>
                 <br /><br />
@@ -99,13 +100,9 @@ import SurfaceCard from "./SurfaceCard.vue";
 import PersonInfo from "./PersonInfo.vue";
 import Message from '@/volt/Message.vue';
 import { useCalculatorFramework, type CalculatorConfig, type CalculatorStep } from '@/composables/useCalculatorFramework';
+import { getGenderLabelByAge, type GenderValue } from '@/utils/genderUtils';
 
-// New imports for enhanced functionality
-import { useErrorHandler } from '@/composables/useErrorHandler';
-import { useLogging } from '@/composables/useLogging';
-import { useValidation } from '@/composables/useValidation';
-import { AuditSchema } from '@/schemas/calculators';
-import { PatientPsychologySchema } from '@/schemas/patient';
+// Removed unused imports
 
 export interface Option {
   text: string;
@@ -142,7 +139,7 @@ framework.initializeSteps(steps);
 
 // Initialize with default patient data
 framework.setFieldValue('patient', 'age', 50);
-framework.setFieldValue('patient', 'gender', 'Mand');
+framework.setFieldValue('patient', 'gender', 'male');
 
 const options1 = ref<Option[]>([
   { text: "Aldrig", value: 0 },

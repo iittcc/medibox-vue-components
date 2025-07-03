@@ -101,7 +101,7 @@ describe('GCSScore.vue', () => {
 
       // Patient info defaults
       expect(component.name).toBe("")
-      expect(component.gender).toBe("Mand")
+      expect(component.gender).toBe("male")
       expect(component.age).toBe(50)
 
       // Form state
@@ -349,7 +349,7 @@ describe('GCSScore.vue', () => {
       // Set up patient info
       component.name = 'Test Patient'
       component.age = 65
-      component.gender = 'Kvinde'
+      component.gender = 'female'
 
       // Set specific GCS scores
       component.questionsSection1[0].answer = 3
@@ -361,7 +361,7 @@ describe('GCSScore.vue', () => {
 
       expect(payload.name).toBe('Test Patient')
       expect(payload.age).toBe(65)
-      expect(payload.gender).toBe('Kvinde')
+      expect(payload.gender).toBe('female')
       expect(payload.answers).toHaveLength(3)
       expect(payload.scores.totalScore).toBe(12)
     })

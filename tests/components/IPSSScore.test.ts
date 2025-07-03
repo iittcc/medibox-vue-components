@@ -167,7 +167,7 @@ describe('IPSSScore Component', () => {
       
       // Patient info defaults (male-focused for prostate symptoms)
       expect(component.name).toBe('')
-      expect(component.gender).toBe('Mand') // Male default for prostate
+      expect(component.gender).toBe('male') // Male default for prostate
       expect(component.age).toBe(50) // Same as AUDIT, different from EPDS
       
       // Form state defaults
@@ -505,14 +505,14 @@ describe('IPSSScore Component', () => {
       
       component.name = 'Test Patient'
       component.age = 65
-      component.gender = 'Mand'
+      component.gender = 'male'
       component.totalScore = 12
       
       const payload = component.generatePayload()
       
       expect(payload).toHaveProperty('name', 'Test Patient')
       expect(payload).toHaveProperty('age', 65)
-      expect(payload).toHaveProperty('gender', 'Mand')
+      expect(payload).toHaveProperty('gender', 'male')
       expect(payload).toHaveProperty('answers')
       expect(payload).toHaveProperty('scores')
       expect(payload.scores.totalScore).toBe(12)
@@ -586,7 +586,7 @@ describe('IPSSScore Component', () => {
 
     test('has correct male default for prostate symptoms', () => {
       const component = wrapper.vm as any
-      expect(component.gender).toBe('Mand') // Male default for prostate assessment
+      expect(component.gender).toBe('male') // Male default for prostate assessment
       expect(component.age).toBe(50) // Appropriate age for prostate issues
     })
   })

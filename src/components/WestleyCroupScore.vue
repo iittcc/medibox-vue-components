@@ -9,7 +9,7 @@
           :age="age"
           :minAge="0"
           :maxAge="12"
-          :gender="gender"
+          :gender="gender as GenderValue"
           genderdisplay="block"
           child="true"
           @update:name="name = $event"
@@ -48,7 +48,7 @@
               <b>WESTLEY CROUP SCORE</b>
               <br /><br />
               Navn: {{ name }} <br />
-              Køn: {{ gender }} <br />
+              Køn: {{ getGenderLabelByAge(gender as GenderValue, age) }} <br />
               Alder: {{ age }} år<br /><br />
               <div v-for="(question, index) in resultsSection1" >{{ question.text }} {{ question.score }}</div />
               <br /><br />
@@ -87,6 +87,7 @@ import SurfaceCard from "./SurfaceCard.vue";
 import PersonInfo from "./PersonInfo.vue";
 import Message from '@/volt/Message.vue';
 import sendDataToServer from '../assets/sendDataToServer.ts';
+import { getGenderLabelByAge, type GenderValue } from '@/utils/genderUtils';
 
 export interface Option {
   text: string;
@@ -120,7 +121,7 @@ const keyUrl = apiUrlServer+'/index.php/KeyServer/getPublicKey';
 
 const resultsSection = ref<HTMLDivElement | null>(null);
 const name = ref<string>("");
-const gender = ref<string>("Dreng");
+const gender = ref<GenderValue>("male");
 const age = ref<number>(6);
 
 const formSubmitted = ref<boolean>(false);

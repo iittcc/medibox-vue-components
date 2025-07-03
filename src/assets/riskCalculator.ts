@@ -1,8 +1,8 @@
 import scoreDataJson from './score2_data.json';
 
 interface ScoreData {
-  "Kvinde": GenderData;
-  "Mand": GenderData;
+  "female": GenderData;
+  "male": GenderData;
 }
 
 interface GenderData {
@@ -62,7 +62,7 @@ function getSmokingGroup(smoking: boolean): 'Ikke-ryger' | 'Ryger' {
 }
 
 export function filterByAgeGroup(
-  gender: 'Mand' | 'Kvinde',
+  gender: 'male' | 'female',
   smokerStatus: 'Ikke-ryger' | 'Ryger',
   ageGroup: string
 ): { [ldlRange: string]: BloodPressureData } | undefined {
@@ -84,7 +84,7 @@ export function filterByAgeGroup(
   return filteredData;
 }
 
-export function calculateRisk(gender: 'Kvinde' | 'Mand', age: number, smoker: boolean, sysBP: number, ldl: number): number {
+export function calculateRisk(gender: 'female' | 'male', age: number, smoker: boolean, sysBP: number, ldl: number): number {
   const ageGroup = getAgeGroup(age);
   const bpGroup = getBPGroup(sysBP);
   const ldlGroup = getLDLGroup(ldl);

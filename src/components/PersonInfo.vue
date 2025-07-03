@@ -13,6 +13,8 @@
                 <SelectButton
                     v-model="localGender"
                     :options="currentGenderOptions"
+                    optionLabel="label"
+                    optionValue="value"
                     aria-labelledby="basic"
                     @update:modelValue="updateGender"
                     class="ml-1"
@@ -42,13 +44,14 @@ import { ref, computed, watch } from "vue";
 import InputText from '@/volt/InputText.vue';
 import SelectButton from '@/volt/SelectButton.vue';
 import NumberSliderInput from './NumberSliderInput.vue';
+import { genderDisplayMap, childGenderDisplayMap, type GenderValue } from '@/utils/genderUtils'
 
 export interface Props {
     name: string,
     age: number,
     minAge: number,
     maxAge: number,
-    gender: string,
+    gender: GenderValue,
     genderdisplay?: string;
     sliderType?: string;
 }
@@ -57,17 +60,27 @@ const props = withDefaults(defineProps<Props>(), {
     sliderType: "prime"
 });
 
-const genderOptions = ref(["Mand", "Kvinde"]);
-const genderOptionsChild = ref(["Dreng", "Pige"]);
-
 const localName = ref<string>(props.name);
 
 const localAge = ref<number>(props.age);
 
+// Display options for SelectButton (Danish labels with English values)
 const currentGenderOptions = computed(() => {
-    return localAge.value <= 16 ? genderOptionsChild.value : genderOptions.value;
+    if (localAge.value <= 16) {
+        return Object.entries(childGenderDisplayMap).map(([key, label]) => ({
+            label: label,
+            value: key
+        }));
+    } else {
+        return Object.entries(genderDisplayMap).map(([key, label]) => ({
+            label: label,
+            value: key
+        }));
+    }
 });
-const localGender = ref<string>(props.gender);
+
+const localGender = ref<GenderValue>(props.gender as GenderValue);
+
 const emit = defineEmits(['update:name', 'update:age', 'update:gender']);
 
 const updateName = (event: Event) => {
@@ -75,7 +88,7 @@ const updateName = (event: Event) => {
     emit('update:name', target.value);
 };
 
-const updateGender = (value: string) => {
+const updateGender = (value: GenderValue) => {
     emit('update:gender', value);
 };
 
@@ -83,15 +96,6 @@ const updateAge = (value: number | number[]) => {
     emit('update:age', Array.isArray(value) ? value[0] : value);
 };
 
-watch(localAge, (newAge) => {
-    if (newAge <= 16 && (localGender.value === "Mand" || localGender.value === "Kvinde")) {
-        localGender.value = (localGender.value === "Mand") ? genderOptionsChild.value[0] : genderOptionsChild.value[1];
-        emit('update:gender', localGender.value);
-    } else if (newAge >= 16 && (localGender.value === "Dreng" || localGender.value === "Pige")) {
-        localGender.value = (localGender.value === "Dreng") ? genderOptions.value[0] : genderOptions.value[1];
-        emit('update:gender', localGender.value);
-    }
-});
 </script>
 <style scoped>
 html {
