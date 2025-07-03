@@ -4,7 +4,7 @@ export const calculateAuditScore = (responses: CalculatorResponses): Calculation
   const score = Object.values(responses).reduce((sum, value) => sum + (Number(value) || 0), 0);
 
   let interpretation = '';
-  let riskLevel: 'low' | 'medium' | 'high' | 'very_high' = 'low';
+  let riskLevel: 'low' | 'high' = 'low';
   let recommendations: string[] = [];
 
   if (score >= 8) {
@@ -24,3 +24,4 @@ export const calculateAuditScore = (responses: CalculatorResponses): Calculation
     recommendations,
   };
 };
+  

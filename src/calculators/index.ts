@@ -1,5 +1,5 @@
 import type { MedicalCalculator } from './base/calculatorBase'
-import type { CalculatorResponses, CalculationResult } from '@/types/calculatorTypes'
+import type { CalculatorResponses, CalculationResult, SpecificCalculatorDetails, CalculatorDetails } from '@/types/calculatorTypes'
 
 // Import calculator implementations
 import { auditCalculator } from './audit/auditCalculator'
@@ -118,7 +118,7 @@ export function calculateMedicalScore(
     // Perform calculation with built-in validation
     const result = calculator.calculate(responses)
     
-    return result
+    return result as CalculationResult
   } catch (error) {
     // Re-throw with additional context
     if (error instanceof Error) {

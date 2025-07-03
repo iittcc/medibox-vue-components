@@ -4,7 +4,7 @@ import type { AuditResponses, AuditDetails } from '@/types/calculatorTypes'
 export type { AuditResponses, AuditDetails }
 
 // AUDIT-specific risk categories
-export type AuditRiskCategory = 'low' | 'medium' | 'high' | 'very_high'
+export type AuditRiskCategory = 'low' | 'high'
 
 // AUDIT score interpretation
 export interface AuditInterpretation {
@@ -22,9 +22,7 @@ export const AUDIT_CONFIG = {
   SCORE_RANGE: { min: 0, max: 40 },
   QUESTION_RANGE: { min: 0, max: 4 },
   RISK_THRESHOLDS: {
-    LOW: 7,      // 0-7: Low risk
-    MEDIUM: 15,  // 8-15: Medium risk  
-    HIGH: 19,    // 16-19: High risk
-    VERY_HIGH: 40 // 20+: Very high risk
+    LOW: 0,      // 0-7: Low risk
+    HIGH: 8,    // 8-40: High risk
   }
 } as const
