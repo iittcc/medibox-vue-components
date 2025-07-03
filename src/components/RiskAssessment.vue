@@ -372,8 +372,6 @@ const chartPieOptions = ref({
   },
 });
 
-const ageGroupData = filterByAgeGroup("Mand", "Ikke-ryger", "40-44");
-
 // Function to update the chart data based on sysBP and age
 const calcRisk = () => {
   risk.value = calculateRisk(
@@ -547,7 +545,7 @@ const updateMinMaxRanges = () => {
       50 år og ældre: 2,0 - 5,3 mmol/L
   */
 
-  if (gender.value == "Mand") {
+  if (gender.value == "male") {
     minSysBP.value = 90;
     maxSysBP.value = 140;
 
