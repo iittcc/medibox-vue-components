@@ -41,7 +41,11 @@ export class WestleyCroupCalculator extends BaseCalculator<WestleyCroupResponses
   }
 
   protected calculateScore(responses: WestleyCroupResponses): CalculationResult<WestleyCroupDetails> {
-    const score = Object.values(responses).reduce((sum: number, value: any) => sum + (Number(value) || 0), 0)
+    const score = Number(responses.levelOfConsciousness || 0) + 
+                  Number(responses.cyanosis || 0) + 
+                  Number(responses.stridor || 0) + 
+                  Number(responses.airEntry || 0) + 
+                  Number(responses.retractions || 0)
     
     let interpretation: string
     let recommendations: string[]
