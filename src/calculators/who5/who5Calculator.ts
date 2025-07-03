@@ -68,10 +68,14 @@ export class Who5Calculator extends BaseCalculator<Who5Responses, Who5Details> {
       screeningRecommended: depressionRisk
     }
 
-    const interpretation = `Velbefindende niveau: ${wellBeingLevel === 'poor' ? 'dårligt' : 
-      wellBeingLevel === 'below_average' ? 'under gennemsnit' :
-      wellBeingLevel === 'average' ? 'gennemsnitligt' :
-      wellBeingLevel === 'good' ? 'godt' : 'fremragende'}`
+    const wellBeingTranslations = {
+      poor: 'dårligt',
+      below_average: 'under gennemsnit',
+      average: 'gennemsnitligt',
+      good: 'godt',
+      excellent: 'fremragende'
+    }
+    const interpretation = `Velbefindende niveau: ${wellBeingTranslations[wellBeingLevel]}`
 
     const recommendations = depressionRisk 
       ? ['Kontakt læge for depression screening', 'Overvej psykologisk støtte']
