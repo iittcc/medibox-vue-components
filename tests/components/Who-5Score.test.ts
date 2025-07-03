@@ -101,7 +101,7 @@ describe('Who-5Score.vue', () => {
 
       // Patient info defaults
       expect(component.name).toBe("")
-      expect(component.gender).toBe("Mand")
+      expect(component.gender).toBe("male")
       expect(component.age).toBe(50)
 
       // Form state
@@ -346,7 +346,7 @@ describe('Who-5Score.vue', () => {
       // Set up patient info
       component.name = 'Test Patient'
       component.age = 35
-      component.gender = 'Kvinde'
+      component.gender = 'female'
 
       // Set specific scores
       component.questionsSection1[0].answer = 3
@@ -360,7 +360,7 @@ describe('Who-5Score.vue', () => {
 
       expect(payload.name).toBe('Test Patient')
       expect(payload.age).toBe(35)
-      expect(payload.gender).toBe('Kvinde')
+      expect(payload.gender).toBe('female')
       expect(payload.answers).toHaveLength(5)
       expect(payload.scores.totalScore).toBe(60)
     })

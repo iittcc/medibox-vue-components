@@ -104,7 +104,7 @@ describe('Score2 Medical Calculator - Core Logic Tests', () => {
   describe('Initial State', () => {
     it('has correct default patient values', () => {
       expect(component.name).toBe('')
-      expect(component.gender).toBe('Mand')
+      expect(component.gender).toBe('male')
       expect(component.age).toBe(55)
     })
 
@@ -352,7 +352,7 @@ describe('Score2 Medical Calculator - Core Logic Tests', () => {
     it('formats patient data correctly', async () => {
       component.name = 'Test Patient'
       component.age = 65
-      component.gender = 'Kvinde'
+      component.gender = 'female'
       component.sysBP = 150
       component.LDLCholesterol = 5.5
       component.smoking = true
@@ -361,7 +361,7 @@ describe('Score2 Medical Calculator - Core Logic Tests', () => {
       // These values should be accessible for copy dialog
       expect(component.name).toBe('Test Patient')
       expect(component.age).toBe(65)
-      expect(component.gender).toBe('Kvinde')
+      expect(component.gender).toBe('female')
       expect(component.sysBP).toBe(150)
       expect(component.LDLCholesterol).toBe(5.5)
       expect(component.smoking).toBe(true)

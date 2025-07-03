@@ -102,7 +102,7 @@ describe('WestleyCroupScore.vue', () => {
 
       // Patient info defaults for pediatric patient
       expect(component.name).toBe("")
-      expect(component.gender).toBe("Dreng")
+      expect(component.gender).toBe("male")
       expect(component.age).toBe(6)
 
       // Form state
@@ -327,7 +327,7 @@ describe('WestleyCroupScore.vue', () => {
       // Set up patient info
       component.name = 'Test Child'
       component.age = 4
-      component.gender = 'Pige'
+      component.gender = 'female'
 
       // Set some scores
       component.questionsSection1[0].answer = 0
@@ -338,7 +338,7 @@ describe('WestleyCroupScore.vue', () => {
 
       expect(payload.name).toBe('Test Child')
       expect(payload.age).toBe(4)
-      expect(payload.gender).toBe('Pige')
+      expect(payload.gender).toBe('female')
       expect(payload.answers).toHaveLength(5)
       expect(payload.scores.totalScore).toBe(4)
     })

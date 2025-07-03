@@ -166,7 +166,7 @@ describe('PUQEScore Component', () => {
       
       // Patient info defaults (female-focused for pregnancy)
       expect(component.name).toBe('')
-      expect(component.gender).toBe('Kvinde') // Female for pregnancy
+      expect(component.gender).toBe('female') // Female for pregnancy
       expect(component.age).toBe(28) // Youngest default - appropriate for pregnancy
       
       // Form state defaults
@@ -497,14 +497,14 @@ describe('PUQEScore Component', () => {
       
       component.name = 'Test Patient'
       component.age = 30
-      component.gender = 'Kvinde'
+      component.gender = 'female'
       component.totalScore = 8
       
       const payload = component.generatePayload()
       
       expect(payload).toHaveProperty('name', 'Test Patient')
       expect(payload).toHaveProperty('age', 30)
-      expect(payload).toHaveProperty('gender', 'Kvinde')
+      expect(payload).toHaveProperty('gender', 'female')
       expect(payload).toHaveProperty('answers')
       expect(payload).toHaveProperty('scores')
       expect(payload.scores.totalScore).toBe(8)
@@ -577,7 +577,7 @@ describe('PUQEScore Component', () => {
 
     test('has correct female default for pregnancy assessment', () => {
       const component = wrapper.vm as any
-      expect(component.gender).toBe('Kvinde') // Female default for pregnancy
+      expect(component.gender).toBe('female') // Female default for pregnancy
       expect(component.age).toBe(28) // Appropriate age for pregnancy assessment
     })
   })

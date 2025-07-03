@@ -47,7 +47,7 @@
                 <b>WHO-5 Trivselsindex</b>
                 <br /><br />
                 Navn: {{ name }} <br />
-                Køn: {{ gender }} <br />
+                Køn: {{ getGenderLabel(gender as GenderValue) }} <br />
                 Alder: {{ age }} år<br /><br />
                 <div v-for="(question, index) in resultsSection1" >{{ question.text }} {{ question.score }}</div />
                 <br /><br />
@@ -86,6 +86,7 @@ import SurfaceCard from "./SurfaceCard.vue";
 import PersonInfo from "./PersonInfo.vue";
 import Message from '@/volt/Message.vue';
 import sendDataToServer from '../assets/sendDataToServer.ts';
+import { getGenderLabel, type GenderValue } from '@/utils/genderUtils';
 
 export interface Option {
   text: string;
@@ -116,7 +117,7 @@ const keyUrl = apiUrlServer+'/index.php/KeyServer/getPublicKey';
 
 const resultsSection = ref<HTMLDivElement | null>(null);
 const name = ref<string>("");
-const gender = ref<string>("Mand");
+const gender = ref<string>("male");
 const age = ref<number>(50);
 
 const formSubmitted = ref<boolean>(false);

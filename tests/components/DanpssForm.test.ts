@@ -113,7 +113,7 @@ describe('DanpssForm.vue', () => {
 
       // Patient info defaults
       expect(component.name).toBe("")
-      expect(component.gender).toBe("Mand")
+      expect(component.gender).toBe("male")
       expect(component.age).toBe(55)
 
       // Form state
@@ -380,7 +380,7 @@ describe('DanpssForm.vue', () => {
       // Set up patient info
       component.name = 'Test Patient'
       component.age = 65
-      component.gender = 'Mand'
+      component.gender = 'male'
 
       // Set some answers
       component.questionsSection1[0].answerA = 2
@@ -393,7 +393,7 @@ describe('DanpssForm.vue', () => {
 
       expect(payload.name).toBe('Test Patient')
       expect(payload.age).toBe(65)
-      expect(payload.gender).toBe('Mand')
+      expect(payload.gender).toBe('male')
       expect(payload.answers).toHaveLength(15) // All questions
       expect(payload.scores.totalScoreA).toBe(10)
       expect(payload.scores.totalScoreB).toBe(15)

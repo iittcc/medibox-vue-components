@@ -253,7 +253,7 @@ const keyUrl = apiUrlServer+'/index.php/KeyServer/getPublicKey';
 
 const resultsSection = ref<HTMLDivElement | null>(null);
 const name = ref<string>("");
-const gender = ref<string>("Mand");
+const gender = ref<string>("male");
 const age = ref<number>(55);
 const formSubmitted = ref<boolean>(false);
 

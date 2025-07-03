@@ -203,7 +203,7 @@ describe('Score2 Risk Assessment Component', () => {
       const component = wrapper.vm as any
       
       expect(component.name).toBe('')
-      expect(component.gender).toBe('Mand')
+      expect(component.gender).toBe('male')
       expect(component.age).toBe(55)
       expect(component.sysBP).toBe(140)
       expect(component.LDLCholesterol).toBe(5.0)
@@ -249,9 +249,9 @@ describe('Score2 Risk Assessment Component', () => {
       expect(component.age).toBe(65)
       
       // Update gender
-      personInfo.vm.$emit('update:gender', 'Kvinde')
+      personInfo.vm.$emit('update:gender', 'female')
       await nextTick()
-      expect(component.gender).toBe('Kvinde')
+      expect(component.gender).toBe('female')
     })
 
     it('updates examination values through sliders', async () => {
@@ -440,7 +440,7 @@ describe('Score2 Risk Assessment Component', () => {
       const component = wrapper.vm as any
       
       // Test male
-      component.gender = 'Mand'
+      component.gender = 'male'
       component.age = 55
       component.updateMinMaxRanges()
       await nextTick()
@@ -448,7 +448,7 @@ describe('Score2 Risk Assessment Component', () => {
       const maleLDL = component.minLDLCholesterol
       
       // Test female
-      component.gender = 'Kvinde'
+      component.gender = 'female'
       component.updateMinMaxRanges()
       await nextTick()
       expect(component.minSysBP).toBe(maleSysBP)
@@ -503,7 +503,7 @@ describe('Score2 Risk Assessment Component', () => {
       const component = wrapper.vm as any
       component.name = 'Test Patient'
       component.age = 65
-      component.gender = 'Mand'
+      component.gender = 'male'
       component.sysBP = 150
       component.LDLCholesterol = 5.5
       component.smoking = true
@@ -633,7 +633,7 @@ describe('Score2 Risk Assessment Component', () => {
       const initialTargetRisk = component.targetRisk
       
       component.age = 75
-      component.gender = 'Kvinde'
+      component.gender = 'female'
       await nextTick()
       
       // Both risks should change when demographics change

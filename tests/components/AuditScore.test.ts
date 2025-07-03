@@ -1,15 +1,19 @@
 import { describe, expect, test, vi, beforeEach } from 'vitest';
 import { mount } from '@vue/test-utils';
 import AuditScore from '@/components/AuditScore.vue';
-import { ref } from 'vue';
+import { ref, reactive } from 'vue';
 import type { CalculationResult } from '@/types/calculatorTypes'; // adjust path as needed
+
+// Create reactive state objects to match actual composable structure
+const mockState = reactive({ isSubmitting: false, isComplete: false });
+const mockResult = ref<CalculationResult | null>(null);
 
 // Mock the framework
 const mockFramework = {
-  patientData: ref({ name: 'Test Patient', age: 45, gender: 'Mand' }),
+  patientData: ref({ name: 'Test Patient', age: 45, gender: 'male' }),
   calculatorData: ref({ question1: 1, question2: 2 }),
-  result: ref<CalculationResult | null>(null),
-  state: ref({ isSubmitting: false, isComplete: false }),
+  result: mockResult,
+  state: mockState, // This should be a reactive object, not ref
   canProceed: ref(true),
   setFieldValue: vi.fn(),
   submitCalculation: vi.fn(),
@@ -62,13 +66,26 @@ describe('Refactored AuditScore Component', () => {
   test('should call framework.setFieldValue when a question answer changes', async () => {
     const questionComponents = wrapper.findAllComponents(QuestionSingleComponentStub);
     const firstQuestion = questionComponents[0];
+    
     firstQuestion.vm.$emit('update:answer', 3);
-    expect(mockFramework.setFieldValue).toHaveBeenCalledWith('calculator', 'question1', 3);
+    
+    // Check that the last call was for the question
+    const calls = mockFramework.setFieldValue.mock.calls;
+    const lastCall = calls[calls.length - 1];
+    expect(lastCall).toEqual(['calculator', 'question1', 3]);
   });
 
   test('should call framework.submitCalculation when the submit button is clicked', async () => {
-    const submitButton = wrapper.findComponent(ButtonStub);
-    await submitButton.trigger('click');
+    // Set up all questions with answers to pass validation
+    const form = wrapper.find('form');
+    
+    // Mock all questions as answered by directly setting the reactive data
+    // This simulates what happens when users answer all questions
+    wrapper.vm.questionsSection1.forEach((question: any, index: number) => {
+      question.answer = index; // Set a valid answer for each question
+    });
+    
+    await form.trigger('submit');
     expect(mockFramework.submitCalculation).toHaveBeenCalled();
   });
 
@@ -81,13 +98,17 @@ describe('Refactored AuditScore Component', () => {
   test('should display results when the framework state is complete', async () => {
     expect(wrapper.find('[data-testid="results-section"]').exists()).toBe(false);
 
-    mockFramework.state.value.isComplete = true;
-    mockFramework.result.value = {
+    // Update the reactive state objects directly (no .value needed for reactive)
+    mockState.isComplete = true;
+    mockState.isSubmitting = false;
+    mockResult.value = {
       score: 15,
       interpretation: 'Tegn på alkoholafhængighed',
       riskLevel: 'high',
       recommendations: [],
     };
+    
+    // Trigger reactivity
     await wrapper.vm.$nextTick();
 
     const resultsSection = wrapper.find('[data-testid="results-section"]');

@@ -12,7 +12,7 @@
             <b>10 års risiko for fatal hændelse pga. iskæmisk hjerte-karsygdom</b>
             <br /><br />
             Navn: {{ name }} <br />
-            Køn: {{ gender }} <br />
+            Køn: {{ getGenderLabel(gender as GenderValue) }} <br />
             Alder: {{ age }} år<br /><br />
 
             <b>Undersøgelse</b><br /><br />
@@ -238,16 +238,15 @@ import CustomIcon from "./CustomIcon.vue";
 import { calculateRisk, filterByAgeGroup } from "../assets/riskCalculator.ts";
 import PersonInfo from "./PersonInfo.vue";
 import NumberSliderInput from './NumberSliderInput.vue';
+import { getGenderLabel, type GenderValue } from '@/utils/genderUtils';
 
 export interface Option {
   label: string;
   value: string | number;
 }
 
-const genderOptions = ref(["Mand", "Kvinde"]);
-
 const name = ref<string>("");
-const gender = ref<"Mand" | "Kvinde">("Mand");
+const gender = ref<"male" | "female">("male");
 const age = ref<number>(55);
 const sysBP = ref<number>(140);
 const minSysBP = ref(90); // Minimum value for the slider

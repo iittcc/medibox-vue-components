@@ -13,6 +13,8 @@
                 <SelectButton
                     v-model="localGender"
                     :options="currentGenderOptions"
+                    optionLabel="label"
+                    optionValue="value"
                     aria-labelledby="basic"
                     @update:modelValue="updateGender"
                     class="ml-1"
@@ -57,15 +59,38 @@ const props = withDefaults(defineProps<Props>(), {
     sliderType: "prime"
 });
 
-const genderOptions = ref(["Mand", "Kvinde"]);
-const genderOptionsChild = ref(["Dreng", "Pige"]);
+// Gender values for internal use (standard types)
+const genderOptions = ref(["male", "female"]);
+const genderOptionsChild = ref(["male", "female"]);
+
+// Display mapping for Danish UI
+const genderDisplayMap = {
+    "male": "Mand",
+    "female": "Kvinde"
+};
+
+const childGenderDisplayMap = {
+    "male": "Dreng", 
+    "female": "Pige"
+};
 
 const localName = ref<string>(props.name);
 
 const localAge = ref<number>(props.age);
 
+// Display options for SelectButton (Danish labels)
 const currentGenderOptions = computed(() => {
-    return localAge.value <= 16 ? genderOptionsChild.value : genderOptions.value;
+    if (localAge.value <= 16) {
+        return genderOptionsChild.value.map(value => ({
+            label: childGenderDisplayMap[value as keyof typeof childGenderDisplayMap],
+            value: value
+        }));
+    } else {
+        return genderOptions.value.map(value => ({
+            label: genderDisplayMap[value as keyof typeof genderDisplayMap],
+            value: value
+        }));
+    }
 });
 const localGender = ref<string>(props.gender);
 const emit = defineEmits(['update:name', 'update:age', 'update:gender']);
@@ -84,12 +109,12 @@ const updateAge = (value: number | number[]) => {
 };
 
 watch(localAge, (newAge) => {
-    if (newAge <= 16 && (localGender.value === "Mand" || localGender.value === "Kvinde")) {
-        localGender.value = (localGender.value === "Mand") ? genderOptionsChild.value[0] : genderOptionsChild.value[1];
-        emit('update:gender', localGender.value);
-    } else if (newAge >= 16 && (localGender.value === "Dreng" || localGender.value === "Pige")) {
-        localGender.value = (localGender.value === "Dreng") ? genderOptions.value[0] : genderOptions.value[1];
-        emit('update:gender', localGender.value);
+    // Gender values remain standard 'male'/'female' - no conversion needed
+    // The display mapping handles the UI presentation
+    if (newAge <= 16 && (localGender.value === "male" || localGender.value === "female")) {
+        // Already using standard values, no change needed
+    } else if (newAge >= 16 && (localGender.value === "male" || localGender.value === "female")) {
+        // Already using standard values, no change needed
     }
 });
 </script>
