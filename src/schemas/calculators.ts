@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { PatientBaseSchema, PatientPsychologySchema, PatientInfectionSchema, PatientPregnancySchema } from './patient'
+import { PatientBaseSchema, PatientPsychologySchema } from './patient'
 
 // Import schemas from their co-located modules
 import { EpdsQuestionSchema, EpdsSchema } from '@/calculators/epds'

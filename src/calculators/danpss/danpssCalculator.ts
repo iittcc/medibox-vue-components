@@ -143,6 +143,7 @@ export class DanpssCalculator extends BaseCalculator<DanpssResponses, DanpssDeta
   private generateInterpretation(
     depressionLevel: SeverityLevel,
     anxietyLevel: SeverityLevel,
+     
     _combinedRisk: RiskLevel
   ): string {
     const depressionText = this.getSeverityText(depressionLevel, 'depression')
@@ -154,6 +155,7 @@ export class DanpssCalculator extends BaseCalculator<DanpssResponses, DanpssDeta
   /**
    * Gets Danish text for severity level
    */
+   
   private getSeverityText(level: SeverityLevel, _symptomType: 'depression' | 'angst'): string {
     const texts: Record<SeverityLevel, string> = {
       'none': 'ingen/minimal',

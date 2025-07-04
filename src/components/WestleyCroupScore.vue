@@ -50,7 +50,7 @@
               Navn: {{ name }} <br />
               Køn: {{ getGenderLabelByAge(gender as GenderValue, age) }} <br />
               Alder: {{ age }} år<br /><br />
-              <div v-for="(question, index) in resultsSection1" >{{ question.text }} {{ question.score }}</div />
+              <div v-for="(question, index) in resultsSection1" :key="index">{{ question.text }} {{ question.score }}</div>
               <br /><br />
               Westley Croup Score {{ totalScore }} : {{ conclusion }}
             </template>
@@ -219,10 +219,10 @@ const handleSubmit = () => {
     calculateResults();
     scrollToResults();
     sendDataToServer(apiUrl, keyUrl, generatePayload())
-    .then((data) => {
+    .then((_data) => {
       //console.log('Data successfully sent:', data);
     })
-    .catch((error) => {
+    .catch((_error) => {
       //console.error('Failed to send data:', error.message);
     });
   }
@@ -280,7 +280,7 @@ const scrollToResults = () => {
   }
 };
 
-const randomlyCheckQuestions = () => {
+const _randomlyCheckQuestions = () => {
   const randomValue = (options: Option[]) => options[Math.floor(Math.random() * options.length)].value;
 
   questionsSection1.value.forEach(question => {
@@ -290,7 +290,7 @@ const randomlyCheckQuestions = () => {
   });
 };
 
-const clearAllQuestionsAndResults = () => {
+const _clearAllQuestionsAndResults = () => {
   questionsSection1.value.forEach(question => {
     question.answer = null;
   });

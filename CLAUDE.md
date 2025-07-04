@@ -229,6 +229,58 @@ Each entry point has:
 - **Strict mode** enabled
 - **Path aliasing**: `@/` points to `src/`
 
+## MCP Server Configuration
+
+### TypeScript Documentation Server
+A local MCP server has been configured to provide access to the complete TypeScript documentation.
+
+#### Setup
+The TypeScript documentation server is set up at `/Users/tej/mcp-servers/` with these components:
+- **MCP Server script**: `/Users/tej/mcp-servers/typescript-docs-mcp.js`
+- **Startup script**: `/Users/tej/mcp-servers/start-typescript-docs.sh`
+- **Configuration**: Added to `.mcp.json` as `typescript-docs`
+- **Documentation source**: Cloned TypeScript-Website repository at `/Users/tej/mcp-servers/typescript-docs/`
+
+#### Available Documentation Resources
+The MCP server provides access to key TypeScript documentation sections:
+- **TypeScript Handbook** - `typescript://docs/handbook`
+- **TypeScript Handbook v2** - `typescript://docs/handbook/2`
+- **TSConfig Reference** - `typescript://tsconfig`
+- **Basic Types** - `typescript://docs/handbook/basic-types`
+- **Interfaces** - `typescript://docs/handbook/interfaces`
+- **Classes** - `typescript://docs/handbook/classes`
+- **Functions** - `typescript://docs/handbook/functions`
+- **Generics** - `typescript://docs/handbook/generics`
+- **Enums** - `typescript://docs/handbook/enums`
+- **Modules** - `typescript://docs/handbook/modules`
+
+#### Manual Server Management
+To manually start the documentation server:
+```bash
+/Users/tej/mcp-servers/start-typescript-docs.sh
+```
+
+The server will be available at `http://localhost:8000`
+
+#### MCP Integration
+The server automatically starts the Gatsby documentation server when Claude Code connects. Access TypeScript documentation through:
+- `ListMcpResourcesTool` with server="typescript-docs" to see available documentation sections
+- `ReadMcpResourceTool` with server="typescript-docs" and uri="typescript://..." to read specific pages
+
+#### Optimization Features
+- **Automatic server startup**: MCP server handles Gatsby process management
+- **Resource caching**: Efficient access to frequently used documentation
+- **Fallback mechanisms**: Uses curl if fetch API unavailable
+- **Clean shutdown**: Proper process cleanup on exit
+
+#### Troubleshooting
+If the server fails to start:
+1. Check that Node.js 18+ and pnpm are installed
+2. Verify the TypeScript documentation repository is at `/Users/tej/mcp-servers/typescript-docs/`
+3. Run `pnpm install` and `pnpm bootstrap` in the docs directory
+4. Check for port conflicts on port 8000
+5. Ensure executable permissions: `chmod +x /Users/tej/mcp-servers/*.sh /Users/tej/mcp-servers/*.js`
+
 ## Repository Etiquette
 
 ### Git Workflow

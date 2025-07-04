@@ -4,6 +4,7 @@ import type { CalculatorConfig } from '@/composables/useCalculatorFramework'
 // Dependency injection interface
 export interface ExportDependencies {
   useLogging: () => {
+     
     logUserAction: (action: string, details: any, calculatorType?: string) => void
   }
 }
@@ -26,6 +27,7 @@ export interface ExportPlugin {
   format: ExportFormat
   name: string
   description: string
+   
   export: (data: ExportData) => string | Promise<string>
 }
 
@@ -39,8 +41,7 @@ export const useExportService = (dependencies: ExportDependencies) => {
 ${data.calculator.name} - Resultat
 
 Patient Information:
-${Object.entries(data.patient).map(([key, value]) => `  ${key}: ${value}`).join('
-')}
+${Object.entries(data.patient).map(([key, value]) => `  ${key}: ${value}`).join('\n')}
 
 Resultat:
   Score: ${data.result.score}
@@ -48,8 +49,7 @@ Resultat:
   Fortolkning: ${data.result.interpretation}
 
 Anbefalinger:
-${data.result.recommendations.map((rec: string) => `  - ${rec}`).join('
-')}
+${data.result.recommendations.map((rec: string) => `  - ${rec}`).join('\n')}
 
 Metadata:
   Session ID: ${data.metadata.sessionId}
@@ -150,7 +150,8 @@ Metadata:
       format: 'pdf',
       name: 'PDF Export',
       description: 'Export results as PDF document',
-      export: async (data: ExportData) => {
+       
+      export: async (_data: ExportData) => {
         // TODO: Implement PDF generation
         throw new Error('PDF export not yet implemented')
       }
@@ -162,7 +163,7 @@ Metadata:
       format: 'csv',
       name: 'CSV Export', 
       description: 'Export results as CSV spreadsheet',
-      export: (data: ExportData) => {
+      export: (_data: ExportData) => {
         // TODO: Implement CSV generation
         throw new Error('CSV export not yet implemented')
       }

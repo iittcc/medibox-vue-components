@@ -1,11 +1,11 @@
-import { describe, expect, test, vi, beforeEach } from 'vitest';
+import { describe, expect, test, vi, beforeEach, afterEach } from 'vitest';
 import { mount } from '@vue/test-utils';
 import AuditScore from '@/components/AuditScore.vue';
-import { ref, reactive } from 'vue';
+import { ref } from 'vue';
 import type { CalculationResult } from '@/types/calculatorTypes'; // adjust path as needed
 
-// Create reactive state objects to match actual composable structure
-const mockState = reactive({ isSubmitting: false, isComplete: false });
+// Create refs to match actual composable structure
+const mockState = ref({ isSubmitting: false, isComplete: false });
 const mockResult = ref<CalculationResult | null>(null);
 
 // Mock the framework
@@ -13,7 +13,7 @@ const mockFramework = {
   patientData: ref({ name: 'Test Patient', age: 45, gender: 'male' }),
   calculatorData: ref({ question1: 1, question2: 2 }),
   result: mockResult,
-  state: mockState, // This should be a reactive object, not ref
+  state: mockState, // This should be a ref, not reactive
   canProceed: ref(true),
   setFieldValue: vi.fn(),
   submitCalculation: vi.fn(),
@@ -51,6 +51,13 @@ describe('Refactored AuditScore Component', () => {
         },
       },
     });
+  });
+
+  afterEach(() => {
+    if (wrapper) {
+      wrapper.unmount();
+      wrapper = null;
+    }
   });
 
   test('should initialize the calculator framework on mount', () => {
@@ -98,9 +105,9 @@ describe('Refactored AuditScore Component', () => {
   test('should display results when the framework state is complete', async () => {
     expect(wrapper.find('[data-testid="results-section"]').exists()).toBe(false);
 
-    // Update the reactive state objects directly (no .value needed for reactive)
-    mockState.isComplete = true;
-    mockState.isSubmitting = false;
+    // Update the ref state objects (.value needed for ref)
+    mockState.value.isComplete = true;
+    mockState.value.isSubmitting = false;
     mockResult.value = {
       score: 15,
       interpretation: 'Tegn på alkoholafhængighed',

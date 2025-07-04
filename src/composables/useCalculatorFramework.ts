@@ -1,22 +1,19 @@
-import { ref, computed, reactive, watch, onMounted, onUnmounted, readonly, type Ref } from 'vue'
-import { useValidation, useFormValidation } from './useValidation'
+import { ref, computed, watch, onMounted, onUnmounted, readonly, type Ref } from 'vue'
+import { useFormValidation } from './useValidation'
 import { useErrorHandler } from './useErrorHandler'
 import { useLogging } from './useLogging'
-import { getCalculatorQuestionSchema, getScoreRange } from '@/schemas/calculators'
+import { getCalculatorQuestionSchema } from '@/schemas/calculators'
 import { getPatientSchemaForCalculator } from '@/schemas/patient'
-import sendDataToServer, { type SendDataOptions } from '@/assets/sendDataToServer'
+import sendDataToServer from '@/assets/sendDataToServer'
 import { nanoid } from 'nanoid'
 import type { 
   CalculatorResponses, 
   CalculationResult, 
-  CalculatorDetails, 
   PatientData, 
-  QuestionValue,
   RiskLevel,
-  MedicalChartData,
-  SpecificCalculatorDetails
+  MedicalChartData
 } from '@/types/calculatorTypes'
-import { calculateMedicalScore, isCalculatorImplemented } from '@/calculators'
+import { calculateMedicalScore } from '@/calculators'
 import { useSubmissionService, useExportService } from '@/services'
 import type { SubmissionDependencies, ExportDependencies } from '@/services'
 
@@ -153,11 +150,11 @@ export function useCalculatorFramework(config: CalculatorConfig): CalculatorFram
   // Helper functions
   const newCorrelationId = () => nanoid()
   const showInfo = (message: string) => {
-    // Implementation depends on UI framework - could be toast, notification, etc.
+     
     console.info(message)
   }
   const showSuccess = (title: string, message: string) => {
-    // Implementation depends on UI framework - could be toast, notification, etc.
+     
     console.log(`${title}: ${message}`)
   }
 
@@ -192,7 +189,7 @@ export function useCalculatorFramework(config: CalculatorConfig): CalculatorFram
 
   // Setup dependency injection for services
   const submissionDeps: SubmissionDependencies = {
-    sendDataToServer,
+    sendDataToServer: async (...args) => { await sendDataToServer(...args); },
     useErrorHandler,
     useLogging,
     showInfo,
@@ -244,7 +241,7 @@ export function useCalculatorFramework(config: CalculatorConfig): CalculatorFram
         )
         return success
       } catch (submissionError) {
-        // Log submission error but don't fail the calculation
+         
         console.warn('Submission failed but calculation completed:', submissionError)
         return true // Return true since calculation succeeded
       }

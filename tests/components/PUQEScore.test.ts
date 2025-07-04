@@ -1,4 +1,4 @@
-import { describe, expect, test, beforeEach, vi } from 'vitest'
+import { describe, expect, test, beforeEach, afterEach, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { nextTick } from 'vue'
 import PUQEScore from '@/components/PUQEScore.vue'
@@ -131,6 +131,13 @@ describe('PUQEScore Component', () => {
     wrapper = mount(PUQEScore)
   })
 
+  afterEach(() => {
+    if (wrapper) {
+      wrapper.unmount()
+      wrapper = null
+    }
+  })
+
   describe('Basic Rendering', () => {
     test('renders the component with correct structure', () => {
       expect(wrapper.find('[data-testid="surface-card"]').exists()).toBe(true)
@@ -184,7 +191,7 @@ describe('PUQEScore Component', () => {
       expect(component.questionsSection1.length).toBe(3)
       
       // Check all questions have required properties
-      component.questionsSection1.forEach((question: any, index: number) => {
+      component.questionsSection1.forEach((question: any, _index: number) => {
         expect(question).toHaveProperty('type')
         expect(question).toHaveProperty('text')
         expect(question).toHaveProperty('optionsType')

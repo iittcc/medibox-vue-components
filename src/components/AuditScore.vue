@@ -28,7 +28,8 @@
               :question="question"
               :options="getOptions(question.optionsType as keyof OptionsSets)"
               :index="index"
-              :is-unanswered="formSubmitted && (question.answer === null || question.answer === undefined)"
+              :framework-answer="(framework.calculatorData.value as any)[question.id]"
+              :is-unanswered="formSubmitted && ((framework.calculatorData.value as any)[question.id] === null || (framework.calculatorData.value as any)[question.id] === undefined)"
               @update:answer="framework.setFieldValue('calculator', question.id, $event)"
             />
             <div v-if="validationMessage" class="text-red-500 mt-5 font-bold">
@@ -41,7 +42,7 @@
               icon="pi pi-clipboard"
               severity="secondary"
               class="mr-3"
-              :disabled="!framework.state.isComplete"
+              :disabled="!framework.state.value.isComplete"
             >
               <template #container>
                 <b>{{ config.name }}</b>
@@ -63,17 +64,17 @@
             />
             <Button
               type="submit"
-              :label="framework.state.isSubmitting ? '' : 'Beregn'"
+              :label="framework.state.value.isSubmitting ? '' : 'Beregn'"
               class="pr-6 pl-6"
-              :icon="framework.state.isSubmitting ? 'pi pi-spin pi-spinner' : 'pi pi-calculator'"
-              :disabled="framework.state.isSubmitting"
+              :icon="framework.state.value.isSubmitting ? 'pi pi-spin pi-spinner' : 'pi pi-calculator'"
+              :disabled="framework.state.value.isSubmitting"
             />
             </div>
           </form>
         </template>
       </SurfaceCard>
 
-      <div data-testid="results-section" v-if="framework.state.isComplete && framework.result.value" class="results">
+      <div data-testid="results-section" v-if="framework.state.value.isComplete && framework.result.value" class="results">
         <SurfaceCard title="Resultat">
           <template #content>
             <br />
@@ -91,7 +92,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, reactive } from "vue";
+import { ref } from "vue";
 import Button from '@/volt/Button.vue';
 import SecondaryButton from '@/volt/SecondaryButton.vue';
 import QuestionSingleComponent from "./QuestionSingleComponent.vue";
@@ -180,96 +181,86 @@ const options5 = ref<Option[]>([
 ]);
 
 const questionsSection1 = [
-  reactive({
+  {
     id: 'question1',
     type: 'Listbox',
     bg: '--p-primary-100',
     text: "1. Hvor tit drikker du alkohol?",
     description: "",
     optionsType: 'options1',
-    answer: null,
-  }),
-  reactive({
+  },
+  {
     id: 'question2',
     type: 'Listbox',
     bg: '--p-primary-50',
     text: "2. Hvor mange genstande drikker du almindeligvis, når du drikker noget?",
     description: "",
     optionsType: 'options2',
-    answer: null,
-  }),
-  reactive({
+  },
+  {
     id: 'question3',
     type: 'Listbox',
     bg: '--p-primary-100',
     text: "3. Hvor tit drikker du fem genstande eller flere ved samme lejlighed?",
     description: "",
     optionsType: 'options3',
-    answer: null,
-  }),
-  reactive({
+  },
+  {
     id: 'question4',
     type: 'Listbox',
     bg: '--p-primary-50',
     text: "4. Har du inden for det seneste år oplevet, at du ikke kunne stoppe, når du først var begyndt at drikke?",
     description: "",
     optionsType: 'options3',
-    answer: null,
-  }),
-  reactive({
+  },
+  {
     id: 'question5',
     type: 'Listbox',
     bg: '--p-primary-100',
     text: "5. Har du inden for det seneste år oplevet, at du ikke kunne gøre det, du skulle, fordi du havde drukket?",
     description: "",
     optionsType: 'options4',
-    answer: null,
-  }),
-  reactive({
+  },
+  {
     id: 'question6',
     type: 'Listbox',
     bg: '--p-primary-50',
     text: "6. Har du inden for det seneste år måttet have en lille én om morgenen, efter at du havde drukket meget dagen før?",
     description: "",
     optionsType: 'options4',
-    answer: null,
-  }),
-  reactive({
+  },
+  {
     id: 'question7',
     type: 'Listbox',
     bg: '--p-primary-100',
     text: "7. Har du inden for det seneste år haft dårlig samvittighed eller fortrudt, efter du har drukket?",
     description: "",
     optionsType: 'options4',
-    answer: null,
-  }),
-  reactive({
+  },
+  {
     id: 'question8',
     type: 'Listbox',
     bg: '--p-primary-50',
     text: "8. Har du inden for det seneste år oplevet, at du ikke kunne huske, hvad der skete aftenen før, fordi du havde drukket?",
     description: "",
     optionsType: 'options4',
-    answer: null,
-  }),
-  reactive({
+  },
+  {
     id: 'question9',
     type: 'Listbox',
     bg: '--p-primary-100',
     text: "9. Er du selv eller andre nogensinde kommet til skade ved en ulykke, fordi du havde drukket?",
     description: "",
     optionsType: 'options5',
-    answer: null,
-  }),
-  reactive({
+  },
+  {
     id: 'question10',
     type: 'Listbox',
     bg: '--p-primary-50',
     text: "10. Har nogen i familien, en ven, en læge eller andre været bekymred over dine alkoholvaner eller foreslået dig at sætte forbruget ned?",
     description: "",
     optionsType: 'options5',
-    answer: null,
-  })
+  }
 ];
 
 const optionsSets = {
@@ -286,14 +277,7 @@ const getOptions = (type: keyof OptionsSets): Option[] => {
 
 const resultsSection1 = questionsSection1;
 
-// Sync question answers to framework data
-questionsSection1.forEach(question => {
-  watch(() => question.answer, (newValue) => {
-    if (newValue !== null) {
-      framework.setFieldValue('calculator', question.id, newValue)
-    }
-  })
-})
+
 
 const handleSubmit = async () => {
   formSubmitted.value = true;
@@ -302,19 +286,25 @@ const handleSubmit = async () => {
   try {
     await framework.submitCalculation();
   } catch (error) {
+     
     console.error('Submit error:', error);
-    validationMessage.value = 'Der opstod en fejl ved beregning. Prøv igen.';
+    
+    // Check if calculation succeeded despite submission error
+    if (framework.state.value.isComplete && framework.result.value) {
+      // Calculation succeeded, just submission failed
+       
+      console.warn('Calculation succeeded but submission failed:', error);
+      validationMessage.value = 'Beregning gennemført. Indsendelse til server fejlede.';
+    } else {
+      // Actual calculation error
+      validationMessage.value = 'Der opstod en fejl ved beregning. Prøv igen.';
+    }
   }
 };
 
 const handleReset = () => {
   formSubmitted.value = false;
   validationMessage.value = '';
-  
-  // Reset local question state
-  questionsSection1.forEach(question => {
-    question.answer = null;
-  });
   
   framework.resetCalculator();
 };

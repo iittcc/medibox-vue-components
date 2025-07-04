@@ -1,7 +1,7 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
 import GCSScore from '@/components/GCSScore.vue'
-import type { Option, Question, Result } from '@/components/GCSScore.vue'
+// import type { Option, Question, Result } from '@/components/GCSScore.vue'
 
 // Mock child components
 vi.mock('@/volt/Button.vue', () => ({
@@ -67,6 +67,13 @@ describe('GCSScore.vue', () => {
 
   beforeEach(() => {
     wrapper = mount(GCSScore)
+  })
+
+  afterEach(() => {
+    if (wrapper) {
+      wrapper.unmount()
+      wrapper = null
+    }
   })
 
   describe('Component Rendering', () => {
@@ -415,7 +422,7 @@ describe('GCSScore.vue', () => {
     })
 
     it('correctly assesses pediatric GCS considerations', () => {
-      const component = wrapper.vm
+      const _component = wrapper.vm
 
       // Component restricts age to 5+ years (appropriate for standard GCS)
       const personInfo = wrapper.findComponent({ name: 'PersonInfo' })

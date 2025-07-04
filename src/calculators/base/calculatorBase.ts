@@ -17,14 +17,16 @@ export interface MedicalCalculator<TResponses = any, TDetails extends Calculator
    * @param responses The calculator responses to validate
    * @returns Validation result with any errors
    */
-  validate(responses: TResponses): ValidationResult
+   
+  validate(_responses: TResponses): ValidationResult
   
   /**
    * Performs the calculator-specific score calculation
    * @param responses Validated calculator responses
    * @returns Complete calculation result with score, interpretation, and recommendations
    */
-  calculate(responses: TResponses): CalculationResult<TDetails>
+   
+  calculate(_responses: TResponses): CalculationResult<TDetails>
   
   /**
    * Gets the valid score range for this calculator
@@ -76,6 +78,7 @@ export abstract class BaseCalculator<TResponses, TDetails extends CalculatorDeta
    * Abstract method for calculator-specific score calculation
    * Must be implemented by each calculator
    */
+   
   protected abstract calculateScore(responses: TResponses): CalculationResult<TDetails>
   
   /**

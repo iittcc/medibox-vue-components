@@ -1,5 +1,5 @@
 import type { MedicalCalculator } from './base/calculatorBase'
-import type { CalculatorResponses, CalculationResult, SpecificCalculatorDetails, CalculatorDetails } from '@/types/calculatorTypes'
+import type { CalculatorResponses, CalculationResult } from '@/types/calculatorTypes'
 
 // Import calculator implementations
 import { auditCalculator } from './audit/auditCalculator'

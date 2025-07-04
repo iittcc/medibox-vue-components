@@ -164,7 +164,7 @@
           <Message class="flex justify-center p-3" :severity="conclusionSeverity">{{ conclusion }}</Message><br />
 
           
-            <p class="text-sm text-center ">Score < 8: Lette symptomer | Score 8-19: Moderate symptomer | Score > 19: Svære symptomer</p>
+            <p class="text-sm text-center ">Score &lt; 8: Lette symptomer | Score 8-19: Moderate symptomer | Score &gt; 19: Svære symptomer</p>
             <p class="text-sm text-center ">(Seksualfunktion tæller ikke med i score)</p>
             <div class="flex flex-row flex-wrap justify-center mt-5">
             <div class="flex flex-wrap justify-center">

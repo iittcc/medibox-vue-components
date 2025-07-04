@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { mount, VueWrapper } from '@vue/test-utils'
 import { nextTick } from 'vue'
 import RiskAssessment from '@/components/RiskAssessment.vue'
@@ -167,6 +167,13 @@ describe('Score2 Risk Assessment Component', () => {
         }
       }
     })
+  })
+
+  afterEach(() => {
+    if (wrapper) {
+      wrapper.unmount()
+      wrapper = null
+    }
   })
 
   describe('Basic Rendering', () => {

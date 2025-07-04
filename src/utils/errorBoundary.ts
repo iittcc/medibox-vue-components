@@ -180,7 +180,7 @@ class ErrorBoundaryManager {
     return ErrorType.UNKNOWN
   }
 
-  getUserFriendlyMessage(errorType: ErrorType, error: Error): string {
+  getUserFriendlyMessage(errorType: ErrorType, _error: Error): string {
     switch (errorType) {
       case ErrorType.NETWORK:
         return 'Der opstod en netværksfejl. Tjek din internetforbindelse og prøv igen.'
@@ -200,7 +200,7 @@ class ErrorBoundaryManager {
   async handleError(error: Error, componentName?: string, calculatorType?: string, context?: Record<string, any>): Promise<void> {
     const errorType = this.categorizeError(error)
     // Create a more robust error key to prevent collisions
-    const errorKey = `${context?.component || componentName || 'unknown'}-${errorType}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+    const _errorKey = `${context?.component || componentName || 'unknown'}-${errorType}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
     const retryKey = `${context?.component || componentName || 'unknown'}-${errorType}` // Keep simpler key for retry logic
     const currentRetries = this.retryCount.value.get(retryKey) || 0
     

@@ -104,7 +104,7 @@ const onFormSubmit = async (e: any) => {
         const data = await response.json().catch(() => ({}))
         resultMessage.value = data.message || 'Der opstod en fejl ved ændring af password.'
       }
-    } catch (error) {
+    } catch (_error) {
       resultMessage.value = 'Netværksfejl. Prøv igen senere.'
     }
   }

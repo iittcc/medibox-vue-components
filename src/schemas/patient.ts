@@ -4,7 +4,7 @@ import { z } from 'zod'
 export const PatientBaseSchema = z.object({
   name: z.string()
     .max(100, 'Navn må højst være 100 tegn')
-    .regex(/^[\p{L}\s\-'\.]*$/u, 'Navn må kun indeholde bogstaver, mellemrum, bindestreg, apostrof og punktum')
+    .regex(/^[\p{L}\s\-'.]*$/u, 'Navn må kun indeholde bogstaver, mellemrum, bindestreg, apostrof og punktum')
     .optional()
     .or(z.literal('')),
     
@@ -129,8 +129,7 @@ export const PatientPregnancySchema = PatientBaseSchema.extend({
     .int('Antal tidligere graviditeter skal være et helt tal')
     .optional(),
     
-  birthDate: z.date()
-    .optional(),
+  birthDate: z.union([z.date(), z.string(), z.undefined()]),
     
   breastfeeding: z.boolean()
     .optional(),

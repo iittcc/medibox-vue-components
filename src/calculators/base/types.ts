@@ -1,4 +1,4 @@
-import type { RiskLevel, CalculatorDetails, SpecificCalculatorDetails } from '@/types/calculatorTypes'
+import type { RiskLevel, CalculatorDetails } from '@/types/calculatorTypes'
 
 // Enhanced calculation result with proper generics
 export interface CalculationResult<TDetails extends CalculatorDetails = CalculatorDetails> {

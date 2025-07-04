@@ -1,10 +1,7 @@
 import { describe, expect, test } from 'vitest'
 import {
-  type Indholdsstof,
-  type Dispensering,
   type Praeparat,
   type Detaljer,
-  type CalculationResult,
   mainarray,
   dispenseringsarray,
   praeparatarray,

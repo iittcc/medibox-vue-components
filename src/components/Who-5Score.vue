@@ -49,7 +49,7 @@
                 Navn: {{ name }} <br />
                 Køn: {{ getGenderLabel(gender as GenderValue) }} <br />
                 Alder: {{ age }} år<br /><br />
-                <div v-for="(question, index) in resultsSection1" >{{ question.text }} {{ question.score }}</div />
+                <div v-for="(question, index) in resultsSection1" :key="index">{{ question.text }} {{ question.score }}</div>
                 <br /><br />
                 WHO-5 Trivselsindex {{ totalScore }} : {{ conclusion }}
               </template>

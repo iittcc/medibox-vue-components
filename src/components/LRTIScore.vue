@@ -130,17 +130,12 @@
 <script setup lang="ts">
 import { ref } from "vue";
 
-import DatePicker from 'primevue/datepicker';
-import Button from 'primevue/button';
 import ToggleButton from "primevue/togglebutton";
-import InputText from 'primevue/inputtext';
-import QuestionSingleComponent from "./QuestionSingleComponent.vue";
-import CopyDialog from "./CopyDialog.vue";
 import SurfaceCard from "./SurfaceCard.vue";
 import SurfaceCardItem from "./SurfaceCardItem.vue";
 import PersonInfo from "./PersonInfo.vue";
 import Message from 'primevue/message';
-import sendDataToServer from '../assets/sendDataToServer.ts';
+// import sendDataToServer from '../assets/sendDataToServer.ts';
 import { type GenderValue } from '@/utils/genderUtils';
 
 export interface Option {
@@ -161,9 +156,9 @@ const inspirationPain = ref<boolean>(false);
 const confusion = ref<boolean>(false);
 const condition = ref<boolean>(false);
 const percussion = ref<boolean>(false);
-const apiUrlServer = import.meta.env.VITE_API_URL;
-const apiUrl = apiUrlServer+'/index.php/callback/LogCB/log';
-const keyUrl = apiUrlServer+'/index.php/KeyServer/getPublicKey';
+const _apiUrlServer = import.meta.env.VITE_API_URL;
+// const apiUrl = apiUrlServer+'/index.php/callback/LogCB/log';
+// const keyUrl = apiUrlServer+'/index.php/KeyServer/getPublicKey';
 
 const resultsSection = ref<HTMLDivElement | null>(null);
 const name = ref<string>("");
@@ -180,11 +175,11 @@ const conclusion = ref<string>('');
 const conclusionSeverity = ref<string>('');
 const validationMessage = ref<string>('');
 
-const handleSubmit = () => {
+const _handleSubmit = () => {
   formSubmitted.value = true;
 };
 
-const calculateResults = () => {
+const _calculateResults = () => {
   totalScore.value = resultsSection1.value.reduce((sum, result) => sum + result.score, 0);
 
   if (totalScore.value > 7) {
@@ -199,21 +194,21 @@ const calculateResults = () => {
   }
 };
 
-const scrollToResults = () => {
+const _scrollToResults = () => {
   const resultsSectionEl = resultsSection.value as HTMLElement;
   if (resultsSectionEl) {
     resultsSectionEl.scrollIntoView({ behavior: 'smooth' });
   }
 };
 
-const clearAllQuestionsAndResults = () => {
+const _clearAllQuestionsAndResults = () => {
   resultsSection1.value = [];
   totalScore.value = 0;
   validationMessage.value = '';
   formSubmitted.value = false;
 };
 
-const generatePayload = () => {
+const _generatePayload = () => {
   return {
       name: name.value,
       age: age.value,

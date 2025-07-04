@@ -289,10 +289,10 @@ interface Props {
 }
 
 interface Emits {
-  (e: 'update:modelValue', value: string | number | boolean | string[]): void
-  (e: 'change', value: string | number | boolean | string[]): void
-  (e: 'focus'): void
-  (e: 'blur'): void
+  (_e: 'update:modelValue', _value: string | number | boolean | string[]): void
+  (_e: 'change', _value: string | number | boolean | string[]): void
+  (_e: 'focus'): void
+  (_e: 'blur'): void
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -336,14 +336,7 @@ const isOptionSelected = (value: string | number | boolean) => {
   return false
 }
 
-// Event handlers
-const handleFocus = () => {
-  emit('focus')
-}
 
-const handleBlur = () => {
-  emit('blur')
-}
 
 // Initialize multiple choice as array if needed
 onMounted(() => {

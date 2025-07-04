@@ -1,7 +1,7 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
 import Who5Score from '@/components/Who-5Score.vue'
-import type { Option, Question, Result } from '@/components/Who-5Score.vue'
+// import type { Option, Question, Result } from '@/components/Who-5Score.vue'
 
 // Mock child components
 vi.mock('@/volt/Button.vue', () => ({
@@ -69,6 +69,13 @@ describe('Who-5Score.vue', () => {
     wrapper = mount(Who5Score)
   })
 
+  afterEach(() => {
+    if (wrapper) {
+      wrapper.unmount()
+      wrapper = null
+    }
+  })
+
   describe('Component Rendering', () => {
     it('renders the component with title', () => {
       expect(wrapper.find('[data-testid="surface-card"]').exists()).toBe(true)
@@ -118,7 +125,7 @@ describe('Who-5Score.vue', () => {
       expect(component.questionsSection1.length).toBe(5)
       
       // All questions should have same options and highest default value
-      component.questionsSection1.forEach((question, index) => {
+      component.questionsSection1.forEach((question, _index) => {
         expect(question.optionsType).toBe('options1')
         expect(question.answer).toBe(5) // Default: "Hele tiden"
       })
@@ -199,7 +206,7 @@ describe('Who-5Score.vue', () => {
       
       component.calculateResults()
 
-      const rawScore = 3 + 2 + 2 + 2 + 2 // = 11
+      const _rawScore = 3 + 2 + 2 + 2 + 2 // = 11
       expect(component.totalScore).toBe(44) // 11 * 4
       expect(component.conclusion).toBe("Der kan være risiko for depression eller stressbelastning.")
       expect(component.conclusionSeverity).toBe("warn")
@@ -217,7 +224,7 @@ describe('Who-5Score.vue', () => {
       
       component.calculateResults()
 
-      const rawScore = 1 + 2 + 1 + 1 + 1 // = 6
+      const _rawScore2 = 1 + 2 + 1 + 1 + 1 // = 6
       expect(component.totalScore).toBe(24) // 6 * 4
       expect(component.conclusion).toBe("Der kan være stor risiko for depression eller stressbelastning.")
       expect(component.conclusionSeverity).toBe("error")
@@ -410,7 +417,7 @@ describe('Who-5Score.vue', () => {
 
       component.calculateResults()
 
-      const rawScore = 2 + 1 + 1 + 2 + 1 // = 7
+      const _rawScore3 = 2 + 1 + 1 + 2 + 1 // = 7
       expect(component.totalScore).toBe(28) // 7 * 4
       expect(component.conclusion).toBe("Der kan være stor risiko for depression eller stressbelastning.")
       expect(component.conclusionSeverity).toBe("error")
@@ -431,7 +438,7 @@ describe('Who-5Score.vue', () => {
 
       component.calculateResults()
 
-      const rawScore = 3 + 2 + 2 + 3 + 2 // = 12
+      const _rawScore4 = 3 + 2 + 2 + 3 + 2 // = 12
       expect(component.totalScore).toBe(48) // 12 * 4
       expect(component.conclusion).toBe("Der kan være risiko for depression eller stressbelastning.")
       

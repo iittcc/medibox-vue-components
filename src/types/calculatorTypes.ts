@@ -1,7 +1,7 @@
 import type { ChartData, ChartOptions, ChartDataset } from 'chart.js'
 
 // Base types for calculator responses
-export type QuestionValue = string | number | boolean
+export type QuestionValue = string | number | boolean | Date
 export type CalculatorResponseValue = QuestionValue | QuestionValue[]
 
 // Risk levels used across all calculators
@@ -274,6 +274,7 @@ export interface PatientData {
   name?: string
   age: number
   gender: 'male' | 'female'
+  birthDate?: string | Date | undefined
   cpr?: string
   
   // Contact information (optional)
