@@ -135,7 +135,8 @@ describe('useLogging', () => {
           // Call original cleanup but don't wait for flushLogs
           try {
             originalCleanup()
-          } catch (e) {
+          } catch (error) {
+            console.error('Error during cleanup:', error)
             // Ignore cleanup errors
           }
         })

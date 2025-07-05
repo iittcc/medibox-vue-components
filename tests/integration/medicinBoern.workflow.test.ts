@@ -14,21 +14,21 @@ describe('Medicine Calculator Integration Tests', () => {
 
     // Step 1: Select medicine (Amoxicillin)
     const medicineSelect = screen.getByTestId('medicine-select')
-    await medicineSelect.selectOption('amoxicillin')
+    await medicineSelect.selectOptions('amoxicillin')
     
     // Verify dispensing options appeared
     await expect.element(screen.getByTestId('dispensing-select')).toBeInTheDocument()
     
     // Step 2: Select dispensing form (Tablets)
     const dispensingSelect = screen.getByTestId('dispensing-select')
-    await dispensingSelect.selectOption('tabletter')
+    await dispensingSelect.selectOptions('tabletter')
     
     // Verify preparation options appeared
     await expect.element(screen.getByTestId('preparation-select')).toBeInTheDocument()
     
     // Step 3: Select preparation (500mg tablets)
     const preparationSelect = screen.getByTestId('preparation-select')
-    await preparationSelect.selectOption('amoxicillin_tabletter_1')
+    await preparationSelect.selectOptions('amoxicillin_tabletter_1')
     
     // Step 4: Set weight using slider
     const weightSlider = screen.getByTestId('weight-slider')
@@ -60,7 +60,7 @@ describe('Medicine Calculator Integration Tests', () => {
 
     // Select Penicillin
     const medicineSelect = screen.getByTestId('medicine-select')
-    await medicineSelect.selectOption('penicillin')
+    await medicineSelect.selectOptions('penicillin')
     
     // Verify dosage suggestions appear
     await expect.element(screen.getByTestId('dosage-suggestions')).toBeVisible()
@@ -83,13 +83,13 @@ describe('Medicine Calculator Integration Tests', () => {
 
     // Select Ibuprofen (has weight restriction)
     const medicineSelect = screen.getByTestId('medicine-select')
-    await medicineSelect.selectOption('ibuprofen')
+    await medicineSelect.selectOptions('ibuprofen')
     
     const dispensingSelect = screen.getByTestId('dispensing-select')
-    await dispensingSelect.selectOption('tabletter')
+    await dispensingSelect.selectOptions('tabletter')
     
     const preparationSelect = screen.getByTestId('preparation-select')
-    await preparationSelect.selectOption('ibuprofen_tabletter_0')
+    await preparationSelect.selectOptions('ibuprofen_tabletter_0')
     
     // Set weight below minimum (7kg)
     const weightSlider = screen.getByTestId('weight-slider')
@@ -109,10 +109,10 @@ describe('Medicine Calculator Integration Tests', () => {
 
     // Fill out the form
     const medicineSelect = screen.getByTestId('medicine-select')
-    await medicineSelect.selectOption('amoxicillin')
+    await medicineSelect.selectOptions('amoxicillin')
     
     const dispensingSelect = screen.getByTestId('dispensing-select')
-    await dispensingSelect.selectOption('tabletter')
+    await dispensingSelect.selectOptions('tabletter')
     
     const weightSlider = screen.getByTestId('weight-slider')
     await weightSlider.fill('25')
@@ -145,7 +145,7 @@ describe('Medicine Calculator Integration Tests', () => {
     await expect.element(weightSlider).toBeVisible()
     
     // Test touch interactions work
-    await medicineSelect.selectOption('paracetamol')
+    await medicineSelect.selectOptions('paracetamol')
     await expect.element(screen.getByTestId('dispensing-select')).toBeVisible()
   })
 
@@ -170,7 +170,7 @@ describe('Medicine Calculator Integration Tests', () => {
       
       // Select medicine
       const medicineSelect = screen.getByTestId('medicine-select')
-      await medicineSelect.selectOption(medicine)
+      await medicineSelect.selectOptions(medicine)
       
       // Verify dispensing options appear
       await expect.element(screen.getByTestId('dispensing-select')).toBeVisible()
@@ -179,7 +179,7 @@ describe('Medicine Calculator Integration Tests', () => {
       const dispensingSelect = screen.getByTestId('dispensing-select')
       const dispensingOptions = await dispensingSelect.query('option[value!=""]')
       if (dispensingOptions.length > 0) {
-        await dispensingSelect.selectOption(dispensingOptions[0].getAttribute('value'))
+        await dispensingSelect.selectOptions(dispensingOptions[0].getAttribute('value'))
         
         // Verify preparation options appear
         await expect.element(screen.getByTestId('preparation-select')).toBeVisible()
@@ -196,13 +196,13 @@ describe('Medicine Calculator Integration Tests', () => {
 
     // Set up complete form
     const medicineSelect = screen.getByTestId('medicine-select')
-    await medicineSelect.selectOption('amoxicillin')
+    await medicineSelect.selectOptions('amoxicillin')
     
     const dispensingSelect = screen.getByTestId('dispensing-select')
-    await dispensingSelect.selectOption('tabletter')
+   
     
     const preparationSelect = screen.getByTestId('preparation-select')
-    await preparationSelect.selectOption('amoxicillin_tabletter_1')
+    await preparationSelect.selectOptions('amoxicillin_tabletter_1')
     
     const weightSlider = screen.getByTestId('weight-slider')
     await weightSlider.fill('20')
@@ -245,13 +245,13 @@ describe('Medicine Calculator Integration Tests', () => {
     
     // Test calculations still work at extremes
     const medicineSelect = screen.getByTestId('medicine-select')
-    await medicineSelect.selectOption('paracetamol')
+    await medicineSelect.selectOptions('paracetamol')
     
     const dispensingSelect = screen.getByTestId('dispensing-select')
-    await dispensingSelect.selectOption('tabletter')
+    await dispensingSelect.selectOptions('tabletter')
     
     const preparationSelect = screen.getByTestId('preparation-select')
-    await preparationSelect.selectOption('paracetamol_tabletter_0')
+    await preparationSelect.selectOptions('paracetamol_tabletter_0')
     
     // Verify calculations appear even with extreme values
     await expect.element(screen.getByTestId('daily-amount')).toBeVisible()

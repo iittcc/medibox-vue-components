@@ -455,10 +455,10 @@ describe('withErrorBoundary', () => {
     withErrorBoundary(app)
 
     const testError = new Error('Global error')
-    const mockInstance = { $options: { name: 'TestComponent' } }
+    const mockInstance = { $options: { name: 'TestComponent' } } as any
     
     // Simulate Vue error
-    app.config.errorHandler?.(testError, mockInstance, 'render function')
+    app.config.errorHandler?.(testError, mockInstance as any, 'render function')
 
     const errors = errorBoundaryManager.getErrors()
     expect(errors.length).toBeGreaterThan(0)
