@@ -28,8 +28,10 @@
             :question="question"
             :options="getOptions(question.optionsType as keyof OptionsSets)"
             :index="index"
+            :framework-answer="question.answer ?? undefined"
             :is-unanswered="formSubmitted && isUnanswered(question)"
             scrollHeight="18rem"
+            @update:answer="question.answer = $event"
           />
           <div v-if="validationMessage" class="text-red-500 mt-5 font-bold">
             {{ validationMessage }}
@@ -180,6 +182,9 @@ const questionsSection1 = ref<Question[]>([
     answer: options2.value[0].value
   }
 ]);
+
+// Default answers are already set in question configurations above
+
 const optionsSets = {
   options1,
   options2,
