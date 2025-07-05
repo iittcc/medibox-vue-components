@@ -342,3 +342,8 @@ If the server fails to start:
 
 - **Configuration State Initialization**:
   1. Check if configuration is being used to initialize reactive state
+  2. Add explicit initialization loop after variable declarations
+```
+
+## Workflow Memory
+- 3. Test visually to confirm defaults appear
