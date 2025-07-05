@@ -41,7 +41,6 @@ export default defineConfig({
       '**/node_modules/**',
       '**/dist/**',
       '**/tests/browser/**',
-      '**/tests/integration/**',
       '**/tests/unit/useLogging.test.ts' // Exclude problematic test with memory leak
     ]
   },
