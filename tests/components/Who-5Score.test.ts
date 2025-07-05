@@ -125,7 +125,7 @@ describe('Who-5Score.vue', () => {
       expect(component.questionsSection1.length).toBe(5)
       
       // All questions should have same options and highest default value
-      component.questionsSection1.forEach((question, _index) => {
+      component.questionsSection1.forEach((question: { optionsType: any; answer: any }, _index: any) => {
         expect(question.optionsType).toBe('options1')
         expect(question.answer).toBe(5) // Default: "Hele tiden"
       })
@@ -155,7 +155,7 @@ describe('Who-5Score.vue', () => {
       const component = wrapper.vm
       
       // All questions default to 5
-      const totalRawScore = component.questionsSection1.reduce((sum, q) => sum + (q.answer || 0), 0)
+      const totalRawScore = component.questionsSection1.reduce((sum: any, q: { answer: any }) => sum + (q.answer || 0), 0)
       expect(totalRawScore).toBe(25) // 5 * 5
     })
   })
@@ -185,7 +185,7 @@ describe('Who-5Score.vue', () => {
       const component = wrapper.vm
 
       // All max values (default)
-      component.questionsSection1.forEach(q => q.answer = 5)
+      component.questionsSection1.forEach((q: { answer: number }) => q.answer = 5)
       
       component.calculateResults()
 
@@ -234,7 +234,7 @@ describe('Who-5Score.vue', () => {
       const component = wrapper.vm
 
       // All minimum values
-      component.questionsSection1.forEach(q => q.answer = 0)
+      component.questionsSection1.forEach((q: { answer: number }) => q.answer = 0)
       
       component.calculateResults()
 
@@ -257,7 +257,7 @@ describe('Who-5Score.vue', () => {
       ]
 
       testCases.forEach(testCase => {
-        component.questionsSection1.forEach((q, i) => q.answer = testCase.raw[i])
+        component.questionsSection1.forEach((q: { answer: number }, i: number ) => q.answer = testCase.raw[i])
         component.calculateResults()
         expect(component.totalScore).toBe(testCase.expected)
       })
@@ -287,7 +287,7 @@ describe('Who-5Score.vue', () => {
       expect(component.conclusion).toBe("Der kan være risiko for depression eller stressbelastning.")
 
       // Test score = 51 (start of no risk)
-      component.questionsSection1.forEach(q => q.answer = 2)
+      component.questionsSection1.forEach((q: { answer: number }) => q.answer = 2)
       component.questionsSection1[0].answer = 3
       component.questionsSection1[1].answer = 3
       component.questionsSection1[2].answer = 3
@@ -339,7 +339,7 @@ describe('Who-5Score.vue', () => {
       component.resetQuestions()
 
       // Verify reset to defaults (all 5)
-      component.questionsSection1.forEach(q => {
+      component.questionsSection1.forEach((q: { answer: any }) => {
         expect(q.answer).toBe(5)
       })
       expect(component.totalScore).toBe(0)

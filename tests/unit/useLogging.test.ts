@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { defineComponent, nextTick } from 'vue'
 import { useLogging, LogLevel, LogCategory, type LoggingConfig } from '@/composables/useLogging'
+import type { LogEntry } from '@/composables/useLogging'
 
 // Mock nanoid
 vi.mock('nanoid', () => ({
@@ -91,6 +92,7 @@ describe('useLogging', () => {
           logger.cleanup()
         } catch (error) {
           // Ignore cleanup errors
+          console.error('Error during cleanup:', error)
         }
       }
     })
@@ -504,7 +506,7 @@ describe('useLogging', () => {
       await vi.runAllTimersAsync()
 
       // Should log the failure
-      expect(logger.logEntries.value.some(entry => 
+      expect(logger.logEntries.value.some((entry: LogEntry) => 
         entry.message.includes('Failed to send log batch')
       )).toBe(true)
     })

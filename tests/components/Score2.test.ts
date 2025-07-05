@@ -18,7 +18,7 @@ vi.mock('@/volt/ToggleButton.vue', () => ({
     name: 'ToggleButton',
     props: ['modelValue', 'onLabel', 'offLabel'],
     emits: ['update:modelValue'],
-    setup(props, { emit }) {
+    setup(props: any, { emit }: any) {
       return { emit }
     },
     template: `
@@ -115,7 +115,7 @@ vi.mock('@/components/NumberSliderInput.vue', () => ({
     name: 'NumberSliderInput',
     props: ['modelValue', 'min', 'max', 'mode', 'showButtons', 'step', 'suffix', 'normalMin', 'normalMax', 'tooltip', 'sliderType'],
     emits: ['update:modelValue'],
-    setup(props, { emit }) {
+    setup(props: any, { emit }: any) {
       return { emit }
     },
     template: `
@@ -156,7 +156,7 @@ vi.mock('@/assets/riskCalculator.ts', () => ({
 }))
 
 describe('Score2 Risk Assessment Component', () => {
-  let wrapper: VueWrapper<any>
+  let wrapper: VueWrapper<any, any> | null
 
   beforeEach(() => {
     wrapper = mount(RiskAssessment, {
@@ -178,12 +178,12 @@ describe('Score2 Risk Assessment Component', () => {
 
   describe('Basic Rendering', () => {
     it('renders the component with medical calculator container', () => {
-      expect(wrapper.find('.medical-calculator-container').exists()).toBe(true)
+      expect(wrapper?.find('.medical-calculator-container').exists()).toBe(true)
     })
 
     it('displays all main sections', () => {
-      const cards = wrapper.findAll('[data-testid="surface-card"]')
-      const titles = cards.map(card => card.attributes('data-title'))
+      const cards = wrapper?.findAll('[data-testid="surface-card"]')
+      const titles = cards?.map(card => card.attributes('data-title'))
       
       expect(titles).toContain('Oplysninger')
       expect(titles).toContain('Undersøgelse')
@@ -194,11 +194,11 @@ describe('Score2 Risk Assessment Component', () => {
     })
 
     it('renders copy dialog in information section', () => {
-      expect(wrapper.find('[data-testid="copy-dialog"]').exists()).toBe(true)
+      expect(wrapper?.find('[data-testid="copy-dialog"]').exists()).toBe(true)
     })
 
     it('displays both bar and pie charts', () => {
-      const charts = wrapper.findAll('[data-testid="chart"]')
+      const charts = wrapper?.findAll('[data-testid="chart"]')
       expect(charts).toHaveLength(2)
       expect(charts[0].attributes('data-type')).toBe('bar')
       expect(charts[1].attributes('data-type')).toBe('pie')
@@ -207,7 +207,7 @@ describe('Score2 Risk Assessment Component', () => {
 
   describe('Initial State', () => {
     it('has correct default values', () => {
-      const component = wrapper.vm as any
+      const component = wrapper?.vm as any
       
       expect(component.name).toBe('')
       expect(component.gender).toBe('male')
@@ -221,7 +221,7 @@ describe('Score2 Risk Assessment Component', () => {
     })
 
     it('initializes risk values on mount', () => {
-      const component = wrapper.vm as any
+      const component = wrapper?.vm as any
       
       expect(component.risk).toBeGreaterThan(-1)
       expect(component.targetRisk).toBeGreaterThan(-1)
@@ -230,7 +230,7 @@ describe('Score2 Risk Assessment Component', () => {
     })
 
     it('has correct normal range values for default age and gender', () => {
-      const component = wrapper.vm as any
+      const component = wrapper?.vm as any
       
       // For male age 55 - values will be updated based on actual calculation
       expect(component.minSysBP).toBeGreaterThan(0)
@@ -242,38 +242,38 @@ describe('Score2 Risk Assessment Component', () => {
 
   describe('Form Interactions', () => {
     it('updates person information through PersonInfo component', async () => {
-      const component = wrapper.vm as any
-      const personInfo = wrapper.findComponent({ name: 'PersonInfo' })
+      const component = wrapper?.vm as any
+      const personInfo = wrapper?.findComponent({ name: 'PersonInfo' })
       
       // Update name
-      personInfo.vm.$emit('update:name', 'Test Patient')
+      personInfo?.vm.$emit('update:name', 'Test Patient')
       await nextTick()
       expect(component.name).toBe('Test Patient')
       
       // Update age
-      personInfo.vm.$emit('update:age', 65)
+      personInfo?.vm.$emit('update:age', 65)
       await nextTick()
       expect(component.age).toBe(65)
       
       // Update gender
-      personInfo.vm.$emit('update:gender', 'female')
+      personInfo?.vm.$emit('update:gender', 'female')
       await nextTick()
       expect(component.gender).toBe('female')
     })
 
     it('updates examination values through sliders', async () => {
-      const component = wrapper.vm as any
-      const sliders = wrapper.findAllComponents({ name: 'NumberSliderInput' })
+      const component = wrapper?.vm as any
+      const sliders = wrapper?.findAllComponents({ name: 'NumberSliderInput' })
       
       // Update systolic BP
-      if (sliders.length > 0) {
+      if (sliders?.length > 0) {
         sliders[0].vm.emit('update:modelValue', 160)
         await nextTick()
         expect(component.sysBP).toBe(160)
       }
       
       // Update LDL cholesterol
-      if (sliders.length > 1) {
+      if (sliders?.length > 1) {
         sliders[1].vm.emit('update:modelValue', 6.0)
         await nextTick()
         expect(component.LDLCholesterol).toBe(6.0)
@@ -281,11 +281,11 @@ describe('Score2 Risk Assessment Component', () => {
     })
 
     it('updates smoking status through toggle button', async () => {
-      const component = wrapper.vm as any
-      const toggleButtons = wrapper.findAllComponents({ name: 'ToggleButton' })
+      const component = wrapper?.vm as any
+      const toggleButtons = wrapper?.findAllComponents({ name: 'ToggleButton' })
       
       // Toggle smoking status
-      if (toggleButtons.length > 0) {
+      if (toggleButtons?.length > 0) {
         toggleButtons[0].vm.emit('update:modelValue', true)
         await nextTick()
         expect(component.smoking).toBe(true)
@@ -293,18 +293,18 @@ describe('Score2 Risk Assessment Component', () => {
     })
 
     it('updates treatment goal values', async () => {
-      const component = wrapper.vm as any
-      const sliders = wrapper.findAllComponents({ name: 'NumberSliderInput' })
+      const component = wrapper?.vm as any
+      const sliders = wrapper?.findAllComponents({ name: 'NumberSliderInput' })
       
       // Update target systolic BP
-      if (sliders.length > 2) {
+      if (sliders?.length > 2) {
         sliders[2].vm.emit('update:modelValue', 110)
         await nextTick()
         expect(component.targetSysBP).toBe(110)
       }
       
       // Update target LDL
-      if (sliders.length > 3) {
+      if (sliders?.length > 3) {
         sliders[3].vm.emit('update:modelValue', 1.8)
         await nextTick()
         expect(component.targetLDLCholesterol).toBe(1.8)
@@ -314,7 +314,7 @@ describe('Score2 Risk Assessment Component', () => {
 
   describe('Risk Calculation', () => {
     it('calculates risk when examination values change', async () => {
-      const component = wrapper.vm as any
+      const component = wrapper?.vm as any
       const initialRisk = component.risk
       
       // Change values that should increase risk
@@ -327,7 +327,7 @@ describe('Score2 Risk Assessment Component', () => {
     })
 
     it('calculates target risk when treatment goals change', async () => {
-      const component = wrapper.vm as any
+      const component = wrapper?.vm as any
       
       // Set higher initial target values
       component.targetSysBP = 150
@@ -348,7 +348,7 @@ describe('Score2 Risk Assessment Component', () => {
     })
 
     it('calculates risk reduction metrics correctly', async () => {
-      const component = wrapper.vm as any
+      const component = wrapper?.vm as any
       
       // Set specific values for predictable calculation
       component.risk = 20
@@ -362,7 +362,7 @@ describe('Score2 Risk Assessment Component', () => {
     })
 
     it('handles zero risk difference correctly', async () => {
-      const component = wrapper.vm as any
+      const component = wrapper?.vm as any
       
       component.risk = 10
       component.targetRisk = 10
@@ -377,7 +377,7 @@ describe('Score2 Risk Assessment Component', () => {
 
   describe('Risk Group Classification', () => {
     it('classifies risk correctly for age < 50', async () => {
-      const component = wrapper.vm as any
+      const component = wrapper?.vm as any
       component.age = 45
       await nextTick()
       
@@ -398,7 +398,7 @@ describe('Score2 Risk Assessment Component', () => {
     })
 
     it('classifies risk correctly for age 50-69', async () => {
-      const component = wrapper.vm as any
+      const component = wrapper?.vm as any
       component.age = 60
       await nextTick()
       
@@ -409,7 +409,7 @@ describe('Score2 Risk Assessment Component', () => {
     })
 
     it('classifies risk correctly for age >= 70', async () => {
-      const component = wrapper.vm as any
+      const component = wrapper?.vm as any
       component.age = 75
       await nextTick()
       
@@ -422,7 +422,7 @@ describe('Score2 Risk Assessment Component', () => {
 
   describe('Normal Range Updates', () => {
     it('updates LDL normal ranges based on age', async () => {
-      const component = wrapper.vm as any
+      const component = wrapper?.vm as any
       
       // Test age < 30
       component.age = 25
@@ -444,7 +444,7 @@ describe('Score2 Risk Assessment Component', () => {
     })
 
     it('maintains same normal ranges for both genders', async () => {
-      const component = wrapper.vm as any
+      const component = wrapper?.vm as any
       
       // Test male
       component.gender = 'male'
@@ -465,7 +465,7 @@ describe('Score2 Risk Assessment Component', () => {
 
   describe('Chart Data Updates', () => {
     it('updates bar chart data when risks change', async () => {
-      const component = wrapper.vm as any
+      const component = wrapper?.vm as any
       
       // Set risks and trigger chart update
       component.risk = 15
@@ -480,7 +480,7 @@ describe('Score2 Risk Assessment Component', () => {
     })
 
     it('updates pie chart data for risk factors', async () => {
-      const component = wrapper.vm as any
+      const component = wrapper?.vm as any
       
       // The pie chart shows the contribution of each factor to risk reduction
       component.calcRiskFragment()
@@ -492,7 +492,7 @@ describe('Score2 Risk Assessment Component', () => {
     })
 
     it('updates chart colors based on risk group', async () => {
-      const component = wrapper.vm as any
+      const component = wrapper?.vm as any
       
       // Set high risk
       component.risk = 25
@@ -507,7 +507,7 @@ describe('Score2 Risk Assessment Component', () => {
 
   describe('Copy Dialog Content', () => {
     it('displays all patient information in copy dialog', async () => {
-      const component = wrapper.vm as any
+      const component = wrapper?.vm as any
       component.name = 'Test Patient'
       component.age = 65
       component.gender = 'male'
@@ -516,7 +516,7 @@ describe('Score2 Risk Assessment Component', () => {
       component.smoking = true
       await nextTick()
       
-      const copyContent = wrapper.find('[data-testid="copy-dialog"]').text()
+      const copyContent = wrapper?.find('[data-testid="copy-dialog"]').text()
       
       expect(copyContent).toContain('Test Patient')
       expect(copyContent).toContain('65 år')
@@ -527,14 +527,14 @@ describe('Score2 Risk Assessment Component', () => {
     })
 
     it('displays risk assessment results in copy dialog', async () => {
-      const component = wrapper.vm as any
+      const component = wrapper?.vm as any
       component.risk = 15
       component.targetRisk = 8
       component.riskGroup = 'Høj risiko'
       component.targetRiskGroup = 'Lav-moderat risiko'
       await nextTick()
       
-      const copyContent = wrapper.find('[data-testid="copy-dialog"]').text()
+      const copyContent = wrapper?.find('[data-testid="copy-dialog"]').text()
       
       expect(copyContent).toContain('Nuværende risiko: Høj risiko (15%)')
       expect(copyContent).toContain('Behandlingsmål risiko: Lav-moderat risiko (8%)')
@@ -543,7 +543,7 @@ describe('Score2 Risk Assessment Component', () => {
 
   describe('Edge Cases', () => {
     it('handles extreme age values', async () => {
-      const component = wrapper.vm as any
+      const component = wrapper?.vm as any
       
       // Test minimum age
       component.age = 40
@@ -557,7 +557,7 @@ describe('Score2 Risk Assessment Component', () => {
     })
 
     it('handles extreme blood pressure values', async () => {
-      const component = wrapper.vm as any
+      const component = wrapper?.vm as any
       
       // Test minimum BP
       component.sysBP = 20
@@ -571,7 +571,7 @@ describe('Score2 Risk Assessment Component', () => {
     })
 
     it('handles extreme LDL values', async () => {
-      const component = wrapper.vm as any
+      const component = wrapper?.vm as any
       
       // Test minimum LDL
       component.LDLCholesterol = 0
@@ -585,22 +585,22 @@ describe('Score2 Risk Assessment Component', () => {
     })
 
     it('displays risk percentage or dash correctly', () => {
-      const component = wrapper.vm as any
+      const component = wrapper?.vm as any
       
       // Valid risk - test with current calculated risk
       expect(component.risk).toBeGreaterThan(0)
-      const riskText = wrapper.text()
+      const riskText = wrapper?.text()
       expect(riskText).toMatch(/\d+%/)
       
       // Invalid risk
       component.risk = -1
-      expect(wrapper.html()).toContain('-')
+      expect(wrapper?.html()).toContain('-')
     })
   })
 
   describe('Reactive Behavior', () => {
     it('recalculates current risk when examination values change', async () => {
-      const component = wrapper.vm as any
+      const component = wrapper?.vm as any
       const initialRisk = component.risk
       
       component.sysBP = 180
@@ -613,7 +613,7 @@ describe('Score2 Risk Assessment Component', () => {
     })
 
     it('recalculates target risk when treatment goals change', async () => {
-      const component = wrapper.vm as any
+      const component = wrapper?.vm as any
       
       // Set different values and trigger calculation
       component.targetSysBP = 180
@@ -635,7 +635,7 @@ describe('Score2 Risk Assessment Component', () => {
     })
 
     it('updates both risks when age or gender changes', async () => {
-      const component = wrapper.vm as any
+      const component = wrapper?.vm as any
       const initialRisk = component.risk
       const initialTargetRisk = component.targetRisk
       

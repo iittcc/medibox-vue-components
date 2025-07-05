@@ -209,7 +209,7 @@ describe('WestleyCroupScore.vue', () => {
       const component = wrapper.vm
 
       // All answers are 0 (normal/none)
-      component.questionsSection1.forEach(q => q.answer = 0)
+      component.questionsSection1.forEach((q: { answer: number }) => q.answer = 0)
       
       component.calculateResults()
 
