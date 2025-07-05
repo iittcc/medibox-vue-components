@@ -1,10 +1,17 @@
 import type { MedicalCalculator } from './base/calculatorBase'
-import type { CalculatorResponses, CalculationResult, SpecificCalculatorDetails, CalculatorDetails } from '@/types/calculatorTypes'
+import type { CalculatorResponses, CalculationResult } from '@/types/calculatorTypes'
 
 // Import calculator implementations
 import { auditCalculator } from './audit/auditCalculator'
 import { danpssCalculator } from './danpss/danpssCalculator'
 import { gcsCalculator } from './gcs/gcsCalculator'
+import { epdsCalculator } from './epds/epdsCalculator'
+import { ipssCalculator } from './ipss/ipssCalculator'
+import { puqeCalculator } from './puqe/puqeCalculator'
+import { westleyCroupCalculator } from './westleyCroup/westleyCroupCalculator'
+import { who5Calculator } from './who5/who5Calculator'
+import { lrtiCalculator } from './lrti/lrtiCalculator'
+import { score2Calculator } from './score2/score2Calculator'
 
 // Calculator type mapping
 export type CalculatorType = 
@@ -27,15 +34,13 @@ const calculatorRegistry = {
   audit: auditCalculator,
   danpss: danpssCalculator,
   gcs: gcsCalculator,
-  
-  // TODO: Add remaining calculators as they are extracted
-  // epds: epdsCalculator,
-  // ipss: ipssCalculator,
-  // puqe: puqeCalculator,
-  // westleycroupscore: westleyCroupCalculator,
-  // who5: who5Calculator,
-  // lrti: lrtiCalculator,
-  // score2: score2Calculator,
+  epds: epdsCalculator,
+  ipss: ipssCalculator,
+  puqe: puqeCalculator,
+  westleycroupscore: westleyCroupCalculator,
+  who5: who5Calculator,
+  lrti: lrtiCalculator,
+  score2: score2Calculator,
 } as const
 
 // Type for available calculator keys
@@ -57,7 +62,7 @@ export function getCalculator(type: string): MedicalCalculator {
     ]
     
     if (validTypes.includes(type as CalculatorType)) {
-      throw new Error(`Calculator '${type}' is not yet implemented. Please use the legacy implementation temporarily.`)
+      throw new Error(`Calculator '${type}' should be available but is not found in registry. This is likely a bug.`)
     }
     
     throw new Error(`Unknown calculator type: '${type}'. Valid types are: ${validTypes.join(', ')}`)
@@ -137,5 +142,12 @@ export { BaseCalculator } from './base/calculatorBase'
 export {
   auditCalculator,
   danpssCalculator,
-  gcsCalculator
+  gcsCalculator,
+  epdsCalculator,
+  ipssCalculator,
+  puqeCalculator,
+  westleyCroupCalculator,
+  who5Calculator,
+  lrtiCalculator,
+  score2Calculator
 }

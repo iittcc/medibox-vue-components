@@ -802,13 +802,15 @@ export function roundToOne(val: number): number {
 }
 
 export function isValidNumber(val: string): number | false {
-  let cleanedVal = val.replace(/,/g, '.').replace(/[^0123456789.\*\+\-\/]/g, '')
+  let cleanedVal = val.replace(/,/g, '.').replace(/[^0123456789.*+-/]/g, '')
 
-  if (cleanedVal.match(/[\*\+\-\/]/g)) {
+  if (cleanedVal.match(/[*+-/]/g)) {
     cleanedVal = cleanedVal.replace(/[a-zA-Z]/g, '')
     try {
       cleanedVal = eval(cleanedVal).toString()
-    } catch (e) {
+    } catch (error) {
+       
+      console.error('Error evaluating expression:', error)
       return false
     }
   }

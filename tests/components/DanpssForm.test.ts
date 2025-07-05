@@ -1,8 +1,6 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
-import { nextTick } from 'vue'
 import DanpssForm from '@/components/DanpssForm.vue'
-import type { Option, Question, Result } from '@/components/DanpssForm.vue'
 
 // Mock child components
 vi.mock('@/volt/Button.vue', () => ({
@@ -82,6 +80,17 @@ describe('DanpssForm.vue', () => {
         }
       }
     })
+  })
+
+  afterEach(() => {
+    if (wrapper) {
+      wrapper.unmount()
+      wrapper = null
+    }
+    // Clear any remaining timers
+    vi.clearAllTimers()
+    // Force DOM cleanup
+    document.body.innerHTML = ''
   })
 
   describe('Component Rendering', () => {

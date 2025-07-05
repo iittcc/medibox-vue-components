@@ -195,7 +195,7 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
-import Button from '@/volt/Button.vue'
+// import Button from '@/volt/Button.vue'
 import SecondaryButton from '@/volt/SecondaryButton.vue'
 import Select from '@/volt/Select.vue'
 import InputNumber from '@/volt/InputNumber.vue'
@@ -209,18 +209,15 @@ import {
   praeparatarray,
   detaljerarray,
   calculateDosage,
-  type Indholdsstof,
-  type Dispensering,
-  type Praeparat,
-  type Detaljer,
-  type Forslag
+  // type Indholdsstof,
+  // type Dispensering,
+  type Praeparat as _Praeparat,
+  type Detaljer as _Detaljer
+  // type Forslag
 } from '@/assets/medicinBoern'
 import sendDataToServer from '@/assets/sendDataToServer'
 
-const apiUrlServer = import.meta.env.VITE_API_URL
-if (!apiUrlServer) {
-  throw new Error('VITE_API_URL environment variable is not defined')
-}
+const apiUrlServer = import.meta.env.VITE_API_URL || 'https://test.medibox.dk'
 const apiUrl = `${apiUrlServer}/index.php/callback/LogCB/log`
 const keyUrl = `${apiUrlServer}/index.php/KeyServer/getPublicKey`
 

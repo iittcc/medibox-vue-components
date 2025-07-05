@@ -1,7 +1,7 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
 import WestleyCroupScore from '@/components/WestleyCroupScore.vue'
-import type { Option, Question, Result } from '@/components/WestleyCroupScore.vue'
+// import type { Option, Question, Result } from '@/components/WestleyCroupScore.vue'
 
 // Mock child components
 vi.mock('@/volt/Button.vue', () => ({
@@ -67,6 +67,13 @@ describe('WestleyCroupScore.vue', () => {
 
   beforeEach(() => {
     wrapper = mount(WestleyCroupScore)
+  })
+
+  afterEach(() => {
+    if (wrapper) {
+      wrapper.unmount()
+      wrapper = null
+    }
   })
 
   describe('Component Rendering', () => {
@@ -202,7 +209,7 @@ describe('WestleyCroupScore.vue', () => {
       const component = wrapper.vm
 
       // All answers are 0 (normal/none)
-      component.questionsSection1.forEach(q => q.answer = 0)
+      component.questionsSection1.forEach((q: { answer: number }) => q.answer = 0)
       
       component.calculateResults()
 

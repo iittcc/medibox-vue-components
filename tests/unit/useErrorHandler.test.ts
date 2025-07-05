@@ -40,7 +40,7 @@ describe('useErrorHandler', () => {
   let toastMock: any
   let errorBoundaryMock: any
 
-  beforeEach(() => {
+  beforeEach(async () => {
     // Reset mocks
     vi.clearAllMocks()
     
@@ -80,11 +80,11 @@ describe('useErrorHandler', () => {
       const { errorHandler } = wrapper.vm
 
       expect(errorHandler.errors).toBeDefined()
-      expect(errorHandler.hasErrors).toBe(false)
-      expect(errorHandler.isOnline).toBe(true)
-      expect(errorHandler.networkErrors).toEqual([])
-      expect(errorHandler.validationErrors).toEqual([])
-      expect(errorHandler.calculationErrors).toEqual([])
+      expect(errorHandler.hasErrors.value).toBe(false)
+      expect(errorHandler.isOnline.value).toBe(true)
+      expect(errorHandler.networkErrors.value).toEqual([])
+      expect(errorHandler.validationErrors.value).toEqual([])
+      expect(errorHandler.calculationErrors.value).toEqual([])
     })
 
     it('should initialize with custom options', () => {
@@ -127,8 +127,8 @@ describe('useErrorHandler', () => {
       const testError = new Error('Test error')
       await errorHandler.handleError(testError)
 
-      expect(errorHandler.errors.length).toBe(1)
-      expect(errorHandler.hasErrors).toBe(true)
+      expect(errorHandler.errors.value.length).toBe(1)
+      expect(errorHandler.hasErrors.value).toBe(true)
       expect(errorBoundaryMock.categorizeError).toHaveBeenCalledWith(testError)
       expect(errorBoundaryMock.reportError).toHaveBeenCalledWith(testError, undefined)
     })
@@ -155,9 +155,9 @@ describe('useErrorHandler', () => {
 
       await errorHandler.handleError(testError, context)
 
-      expect(errorHandler.errors.length).toBe(1)
-      expect(errorHandler.errors[0].componentName).toBe('TestComponent')
-      expect(errorHandler.errors[0].calculatorType).toBe('audit')
+      expect(errorHandler.errors.value.length).toBe(1)
+      expect(errorHandler.errors.value[0].componentName).toBe('TestComponent')
+      expect(errorHandler.errors.value[0].calculatorType).toBe('audit')
       expect(errorBoundaryMock.reportError).toHaveBeenCalledWith(testError, context)
     })
 
@@ -296,10 +296,10 @@ describe('useErrorHandler', () => {
       errorBoundaryMock.categorizeError.mockReturnValueOnce(ErrorType.CALCULATION)
       await errorHandler.handleError(new Error('Calculation error'))
 
-      expect(errorHandler.errors.length).toBe(3)
-      expect(errorHandler.networkErrors.length).toBe(1)
-      expect(errorHandler.validationErrors.length).toBe(1)
-      expect(errorHandler.calculationErrors.length).toBe(1)
+      expect(errorHandler.errors.value.length).toBe(3)
+      expect(errorHandler.networkErrors.value.length).toBe(1)
+      expect(errorHandler.validationErrors.value.length).toBe(1)
+      expect(errorHandler.calculationErrors.value.length).toBe(1)
     })
   })
 
@@ -317,11 +317,11 @@ describe('useErrorHandler', () => {
       const { errorHandler } = wrapper.vm
 
       await errorHandler.handleError(new Error('Test error'))
-      expect(errorHandler.errors.length).toBe(1)
+      expect(errorHandler.errors.value.length).toBe(1)
 
       errorHandler.clearErrors()
-      expect(errorHandler.errors.length).toBe(0)
-      expect(errorHandler.hasErrors).toBe(false)
+      expect(errorHandler.errors.value.length).toBe(0)
+      expect(errorHandler.hasErrors.value).toBe(false)
     })
 
     it('should clear specific error by index', async () => {
@@ -338,11 +338,11 @@ describe('useErrorHandler', () => {
 
       await errorHandler.handleError(new Error('Error 1'))
       await errorHandler.handleError(new Error('Error 2'))
-      expect(errorHandler.errors.length).toBe(2)
+      expect(errorHandler.errors.value.length).toBe(2)
 
       errorHandler.clearError(0)
-      expect(errorHandler.errors.length).toBe(1)
-      expect(errorHandler.errors[0].errorMessage).toBe('Error 2')
+      expect(errorHandler.errors.value.length).toBe(1)
+      expect(errorHandler.errors.value[0].errorMessage).toBe('Error 2')
     })
 
     it('should clear errors by type', async () => {
@@ -365,11 +365,11 @@ describe('useErrorHandler', () => {
       errorBoundaryMock.categorizeError.mockReturnValueOnce(ErrorType.VALIDATION)
       await errorHandler.handleError(new Error('Validation error'))
 
-      expect(errorHandler.errors.length).toBe(2)
+      expect(errorHandler.errors.value.length).toBe(2)
 
       errorHandler.clearErrorsByType(ErrorType.NETWORK)
-      expect(errorHandler.errors.length).toBe(1)
-      expect(errorHandler.errors[0].errorType).toBe(ErrorType.VALIDATION)
+      expect(errorHandler.errors.value.length).toBe(1)
+      expect(errorHandler.errors.value[0].errorType).toBe(ErrorType.VALIDATION)
     })
   })
 
@@ -454,7 +454,7 @@ describe('useErrorHandler', () => {
       wrapper = mount(TestComponent)
       const { errorHandler } = wrapper.vm
 
-      expect(errorHandler.isOnline).toBe(true)
+      expect(errorHandler.isOnline.value).toBe(true)
 
       // Simulate going offline
       Object.defineProperty(navigator, 'onLine', { value: false, writable: true })

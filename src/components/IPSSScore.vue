@@ -28,8 +28,10 @@
             :question="question"
             :options="getOptions(question.optionsType as keyof OptionsSets)"
             :index="index"
+            :framework-answer="question.answer ?? undefined"
             :is-unanswered="formSubmitted && isUnanswered(question)"
             scrollHeight="18rem"
+            @update:answer="question.answer = $event"
           />
           <div v-if="validationMessage" class="text-red-500 mt-5 font-bold">
             {{ validationMessage }}
@@ -49,7 +51,7 @@
                 Navn: {{ name }} <br />
                 Køn: {{ getGenderLabel(gender as GenderValue) }} <br />
                 Alder: {{ age }} år<br /><br />
-                <div v-for="(question, index) in resultsSection1" >{{ question.text }} {{ question.score }}</div />
+                <div v-for="(question, index) in resultsSection1" :key="index">{{ question.text }} {{ question.score }}</div>
                 <br /><br />
                 IPSS Score {{ totalScore }} : {{ conclusion }}
               </template>
@@ -208,6 +210,9 @@ const options2 = ref<Option[]>([
         answer: options2.value[0].value
       }
     ]);
+
+// Default answers are already set in question configurations above
+
 const optionsSets = {
   options1,
   options2

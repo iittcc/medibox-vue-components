@@ -1,4 +1,4 @@
-import { describe, expect, test, beforeEach, vi } from 'vitest'
+import { describe, expect, test, beforeEach, afterEach, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { nextTick } from 'vue'
 import IPSSScore from '@/components/IPSSScore.vue'
@@ -132,6 +132,13 @@ describe('IPSSScore Component', () => {
     wrapper = mount(IPSSScore)
   })
 
+  afterEach(() => {
+    if (wrapper) {
+      wrapper.unmount()
+      wrapper = null
+    }
+  })
+
   describe('Basic Rendering', () => {
     test('renders the component with correct structure', () => {
       expect(wrapper.find('[data-testid="surface-card"]').exists()).toBe(true)
@@ -186,7 +193,7 @@ describe('IPSSScore Component', () => {
       expect(component.questionsSection1.length).toBe(7)
       
       // Check all questions have required properties
-      component.questionsSection1.forEach((question: any, index: number) => {
+      component.questionsSection1.forEach((question: any, _index: number) => {
         expect(question).toHaveProperty('type')
         expect(question).toHaveProperty('text')
         expect(question).toHaveProperty('description')

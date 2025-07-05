@@ -13,7 +13,7 @@
               <div class="col-fixed" style="min-width:150px">
                 <div class="text-right items-center">
                   <label :for="`${name}a${index}${optionIndex}`" class="mr-2">{{ (option.value > 0) ? '+ '+option.value : (option.value < 0) ? '- '+Math.abs(option.value) : option.value }}</label>
-                  <RadioButton :inputId="`${name}a${index}${optionIndex}`" :value="option.value" v-model="question.answer" style="vertical-align: baseline" />
+                  <RadioButton :inputId="`${name}a${index}${optionIndex}`" :value="option.value" v-model="currentAnswer" style="vertical-align: baseline" />
                 </div>
               </div>
             </div>
@@ -31,7 +31,7 @@
         <div class="md:w-1/2 w-full h-full p-2 flex-initial" >
           <div class="text-left items-center" >
             <Listbox 
-              v-model="question.answer" 
+              v-model="currentAnswer" 
               :options="options" 
               optionLabel="text" 
               optionValue="value" 
@@ -65,7 +65,7 @@
         </div>
         <div class="col-fixed">
           <div class="text-left items-center">
-            <SelectButton v-model="question.answer" :options="options" optionLabel="text" optionValue="value" class="ml-3" />
+            <SelectButton v-model="currentAnswer" :options="options" optionLabel="text" optionValue="value" class="ml-3" />
           </div>
         </div>
       </div>
@@ -80,7 +80,7 @@
         </div>
         <div class="col-fixed">
           <div class="text-left items-center">
-            <Select v-model="question.answer" :options="options" optionLabel="text" optionValue="value" placeholder="Vælg ..." checkmark :highlightOnSelect="false" class="ml-3"  style="min-width:150px"/>
+            <Select v-model="currentAnswer" :options="options" optionLabel="text" optionValue="value" placeholder="Vælg ..." checkmark :highlightOnSelect="false" class="ml-3"  style="min-width:150px"/>
           </div>
         </div>
       </div>
@@ -91,6 +91,7 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue';
 import RadioButton from '@/volt/RadioButton.vue';
 import SelectButton from '@/volt/SelectButton.vue';
 import Select from '@/volt/Select.vue';
@@ -108,7 +109,6 @@ export interface Question {
   text: string;
   description?: string;
   optionsType?: string;
-  answer: number | null;
 }
 
 const props = defineProps({
@@ -140,9 +140,23 @@ const props = defineProps({
     type: String,
     default: '14rem',
   },
+  frameworkAnswer: {
+    type: [Number, String],
+    default: null,
+  },
 });
 
+const emit = defineEmits<{
+  'update:answer': [value: number | null]
+}>()
+
+// Use framework answer as the single source of truth
+const currentAnswer = computed({
+  get: () => props.frameworkAnswer,
+  set: (value) => emit('update:answer', value)
+})
+
 const isSelected = (value: number): boolean => {
-  return value === props.question.answer;
+  return value === props.frameworkAnswer;
 };
 </script>

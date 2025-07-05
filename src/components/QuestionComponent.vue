@@ -15,7 +15,7 @@
                 <div class="flex flex-row gap-3 justify-end items-center">
                   
                   <label :for="`${name}a${index}${optionIndex}`" >{{ optionIndex }}</label>
-                  <RadioButton :inputId="`${name}a${index}${optionIndex}`" :value="option.value" v-model="question.answerA"/>
+                  <RadioButton :inputId="`${name}a${index}${optionIndex}`" :value="option.value" v-model="answerA"/>
                 </div>
             </div>
           </div>
@@ -30,7 +30,7 @@
             <div class="w-1/4 flex justify-end" >
                 <div class="flex flex-row gap-3 justify-end items-center">
                   <label :for="`${name}b${index}${optionIndex}`" >{{ optionIndex }}</label>
-                  <RadioButton :inputId="`${name}b${index}${optionIndex}`" :value="option.value" v-model="question.answerB" />
+                  <RadioButton :inputId="`${name}b${index}${optionIndex}`" :value="option.value" v-model="answerB" />
                 </div>
               </div>
             </div>
@@ -58,7 +58,7 @@ export interface QuestionProp {
   answerB: number | null;
 }
 
-defineProps<{
+const props = defineProps<{
   name: string;
   question: QuestionProp;
   optionsA: Option[];
@@ -66,6 +66,23 @@ defineProps<{
   index: number;
   isUnanswered?: boolean;
 }>();
+
+const emit = defineEmits<{
+  'update-answer-a': [value: number | null];
+  'update-answer-b': [value: number | null];
+}>();
+
+import { computed } from 'vue';
+
+const answerA = computed({
+  get: () => props.question.answerA,
+  set: (value: number | null) => emit('update-answer-a', value)
+});
+
+const answerB = computed({
+  get: () => props.question.answerB,
+  set: (value: number | null) => emit('update-answer-b', value)
+});
 </script>
 
 

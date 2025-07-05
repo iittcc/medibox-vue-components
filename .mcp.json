@@ -1,25 +1,24 @@
 {
-    "mcpServers": {
-        "Context7": {
-            "command": "npx",
-            "args": [
-                "-y",
-                "@upstash/context7-mcp"
-            ]
-        },
-        "clear-thought": {
-            "command": "node",
-            "args": [
-                "/Users/tej/localhost/clear-thought-mcp-server/dist/index.js"
-            ]
-        },
-        "playwright": {
-            "command": "npx",
-            "args": ["-y", "@executeautomation/playwright-mcp-server"]
-        },
-        "serena": {
-            "command": "/opt/homebrew/bin/uv",
-            "args": ["run", "--directory", "/Users/tej/localhost/AI/mcp/serena", "serena-mcp-server"]
-        }
+  "mcpServers": {
+    "Context7": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@upstash/context7-mcp"
+      ]
+    },
+    "clear-thought": {
+      "command": "node",
+      "args": [
+        "/Users/tej/localhost/clear-thought-mcp-server/dist/index.js"
+      ]
+    },
+    "playwright": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@executeautomation/playwright-mcp-server"
+      ]
     }
+  }
 }

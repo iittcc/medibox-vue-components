@@ -4,7 +4,7 @@
         <div>
             <div class="flex items-center justify-start gap-2">
             <i class="pi pi-user"></i> Navn: 
-            <InputText class="ml-1"v-model="localName" placeholder="Indtast navn" @input="updateName" id="personName"/>
+            <InputText class="ml-1" v-model="localName" placeholder="Indtast navn" @input="updateName" id="personName"/>
             </div>
         </div>
         <div :style="{display: genderdisplay}">
@@ -40,7 +40,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from "vue";
+import { ref, computed } from "vue";
 import InputText from '@/volt/InputText.vue';
 import SelectButton from '@/volt/SelectButton.vue';
 import NumberSliderInput from './NumberSliderInput.vue';

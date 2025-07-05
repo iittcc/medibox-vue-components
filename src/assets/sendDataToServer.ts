@@ -7,7 +7,9 @@ export interface SendDataOptions {
   timeout?: number
   retryDelay?: number
   exponentialBackoff?: boolean
+   
   onProgress?: (attempt: number, maxRetries: number) => void
+   
   onError?: (error: Error, attempt: number) => void
   calculatorType?: string
   correlationId?: string
@@ -33,7 +35,8 @@ export interface NetworkError extends Error {
 // Enhanced error types for better categorization
 export class PublicKeyError extends Error {
   isRetryable = false
-  constructor(message: string, public originalError?: Error) {
+   
+  constructor(message: string, public _originalError?: Error) {
     super(message)
     this.name = 'PublicKeyError'
   }
@@ -41,7 +44,8 @@ export class PublicKeyError extends Error {
 
 export class EncryptionError extends Error {
   isRetryable = false
-  constructor(message: string, public originalError?: Error) {
+   
+  constructor(message: string, public _originalError?: Error) {
     super(message)
     this.name = 'EncryptionError'
   }
@@ -52,7 +56,8 @@ export class NetworkTimeoutError extends Error implements NetworkError {
   isTimeout = true
   isRetryable = true
   
-  constructor(message: string, public attempt: number, public status?: number, public statusText?: string) {
+   
+  constructor(message: string, public _attempt: number, public _status?: number, public _statusText?: string) {
     super(message)
     this.name = 'NetworkTimeoutError'
   }
@@ -62,12 +67,13 @@ export class NetworkRequestError extends Error implements NetworkError {
   isNetworkError = true
   isTimeout = false
   
+   
   constructor(
     message: string, 
-    public attempt: number, 
-    public status?: number, 
-    public statusText?: string,
-    public isRetryable: boolean = true
+    public _attempt: number, 
+    public _status?: number, 
+    public _statusText?: string,
+    public _isRetryable: boolean = true
   ) {
     super(message)
     this.name = 'NetworkRequestError'
@@ -204,7 +210,7 @@ async function sendDataToServer<T = any>(
       message: 'Starting data transmission',
       category: 'network',
       details: {
-        url: url.replace(/\/\/[^\/]+/, '//***'), // Anonymize domain
+        url: url.replace(/\/\/[^/]+/, '//***'), // Anonymize domain
         correlationId,
         calculatorType: options.calculatorType,
         payloadSize: JSON.stringify(payload).length

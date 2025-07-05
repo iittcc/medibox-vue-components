@@ -33,6 +33,7 @@ withErrorBoundary(app, {
     maxRetries: 3,
     showToast: true,
     onError: (error, errorInfo) => {
+         
         console.error('AUDIT Calculator Error:', {
             error: error.message,
             errorInfo,

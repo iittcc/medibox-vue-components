@@ -235,7 +235,7 @@ import SurfaceCard from "./SurfaceCard.vue";
 import SurfaceCardItem from "./SurfaceCardItem.vue";
 import CopyDialog from "./CopyDialog.vue";
 import CustomIcon from "./CustomIcon.vue";
-import { calculateRisk, filterByAgeGroup } from "../assets/riskCalculator.ts";
+import { calculateRisk, filterByAgeGroup as _filterByAgeGroup } from "../assets/riskCalculator.ts";
 import PersonInfo from "./PersonInfo.vue";
 import NumberSliderInput from './NumberSliderInput.vue';
 import { getGenderLabel, type GenderValue } from '@/utils/genderUtils';
@@ -280,7 +280,7 @@ const arr = ref<number>(0);
 const rrr = ref<number>(0);
 const nnt = ref<number>(0);
 
-const cholesterolOptions: Option[] = [
+const _cholesterolOptions: Option[] = [
   { label: "4.0", value: 4.0 },
   { label: "5.0", value: 5.0 },
   { label: "6.0", value: 6.0 },
@@ -288,7 +288,7 @@ const cholesterolOptions: Option[] = [
   { label: "8.0", value: 8.0 },
 ];
 
-const smokingOptions: Option[] = [
+const _smokingOptions: Option[] = [
   { label: "Ja", value: "Ja" },
   { label: "Nej", value: "Nej" },
 ];

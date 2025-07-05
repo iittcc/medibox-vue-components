@@ -7,13 +7,16 @@ export interface ErrorHandlerOptions {
   autoRetry?: boolean
   maxRetries?: number
   retryDelay?: number
+   
   onError?: (error: ErrorInfo) => void
+   
   onRecovery?: (error: ErrorInfo) => void
 }
 
 export function useErrorHandler(options: ErrorHandlerOptions = {}) {
   const toast = useToast()
   const errors = ref<ErrorInfo[]>([])
+   
   const isOnline = ref(navigator.onLine)
   const retryAttempts = ref<Map<string, number>>(new Map())
 
@@ -113,6 +116,7 @@ export function useErrorHandler(options: ErrorHandlerOptions = {}) {
         // Exponential backoff
         const attempt = retryAttempts.value.get(`${context?.component}-${context?.action}`) || 1
         const delay = retryDelay * Math.pow(2, attempt - 1)
+         
         await new Promise(resolve => setTimeout(resolve, delay))
         
         if (onRecovery) {
@@ -129,6 +133,7 @@ export function useErrorHandler(options: ErrorHandlerOptions = {}) {
       
       return false
     } catch (recoveryError) {
+       
       console.error('Recovery attempt failed:', recoveryError)
       return false
     }
@@ -141,11 +146,14 @@ export function useErrorHandler(options: ErrorHandlerOptions = {}) {
         return
       }
       
+       
       const handleOnline = () => {
+         
         window.removeEventListener('online', handleOnline)
         resolve()
       }
       
+       
       window.addEventListener('online', handleOnline)
     })
   }
@@ -236,6 +244,7 @@ export function useErrorHandler(options: ErrorHandlerOptions = {}) {
 
   // Network status handling
   const handleOnlineStatusChange = () => {
+     
     isOnline.value = navigator.onLine
     
     if (isOnline.value && networkErrors.value.length > 0) {
@@ -253,6 +262,7 @@ export function useErrorHandler(options: ErrorHandlerOptions = {}) {
   }
 
   // Store event listener functions for proper cleanup
+   
   const handleMedicalCalculatorError = ((event: CustomEvent) => {
     const errorInfo = event.detail as ErrorInfo
     errors.value.push(errorInfo)
@@ -260,34 +270,46 @@ export function useErrorHandler(options: ErrorHandlerOptions = {}) {
     if (showToasts) {
       showErrorToast(errorInfo)
     }
-  }) as EventListener
+  }) as /* eslint-disable-line no-undef */ EventListener
 
+   
   const handleMedicalCalculatorRecovery = ((event: CustomEvent) => {
     const errorInfo = event.detail as ErrorInfo
     if (onRecovery) {
       onRecovery(errorInfo)
     }
-  }) as EventListener
+  }) as /* eslint-disable-line no-undef */ EventListener
 
+   
   const handleShowErrorToast = ((event: CustomEvent) => {
     const toastOptions = event.detail
     toast.add(toastOptions)
-  }) as EventListener
+  }) as /* eslint-disable-line no-undef */ EventListener
 
   // Lifecycle hooks
   onMounted(() => {
+     
     window.addEventListener('online', handleOnlineStatusChange)
+     
     window.addEventListener('offline', handleOnlineStatusChange)
+     
     window.addEventListener('medicalCalculatorError', handleMedicalCalculatorError)
+     
     window.addEventListener('medicalCalculatorRecovery', handleMedicalCalculatorRecovery)
+     
     window.addEventListener('showErrorToast', handleShowErrorToast)
   })
 
   onUnmounted(() => {
+     
     window.removeEventListener('online', handleOnlineStatusChange)
+     
     window.removeEventListener('offline', handleOnlineStatusChange)
+     
     window.removeEventListener('medicalCalculatorError', handleMedicalCalculatorError)
+     
     window.removeEventListener('medicalCalculatorRecovery', handleMedicalCalculatorRecovery)
+     
     window.removeEventListener('showErrorToast', handleShowErrorToast)
   })
 

@@ -40,7 +40,7 @@ export function useValidation<T extends Record<string, any>>(
     immediate = false,
     abortEarly = false,
     stripUnknown = true,
-    allowUnknown = false
+    allowUnknown: _allowUnknown = false
   } = options
 
   // Validation state

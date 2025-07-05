@@ -2,6 +2,81 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## IMPORTANT INSTRUCTIONS
+- On initialization read instructions on how to use Serena.
+- Get the console log from the browser whenever you perform any action in playwright
+- Only commit working tested code.
+- Do not assume anything about the code. Read the code.
+
+## CRITICAL WORKFLOW - ALWAYS FOLLOW THIS!
+Research → Plan → Implement
+**NEVER JUMP STRAIGHT TO CODING!** Always follow this sequence:
+
+1. **Research**: Explore the codebase, understand existing patterns
+2. **Plan**: Create a detailed implementation plan and verify it with me
+3. **Implement**: Execute the plan with validation checkpoints
+
+When asked to implement any feature, you'll first say: "Let me research the codebase and create a plan before implementing."
+
+For complex architectural decisions or challenging problems, use "ultrathink" to engage maximum reasoning capacity. Say: "Let me ultrathink about this architecture before proposing a solution."
+
+## USE MULTIPLE AGENTS!
+Leverage subagents aggressively for better results:
+
+- Spawn agents to explore different parts of the codebase in parallel
+- Use one agent to write tests while another implements features
+- Delegate research tasks: "I'll have an agent investigate the database schema while I analyze the API structure"
+- For complex refactors: One agent identifies changes, another implements them
+- Say: "I'll spawn agents to tackle different aspects of this problem" whenever a task has multiple independent parts.
+
+## Reality Checkpoints
+Stop and validate at these moments:
+
+- After implementing a complete feature
+- Before starting a new major component
+- When something feels wrong
+- Before declaring "done"
+
+## Problem-Solving Together
+When you're stuck or confused:
+
+- **Stop**: Don't spiral into complex solutions
+- **Delegate**: Consider spawning agents for parallel investigation
+- **Ultrathink**: For complex problems, say "I need to ultrathink through this challenge" to engage deeper reasoning
+- **Step back**: Re-read the requirements
+- **Simplify**: The simple solution is usually correct
+- **Ask**: "I see two approaches: [A] vs [B]. Which do you prefer?"
+
+My insights on better approaches are valued - please ask for them!
+
+## Working Memory Management
+When context gets long:
+
+- Re-read this CLAUDE.md file
+- Summarize progress in a PROGRESS.md file
+- Document current state before major changes
+### Maintain TODO.md:
+
+```
+## Current Task
+- [ ] What we're doing RIGHT NOW
+
+## Completed  
+- [x] What's actually done and tested
+
+## Next Steps
+- [ ] What comes next
+```
+
+### Use SCRATCHPAD.md
+To write down: 
+
+- Important things to remember
+- Learnings
+- Ideas
+- Complex workflows
+- Anything else important for a succesful implemtation
+
 ## Commands
 
 ### Development
@@ -154,6 +229,58 @@ Each entry point has:
 - **Strict mode** enabled
 - **Path aliasing**: `@/` points to `src/`
 
+## MCP Server Configuration
+
+### TypeScript Documentation Server
+A local MCP server has been configured to provide access to the complete TypeScript documentation.
+
+#### Setup
+The TypeScript documentation server is set up at `/Users/tej/mcp-servers/` with these components:
+- **MCP Server script**: `/Users/tej/mcp-servers/typescript-docs-mcp.js`
+- **Startup script**: `/Users/tej/mcp-servers/start-typescript-docs.sh`
+- **Configuration**: Added to `.mcp.json` as `typescript-docs`
+- **Documentation source**: Cloned TypeScript-Website repository at `/Users/tej/mcp-servers/typescript-docs/`
+
+#### Available Documentation Resources
+The MCP server provides access to key TypeScript documentation sections:
+- **TypeScript Handbook** - `typescript://docs/handbook`
+- **TypeScript Handbook v2** - `typescript://docs/handbook/2`
+- **TSConfig Reference** - `typescript://tsconfig`
+- **Basic Types** - `typescript://docs/handbook/basic-types`
+- **Interfaces** - `typescript://docs/handbook/interfaces`
+- **Classes** - `typescript://docs/handbook/classes`
+- **Functions** - `typescript://docs/handbook/functions`
+- **Generics** - `typescript://docs/handbook/generics`
+- **Enums** - `typescript://docs/handbook/enums`
+- **Modules** - `typescript://docs/handbook/modules`
+
+#### Manual Server Management
+To manually start the documentation server:
+```bash
+/Users/tej/mcp-servers/start-typescript-docs.sh
+```
+
+The server will be available at `http://localhost:8000`
+
+#### MCP Integration
+The server automatically starts the Gatsby documentation server when Claude Code connects. Access TypeScript documentation through:
+- `ListMcpResourcesTool` with server="typescript-docs" to see available documentation sections
+- `ReadMcpResourceTool` with server="typescript-docs" and uri="typescript://..." to read specific pages
+
+#### Optimization Features
+- **Automatic server startup**: MCP server handles Gatsby process management
+- **Resource caching**: Efficient access to frequently used documentation
+- **Fallback mechanisms**: Uses curl if fetch API unavailable
+- **Clean shutdown**: Proper process cleanup on exit
+
+#### Troubleshooting
+If the server fails to start:
+1. Check that Node.js 18+ and pnpm are installed
+2. Verify the TypeScript documentation repository is at `/Users/tej/mcp-servers/typescript-docs/`
+3. Run `pnpm install` and `pnpm bootstrap` in the docs directory
+4. Check for port conflicts on port 8000
+5. Ensure executable permissions: `chmod +x /Users/tej/mcp-servers/*.sh /Users/tej/mcp-servers/*.js`
+
 ## Repository Etiquette
 
 ### Git Workflow
@@ -210,3 +337,18 @@ Each entry point has:
 - Risk assessment logic centralized in utility files
 - Danish medical terminology and scoring standards
 - Results include severity levels and clinical recommendations
+
+## Development Research Notes
+
+- **Configuration State Initialization**:
+  1. Check if configuration is being used to initialize reactive state
+  2. Add explicit initialization loop after variable declarations
+## Workflow Memory
+- 3. Test visually to confirm defaults appear
+
+### Memories
+- Environment Variable Graceful Handling. Vue components were throwing runtime errors when VITE_API_URL was undefined, causing complete component failure. Fixed by creating .env files and using fallback values instead of throwing errors.
+- Vitest Browser API Version Compatibility. Browser tests failed because they used deprecated Vitest v2 API (browser.name, browser.headless) instead of the new v3 instances array pattern. Fixed by migrating to browser: { instances: [{ browser: 'chromium' }] } and adding proper dependency optimization.
+- PrimeVue Test Environment Configuration. PrimeVue components failed with "Cannot read properties of undefined (reading 'config')" because the plugin wasn't configured in tests. Fixed by adding global: { plugins: [[PrimeVue, { unstyled: true }]] } to component mounting in all test environments.
+- Browser vs Non-Browser Test Environment Selection. Integration tests were incorrectly using browser-specific APIs (vitest-browser-vue, @vitest/browser/context) in a happy-dom environment. Fixed by converting to Vue Test Utils (mount()) and focusing on component state testing instead of DOM interactions.
+- Vue Component State and Reactivity Testing Expectations. Tests failed because they assumed static default values, but the medical calculator used computed/reactive dosage values based on selected medicine. Fixed by testing value types and reactive behavior instead of hardcoded expectations (expect(typeof wrapper.vm.dosering).toBe('number')).

@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { mount, createLocalVue } from '@vue/test-utils'
-import { defineComponent, createApp, h } from 'vue'
+import { mount } from '@vue/test-utils'
+import { defineComponent, createApp, h as _h } from 'vue'
 import { 
   errorBoundaryManager,
   ErrorBoundary,
@@ -14,7 +14,7 @@ import {
   UIError,
   SecurityError,
   DataError,
-  type ErrorInfo,
+  type ErrorInfo as _ErrorInfo,
   type ErrorBoundaryConfig
 } from '@/utils/errorBoundary'
 
@@ -31,8 +31,8 @@ Object.defineProperty(console, 'info', { value: consoleMock.info })
 Object.defineProperty(console, 'debug', { value: consoleMock.debug })
 
 describe('ErrorBoundaryManager', () => {
-  let addEventListenerSpy: any
-  let removeEventListenerSpy: any
+  let _addEventListenerSpy: any
+  let _removeEventListenerSpy: any
 
   beforeEach(() => {
     vi.clearAllMocks()
@@ -42,8 +42,8 @@ describe('ErrorBoundaryManager', () => {
     errorBoundaryManager.clearErrors()
     
     // Mock DOM event listeners
-    addEventListenerSpy = vi.spyOn(window, 'addEventListener')
-    removeEventListenerSpy = vi.spyOn(window, 'removeEventListener')
+    _addEventListenerSpy = vi.spyOn(window, 'addEventListener')
+    _removeEventListenerSpy = vi.spyOn(window, 'removeEventListener')
   })
 
   afterEach(() => {
@@ -405,7 +405,7 @@ describe('ErrorBoundary Component', () => {
 
     try {
       wrapper = mount(TestComponent)
-    } catch (error) {
+    } catch (_error) {
       // Error is expected during mount
     }
 
@@ -419,10 +419,10 @@ describe('ErrorBoundary Component', () => {
 })
 
 describe('withErrorBoundary', () => {
-  let addEventListenerSpy: any
+  let _addEventListenerSpy2: any
 
   beforeEach(() => {
-    addEventListenerSpy = vi.spyOn(window, 'addEventListener')
+    _addEventListenerSpy2 = vi.spyOn(window, 'addEventListener')
   })
 
   afterEach(() => {
@@ -435,7 +435,7 @@ describe('withErrorBoundary', () => {
     withErrorBoundary(app)
 
     expect(app.config.errorHandler).toBeDefined()
-    expect(addEventListenerSpy).toHaveBeenCalledWith('unhandledrejection', expect.any(Function))
+    expect(_addEventListenerSpy2).toHaveBeenCalledWith('unhandledrejection', expect.any(Function))
   })
 
   it('should apply custom configuration', () => {
@@ -455,10 +455,10 @@ describe('withErrorBoundary', () => {
     withErrorBoundary(app)
 
     const testError = new Error('Global error')
-    const mockInstance = { $options: { name: 'TestComponent' } }
+    const mockInstance = { $options: { name: 'TestComponent' } } as any
     
     // Simulate Vue error
-    app.config.errorHandler?.(testError, mockInstance, 'render function')
+    app.config.errorHandler?.(testError, mockInstance as any, 'render function')
 
     const errors = errorBoundaryManager.getErrors()
     expect(errors.length).toBeGreaterThan(0)

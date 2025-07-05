@@ -1,4 +1,4 @@
-import { describe, expect, test, beforeEach, vi } from 'vitest'
+import { describe, expect, test, beforeEach, afterEach, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { nextTick } from 'vue'
 import MedicinBoernScore from '@/components/MedicinBoernScore.vue'
@@ -125,6 +125,13 @@ describe('MedicinBoernScore Component', () => {
     wrapper = mount(MedicinBoernScore)
   })
 
+  afterEach(() => {
+    if (wrapper) {
+      wrapper.unmount()
+      wrapper = null
+    }
+  })
+
   test('renders the component with title', () => {
     expect(wrapper.find('[data-testid="surface-card"]').exists()).toBe(true)
     expect(wrapper.text()).toContain('Medicin - dosering til børn')
@@ -163,6 +170,13 @@ describe('Medicine Selection Logic', () => {
 
   beforeEach(() => {
     wrapper = mount(MedicinBoernScore)
+  })
+
+  afterEach(() => {
+    if (wrapper) {
+      wrapper.unmount()
+      wrapper = null
+    }
   })
 
   test('updates dispensing options when medicine is selected', async () => {
@@ -232,6 +246,13 @@ describe('Dosage Calculations', () => {
 
   beforeEach(() => {
     wrapper = mount(MedicinBoernScore)
+  })
+
+  afterEach(() => {
+    if (wrapper) {
+      wrapper.unmount()
+      wrapper = null
+    }
   })
 
   test('performs automatic calculations on input changes', async () => {
@@ -331,6 +352,13 @@ describe('Dosage Suggestions', () => {
     wrapper = mount(MedicinBoernScore)
   })
 
+  afterEach(() => {
+    if (wrapper) {
+      wrapper.unmount()
+      wrapper = null
+    }
+  })
+
   test('shows dosage suggestions when medicine is selected', async () => {
     const component = wrapper.vm as any
     
@@ -374,6 +402,13 @@ describe('Form Reset', () => {
     wrapper = mount(MedicinBoernScore)
   })
 
+  afterEach(() => {
+    if (wrapper) {
+      wrapper.unmount()
+      wrapper = null
+    }
+  })
+
   test('resets form values but keeps first medicine selected', async () => {
     const component = wrapper.vm as any
     
@@ -401,8 +436,8 @@ describe('Form Reset', () => {
     const component = wrapper.vm as any
     
     // Store original values to verify they change
-    const originalMedicine = component.selectedIndholdsstof
-    const originalWeight = component.vaegt
+    const _originalMedicine = component.selectedIndholdsstof
+    const _originalWeight = component.vaegt
     
     // Change some values first
     component.selectedIndholdsstof = 'penicillin'
@@ -425,6 +460,13 @@ describe('Copy Functionality', () => {
 
   beforeEach(() => {
     wrapper = mount(MedicinBoernScore)
+  })
+
+  afterEach(() => {
+    if (wrapper) {
+      wrapper.unmount()
+      wrapper = null
+    }
   })
 
   test('copy dialog contains calculation results', async () => {
@@ -472,6 +514,13 @@ describe('Server Data Integration', () => {
     wrapper = mount(MedicinBoernScore)
   })
 
+  afterEach(() => {
+    if (wrapper) {
+      wrapper.unmount()
+      wrapper = null
+    }
+  })
+
   test('sends data to server on calculation', async () => {
     const sendDataToServer = await import('@/assets/sendDataToServer')
     const component = wrapper.vm as any
@@ -487,14 +536,16 @@ describe('Server Data Integration', () => {
     component.dosering = 50
     await nextTick()
     
-    // Verify sendDataToServer was called
+    // Verify sendDataToServer was called with correct parameters
     expect(sendDataToServer.default).toHaveBeenCalledWith(
+      expect.stringContaining('/index.php/callback/LogCB/log'), // apiUrl
+      expect.stringContaining('/index.php/KeyServer/getPublicKey'), // keyUrl
       expect.objectContaining({
         type: 'medicinBoern',
         indholdsstof: 'Amoxicillin',
         dosering: 50,
         vaegt: 20
-      })
+      }) // payload
     )
   })
 })
@@ -504,6 +555,13 @@ describe('Real Data Integration', () => {
 
   beforeEach(() => {
     wrapper = mount(MedicinBoernScore)
+  })
+
+  afterEach(() => {
+    if (wrapper) {
+      wrapper.unmount()
+      wrapper = null
+    }
   })
 
   test('uses real medicine data correctly', async () => {
