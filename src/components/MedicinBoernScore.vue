@@ -217,10 +217,7 @@ import {
 } from '@/assets/medicinBoern'
 import sendDataToServer from '@/assets/sendDataToServer'
 
-const apiUrlServer = import.meta.env.VITE_API_URL
-if (!apiUrlServer) {
-  throw new Error('VITE_API_URL environment variable is not defined')
-}
+const apiUrlServer = import.meta.env.VITE_API_URL || 'https://test.medibox.dk'
 const apiUrl = `${apiUrlServer}/index.php/callback/LogCB/log`
 const keyUrl = `${apiUrlServer}/index.php/KeyServer/getPublicKey`
 
