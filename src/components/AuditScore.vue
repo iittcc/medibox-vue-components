@@ -188,6 +188,7 @@ const questionsSection1 = [
     text: "1. Hvor tit drikker du alkohol?",
     description: "",
     optionsType: 'options1',
+    answer: options1.value[0].value
   },
   {
     id: 'question2',
@@ -196,6 +197,7 @@ const questionsSection1 = [
     text: "2. Hvor mange genstande drikker du almindeligvis, når du drikker noget?",
     description: "",
     optionsType: 'options2',
+    answer: options2.value[0].value
   },
   {
     id: 'question3',
@@ -204,6 +206,7 @@ const questionsSection1 = [
     text: "3. Hvor tit drikker du fem genstande eller flere ved samme lejlighed?",
     description: "",
     optionsType: 'options3',
+    answer: options3.value[0].value
   },
   {
     id: 'question4',
@@ -212,6 +215,7 @@ const questionsSection1 = [
     text: "4. Har du inden for det seneste år oplevet, at du ikke kunne stoppe, når du først var begyndt at drikke?",
     description: "",
     optionsType: 'options3',
+    answer: options3.value[0].value
   },
   {
     id: 'question5',
@@ -220,6 +224,7 @@ const questionsSection1 = [
     text: "5. Har du inden for det seneste år oplevet, at du ikke kunne gøre det, du skulle, fordi du havde drukket?",
     description: "",
     optionsType: 'options4',
+    answer: options4.value[0].value
   },
   {
     id: 'question6',
@@ -228,6 +233,7 @@ const questionsSection1 = [
     text: "6. Har du inden for det seneste år måttet have en lille én om morgenen, efter at du havde drukket meget dagen før?",
     description: "",
     optionsType: 'options4',
+    answer: options4.value[0].value
   },
   {
     id: 'question7',
@@ -236,6 +242,7 @@ const questionsSection1 = [
     text: "7. Har du inden for det seneste år haft dårlig samvittighed eller fortrudt, efter du har drukket?",
     description: "",
     optionsType: 'options4',
+    answer: options4.value[0].value
   },
   {
     id: 'question8',
@@ -244,6 +251,7 @@ const questionsSection1 = [
     text: "8. Har du inden for det seneste år oplevet, at du ikke kunne huske, hvad der skete aftenen før, fordi du havde drukket?",
     description: "",
     optionsType: 'options4',
+    answer: options4.value[0].value
   },
   {
     id: 'question9',
@@ -252,6 +260,7 @@ const questionsSection1 = [
     text: "9. Er du selv eller andre nogensinde kommet til skade ved en ulykke, fordi du havde drukket?",
     description: "",
     optionsType: 'options5',
+    answer: options5.value[0].value
   },
   {
     id: 'question10',
@@ -260,6 +269,7 @@ const questionsSection1 = [
     text: "10. Har nogen i familien, en ven, en læge eller andre været bekymred over dine alkoholvaner eller foreslået dig at sætte forbruget ned?",
     description: "",
     optionsType: 'options5',
+    answer: options5.value[0].value
   }
 ];
 
