@@ -343,7 +343,10 @@ If the server fails to start:
 - **Configuration State Initialization**:
   1. Check if configuration is being used to initialize reactive state
   2. Add explicit initialization loop after variable declarations
-```
-
 ## Workflow Memory
 - 3. Test visually to confirm defaults appear
+
+### Memories
+- Environment Variable Graceful Handling. Vue components were throwing runtime errors when VITE_API_URL was undefined, causing complete component failure. Fixed by creating .env files and using fallback values instead of throwing errors.
+- Vitest Browser API Version Compatibility. Browser tests failed because they used deprecated Vitest v2 API (browser.name, browser.headless) instead of the new v3 instances array pattern. Fixed by migrating to browser: { instances: [{ browser: 'chromium' }] } and adding proper dependency optimization.
+- PrimeVue Test Environment Configuration. PrimeVue components failed with "Cannot read properties of undefined (reading 'config')" because the plugin wasn't configured in tests. Fixed by adding global: { plugins: [[PrimeVue, { unstyled: true }]] } to component mounting in all test environments.

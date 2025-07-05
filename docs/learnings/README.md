@@ -2,9 +2,41 @@
 
 This directory contains documented learnings from real development challenges encountered during the Score2 medical calculator implementation. Each learning document provides detailed analysis, solutions, and prevention strategies for common issues.
 
-## Top 10 Implementation Challenges
+## Top 15 Implementation Challenges
 
-### Latest Implementation Issues (Test Fixing - 2024)
+### Latest Implementation Issues (Test Fixing & API Updates - 2025)
+
+### 11. [Environment Variable Graceful Handling](./11-environment-variable-graceful-handling.md)
+**Issue**: Vue components throwing runtime errors when environment variables are undefined
+- **Impact**: Complete component failure, testing blockage, development workflow disruption
+- **Solution**: Fallback values, graceful degradation, robust environment configuration
+- **Prevention**: Default .env files, conditional assignment patterns, test-friendly defaults
+
+### 12. [Vitest Browser API Version Compatibility](./12-vitest-browser-api-version-compatibility.md)
+**Issue**: Browser tests failing due to using deprecated Vitest v2 API in v3 environment
+- **Impact**: Configuration warnings, test execution failures, API incompatibility
+- **Solution**: Migration to instances array pattern, updated configuration structure
+- **Prevention**: Stay current with framework versions, read migration guides, update incrementally
+
+### 13. [PrimeVue Test Environment Configuration](./13-primevue-test-environment-configuration.md)
+**Issue**: PrimeVue components failing with config errors due to missing plugin setup
+- **Impact**: Component rendering failures, test environment inconsistencies
+- **Solution**: Proper plugin configuration in test mounting, dependency optimization
+- **Prevention**: Match production config in tests, global test setup, UI library documentation
+
+### 14. [Browser vs Non-Browser Test Environment Selection](./14-browser-vs-nonbrowser-test-environment-selection.md)
+**Issue**: Using browser-specific APIs in non-browser test environments causing failures
+- **Impact**: Import errors, API mismatches, test environment confusion
+- **Solution**: Environment-appropriate API selection, clear testing boundaries
+- **Prevention**: Understand test environments, choose correct APIs, organize tests by type
+
+### 15. [Vue Component State and Reactivity Testing Expectations](./15-vue-component-state-reactivity-testing-expectations.md)
+**Issue**: Incorrect assumptions about component defaults and reactive behavior in tests
+- **Impact**: Test brittleness, false negatives, maintenance complexity
+- **Solution**: Component-first analysis, reactive behavior understanding, flexible assertions
+- **Prevention**: Read source before testing, test behavior not implementation, handle async reactivity
+
+### Previous Implementation Issues (Test Fixing - 2024)
 
 ### 6. [Test Process Hanging Due to Active Handles](./6-test-process-hanging-active-handles.md)
 **Issue**: Test processes hang indefinitely preventing any tests from completing
@@ -72,12 +104,22 @@ This directory contains documented learnings from real development challenges en
 
 ### Technical Framework Issues
 - Vue 3 property binding (Learning #1)
-- Mock component setup (Learning #2)
+- Mock component setup (Learning #2)  
 - Composition API testing (Learning #4)
+- Vitest API version compatibility (Learning #12)
+- PrimeVue test configuration (Learning #13)
 
 ### Testing Methodology Issues
 - Test expectations alignment (Learning #3)
 - Medical domain complexity (Learning #5)
+- Test environment selection (Learning #14)
+- Component reactivity understanding (Learning #15)
+
+### Environment & Configuration Issues
+- Environment variable handling (Learning #11)
+- Test process hanging (Learning #6)
+- Resource cleanup (Learning #8)
+- Configuration dependencies (Learning #10)
 
 ### Domain-Specific Challenges
 - Medical calculation accuracy (Learning #5)
@@ -108,7 +150,18 @@ Medical domain brought unique challenges:
 
 ## Implementation Time Analysis
 
-### Latest Implementation (Test Fixing)
+### Latest Implementation (Test Fixing & API Updates - 2025)
+| Issue | Initial Time Lost | Resolution Time | Prevention Value |
+|-------|------------------|-----------------|------------------|
+| Environment Variables | 1+ hour | 30 minutes | High |
+| Vitest Browser API | 2+ hours | 1 hour | Very High |
+| PrimeVue Configuration | 3+ hours | 1.5 hours | High |
+| Test Environment Selection | 2+ hours | 1 hour | Very High |
+| Vue Reactivity Expectations | 1+ hour | 45 minutes | High |
+
+**Latest Total**: 9+ hours of debugging → 4.75 hours of solution development
+
+### Previous Implementation (Test Fixing - 2024)
 | Issue | Initial Time Lost | Resolution Time | Prevention Value |
 |-------|------------------|-----------------|------------------|
 | Test Process Hanging | 4+ hours | 2 hours | Very High |
@@ -117,7 +170,7 @@ Medical domain brought unique challenges:
 | Environment Mocking | 1+ hour | 30 minutes | Medium |
 | Configuration Dependencies | 1+ hour | 45 minutes | High |
 
-**Latest Total**: 11+ hours of debugging → 5.75 hours of solution development
+**Previous Total**: 11+ hours of debugging → 5.75 hours of solution development
 
 ### Original Implementation (Score2 Calculator)
 | Issue | Initial Time Lost | Resolution Time | Prevention Value |
@@ -130,8 +183,8 @@ Medical domain brought unique challenges:
 
 **Original Total**: 11+ hours of debugging → 7+ hours of solution development
 
-**Combined Impact**: 22+ hours of debugging → 12.75 hours of solution development  
-**Efficiency Gain**: ~43% reduction in debugging time through documented learnings
+**Combined Impact**: 31+ hours of debugging → 17.5 hours of solution development  
+**Efficiency Gain**: ~44% reduction in debugging time through documented learnings
 
 ## Key Success Factors
 
