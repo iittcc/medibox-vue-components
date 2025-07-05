@@ -2,8 +2,7 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## IMPORTANT INSTRUCTIONS
-- On initialization read instructions on how to use Serena.
+## 🚨 IMPORTANT INSTRUCTIONS
 - Get the console log from the browser whenever you perform any action in playwright
 - Only commit working tested code.
 - Do not assume anything about the code. Read the code.
@@ -114,6 +113,7 @@ The application has multiple entry points defined in `vite.config.ts`, each corr
 - `puqe` - Pregnancy-Unique Quantification of Emesis
 - `westleycroupscore` - Croup scoring
 - `who5` - WHO-5 Well-Being Index
+Other components:
 - `passwordReset` - Password reset functionality
 
 Each entry point has:
@@ -193,7 +193,7 @@ Each entry point has:
 
 ### Vue 3 Patterns
 - All components use **`<script setup lang="ts">`** syntax
-- **Composition API** with reactive variables via `ref()`
+- **Composition API** with reactive variables
 - **Exported interfaces** for better TypeScript support
 - **Medical calculator container** wrapper pattern for Bootstrap isolation
 
@@ -229,59 +229,38 @@ Each entry point has:
 - **Strict mode** enabled
 - **Path aliasing**: `@/` points to `src/`
 
-## MCP Server Configuration
+## Avaliable MCP Servers
 
-### TypeScript Documentation Server
-A local MCP server has been configured to provide access to the complete TypeScript documentation.
+### Context7
+- Context7 MCP pulls up-to-date, version-specific documentation and code examples straight from the source — and places them directly into your prompt.
+- Context7 MCP provides the following tools that LLMs can use:
+  - **resolve-library-id**: Resolves a general library name into a Context7-compatible library ID.
+    - **libraryName (required)**: The name of the library to search for
+    - **get-library-docs**: Fetches documentation for a library using a Context7-compatible library ID.
+  - **context7CompatibleLibraryID (required)**: Exact Context7-compatible library ID (e.g., /mongodb/docs, /vercel/next.js)
+    - **topic (optional)**: Focus the docs on a specific topic (e.g., "routing", "hooks")
+    - **tokens (optional, default 10000)**: Max number of tokens to return. Values less than the default value of 10000 are automatically increased to 10000.
 
-#### Setup
-The TypeScript documentation server is set up at `/Users/tej/mcp-servers/` with these components:
-- **MCP Server script**: `/Users/tej/mcp-servers/typescript-docs-mcp.js`
-- **Startup script**: `/Users/tej/mcp-servers/start-typescript-docs.sh`
-- **Configuration**: Added to `.mcp.json` as `typescript-docs`
-- **Documentation source**: Cloned TypeScript-Website repository at `/Users/tej/mcp-servers/typescript-docs/`
+### Playwright
+- Interact with web pages, take screenshots, generate test code, web scraps the page and execute JavaScript in a real browser environment.
+- Documentation: @.dev/.docs/mcp.playwright.md
 
-#### Available Documentation Resources
-The MCP server provides access to key TypeScript documentation sections:
-- **TypeScript Handbook** - `typescript://docs/handbook`
-- **TypeScript Handbook v2** - `typescript://docs/handbook/2`
-- **TSConfig Reference** - `typescript://tsconfig`
-- **Basic Types** - `typescript://docs/handbook/basic-types`
-- **Interfaces** - `typescript://docs/handbook/interfaces`
-- **Classes** - `typescript://docs/handbook/classes`
-- **Functions** - `typescript://docs/handbook/functions`
-- **Generics** - `typescript://docs/handbook/generics`
-- **Enums** - `typescript://docs/handbook/enums`
-- **Modules** - `typescript://docs/handbook/modules`
+### Clear Thought 
+- Provides systematic thinking, mental models, and debugging approaches for enhanced problem-solving capabilities
+- Documentation: @.dev/.docs/mcp.clearthought.md
 
-#### Manual Server Management
-To manually start the documentation server:
-```bash
-/Users/tej/mcp-servers/start-typescript-docs.sh
-```
-
-The server will be available at `http://localhost:8000`
-
-#### MCP Integration
-The server automatically starts the Gatsby documentation server when Claude Code connects. Access TypeScript documentation through:
-- `ListMcpResourcesTool` with server="typescript-docs" to see available documentation sections
-- `ReadMcpResourceTool` with server="typescript-docs" and uri="typescript://..." to read specific pages
-
-#### Optimization Features
-- **Automatic server startup**: MCP server handles Gatsby process management
-- **Resource caching**: Efficient access to frequently used documentation
-- **Fallback mechanisms**: Uses curl if fetch API unavailable
-- **Clean shutdown**: Proper process cleanup on exit
-
-#### Troubleshooting
-If the server fails to start:
-1. Check that Node.js 18+ and pnpm are installed
-2. Verify the TypeScript documentation repository is at `/Users/tej/mcp-servers/typescript-docs/`
-3. Run `pnpm install` and `pnpm bootstrap` in the docs directory
-4. Check for port conflicts on port 8000
-5. Ensure executable permissions: `chmod +x /Users/tej/mcp-servers/*.sh /Users/tej/mcp-servers/*.js`
 
 ## Repository Etiquette
+
+### Ignore
+- `.serena/`
+- `dist/`
+- `node_modules/`
+- `.gitignore`
+- `.gitmodules`
+- `.gitattributes`
+
+
 
 ### Git Workflow
 - **Main branch**: `master`
