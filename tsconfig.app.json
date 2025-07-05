@@ -1,7 +1,7 @@
 {
     "extends": "@vue/tsconfig/tsconfig.dom.json",
 
-  "include": ["env.d.ts", "src/**/*", "src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue", "tests/**/*.ts","src/components/**/*.vue","src/components/**/*.ts","src/volt/**/*.vue","src/volt/**/*.ts"],
+  "include": ["env.d.ts", "src/**/*", "src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue", "tests/**/*.ts","src/components/**/*.vue","src/components/**/*.ts","src/volt/**/*.vue","src/volt/**/*.ts", "src/calculators/**/*.ts"],
   "exclude": [
     
   ],
