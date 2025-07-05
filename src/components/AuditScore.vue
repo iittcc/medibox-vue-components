@@ -287,6 +287,11 @@ const getOptions = (type: keyof OptionsSets): Option[] => {
 
 const resultsSection1 = questionsSection1;
 
+// Initialize with default answers from question configurations
+questionsSection1.forEach(question => {
+  framework.setFieldValue('calculator', question.id, question.answer);
+});
+
 
 
 const handleSubmit = async () => {
