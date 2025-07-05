@@ -85,7 +85,7 @@ describe('useLogging', () => {
     // Clear all timers immediately to prevent hanging
     vi.clearAllTimers()
     
-    // Clean up all logger instances first
+    // Clean up all logger instances first - now synchronous
     loggerInstances.forEach(logger => {
       if (logger && typeof logger.cleanup === 'function') {
         try {
@@ -117,13 +117,28 @@ describe('useLogging', () => {
           enableRemoteLogging: false,
           enableLocalStorage: false,
           flushInterval: 999999999, // Very long interval to prevent auto-flush
+          maxLocalEntries: 10, // Limit entries to prevent memory issues
           ...config
         }
         
         const logger = useLogging(safeConfig)
         
         // Mock flushLogs to prevent hanging async operations
-        logger.flushLogs = vi.fn().mockResolvedValue(undefined)
+        logger.flushLogs = vi.fn().mockImplementation(async () => {
+          // Return immediately to prevent hanging
+          return Promise.resolve()
+        })
+        
+        // Mock cleanup to be synchronous and immediate
+        const originalCleanup = logger.cleanup
+        logger.cleanup = vi.fn().mockImplementation(() => {
+          // Call original cleanup but don't wait for flushLogs
+          try {
+            originalCleanup()
+          } catch (e) {
+            // Ignore cleanup errors
+          }
+        })
         
         loggerInstances.push(logger)  // Track for cleanup
         return { logger }
@@ -563,7 +578,6 @@ describe('useLogging', () => {
       wrapper = createTestComponent()
       const { logger } = wrapper.vm
 
-      const _initialId = logger.correlationId.value
       const newId = logger.newCorrelationId()
 
       expect(newId).toBe('mock-id-123')
