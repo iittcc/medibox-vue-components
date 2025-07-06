@@ -1,0 +1,57 @@
+# Page snapshot
+
+```yaml
+- text: "Patient  Navn:"
+- textbox "Indtast navn"
+- text: "  Køn:"
+- group:
+  - button "Dreng" [pressed]
+  - button "Pige"
+- text: " Alder:"
+- spinbutton: 6 År
+- slider
+- text: Westley Croup Score
+- paragraph: Bevidsthedsniveau
+- paragraph
+- listbox:
+  - option "Vågen (eller sovende)" [selected]: Vågen (eller sovende) 0
+  - option "Desorienteret/forvirret": Desorienteret/forvirret + 5
+- status: 1 items selected
+- separator
+- paragraph: Cyanose
+- paragraph
+- listbox:
+  - option "Ingen" [selected]: Ingen 0
+  - option "Ved ophidselse": Ved ophidselse + 4
+  - option "I hvile": I hvile + 5
+- status: 1 items selected
+- separator
+- paragraph: Stridor
+- paragraph
+- listbox:
+  - option "Ingen" [selected]: Ingen 0
+  - option "Ved ophidselse": Ved ophidselse + 1
+  - option "I hvile": I hvile + 2
+- status: 1 items selected
+- separator
+- paragraph: Luftskifte (st.p.)
+- paragraph
+- listbox:
+  - option "Normal" [selected]: Normal 0
+  - option "Nedsat": Nedsat + 1
+  - option "Udtalt nedsat": Udtalt nedsat + 2
+- status: 1 items selected
+- separator
+- paragraph: Indtrækninger
+- paragraph
+- listbox:
+  - option "Ingen" [selected]: Ingen 0
+  - option "Milde": Milde + 1
+  - option "Moderate": Moderate + 2
+  - option "Svære": Svære + 3
+- status: 1 items selected
+- separator
+- button "Kopier til Clipboard" [disabled]:  Kopier til Clipboard
+- button "Reset":  Reset
+- button "Beregn":  Beregn
+```
