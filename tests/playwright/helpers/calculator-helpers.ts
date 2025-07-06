@@ -4,7 +4,7 @@ import type { PatientData, WestleyCroupInputs } from '../fixtures/test-data'
 import { formOptions } from '../fixtures/test-data'
 
 export class WestleyCroupCalculatorHelper {
-  constructor(private page: Page) {}
+  constructor(public page: Page) {}
 
   // Navigation and page setup
   async navigateToCalculator() {
@@ -13,12 +13,12 @@ export class WestleyCroupCalculatorHelper {
   }
 
   async waitForPageLoad() {
-    // Wait for the Vue app to mount
-    await this.page.waitForSelector('#app div', { timeout: 30000 })
-    // Wait for the medical calculator container to be visible
+    // Wait for the Vue app to mount and render content
     await this.page.waitForSelector('.medical-calculator-container', { timeout: 30000 })
     // Wait for the title to be visible
     await expect(this.page.locator('text=Westley Croup Score')).toBeVisible()
+    // Wait for form to be ready
+    await this.page.waitForSelector('text=Bevidsthedsniveau', { timeout: 10000 })
   }
 
   // Patient information helpers
@@ -49,7 +49,9 @@ export class WestleyCroupCalculatorHelper {
       throw new Error(`Invalid level of consciousness value: ${value}`)
     }
 
-    await this.page.locator(`text=${option}`).click()
+    // Find the section containing "Bevidsthedsniveau" and select the option within it
+    const section = this.page.locator('text=Bevidsthedsniveau').locator('..').locator('..')
+    await section.getByText(option, { exact: true }).click()
   }
 
   async selectCyanosis(value: number) {
@@ -60,7 +62,9 @@ export class WestleyCroupCalculatorHelper {
       throw new Error(`Invalid cyanosis value: ${value}`)
     }
 
-    await this.page.locator(`text=${option}`).click()
+    // Find the section containing "Cyanose" and select the option within it
+    const section = this.page.locator('text=Cyanose').locator('..').locator('..')
+    await section.getByText(option, { exact: true }).click()
   }
 
   async selectStridor(value: number) {
@@ -71,7 +75,9 @@ export class WestleyCroupCalculatorHelper {
       throw new Error(`Invalid stridor value: ${value}`)
     }
 
-    await this.page.locator(`text=${option}`).click()
+    // Find the section containing "Stridor" and select the option within it
+    const section = this.page.locator('text=Stridor').locator('..').locator('..')
+    await section.getByText(option, { exact: true }).click()
   }
 
   async selectAirEntry(value: number) {
@@ -82,7 +88,9 @@ export class WestleyCroupCalculatorHelper {
       throw new Error(`Invalid air entry value: ${value}`)
     }
 
-    await this.page.locator(`text=${option}`).click()
+    // Find the section containing "Luftskifte" and select the option within it
+    const section = this.page.locator('text=Luftskifte').locator('..').locator('..')
+    await section.getByText(option, { exact: true }).click()
   }
 
   async selectRetractions(value: number) {
@@ -93,7 +101,9 @@ export class WestleyCroupCalculatorHelper {
       throw new Error(`Invalid retractions value: ${value}`)
     }
 
-    await this.page.locator(`text=${option}`).click()
+    // Find the section containing "Indtrækninger" and select the option within it
+    const section = this.page.locator('text=Indtrækninger').locator('..').locator('..')
+    await section.getByText(option, { exact: true }).click()
   }
 
   // Combined form filling
@@ -107,53 +117,45 @@ export class WestleyCroupCalculatorHelper {
 
   // Results verification
   async getCalculatedScore(): Promise<number> {
-    // Wait for calculation to complete - look for result text patterns
-    await this.page.waitForSelector('text=/Score:|Total score:|Resultat:/', { timeout: 10000 })
+    // Wait for results section to be visible
+    await this.page.waitForSelector('[data-testid="results-section"]', { timeout: 5000 })
     
-    // Look for score in various possible formats
-    const scoreSelectors = [
-      'text=/Score: \\d+/',
-      'text=/Total score: \\d+/',
-      'text=/Resultat: \\d+/',
-      '.score-result',
-      '.calculated-score'
-    ]
+    // Look for the score in the format "Westley Croup Score X : ..."
+    const scoreElement = this.page.locator('text=/Westley Croup Score \\d+/')
+    const scoreText = await scoreElement.textContent()
     
-    for (const selector of scoreSelectors) {
-      const element = this.page.locator(selector).first()
-      if (await element.isVisible({ timeout: 1000 }).catch(() => false)) {
-        const text = await element.textContent()
-        if (text) {
-          const match = text.match(/\d+/)
-          if (match) {
-            return parseInt(match[0], 10)
-          }
-        }
-      }
+    if (!scoreText) {
+      throw new Error('Could not find calculated score')
     }
-    
-    throw new Error('Could not find calculated score')
+
+    // Extract the number from "Westley Croup Score X : ..."
+    const match = scoreText.match(/Westley Croup Score (\d+)/)
+    if (!match) {
+      throw new Error(`Could not parse score from: ${scoreText}`)
+    }
+
+    return parseInt(match[1], 10)
   }
 
   async getInterpretation(): Promise<string> {
-    // Look for interpretation text patterns
-    const interpretationSelectors = [
-      'text=/Let croup|Moderat croup|Alvorlig croup/',
-      '.interpretation',
-      '.score-interpretation'
-    ]
+    // Wait for results section to be visible
+    await this.page.waitForSelector('[data-testid="results-section"]', { timeout: 5000 })
     
-    for (const selector of interpretationSelectors) {
-      const element = this.page.locator(selector).first()
-      if (await element.isVisible({ timeout: 1000 }).catch(() => false)) {
-        const text = await element.textContent()
-        if (text && (text.includes('croup') || text.includes('Croup'))) {
-          return text.trim()
-        }
-      }
+    // Look for the interpretation in the format "Westley Croup Score X : interpretation"
+    const resultElement = this.page.locator('text=/Westley Croup Score \\d+ : /')
+    const resultText = await resultElement.textContent()
+    
+    if (!resultText) {
+      throw new Error('Could not find score interpretation')
     }
-    
-    throw new Error('Could not find score interpretation')
+
+    // Extract the interpretation part after the colon
+    const match = resultText.match(/Westley Croup Score \d+ : (.+)/)
+    if (!match) {
+      throw new Error(`Could not parse interpretation from: ${resultText}`)
+    }
+
+    return match[1].trim()
   }
 
   async getRiskLevel(): Promise<string> {
@@ -172,8 +174,8 @@ export class WestleyCroupCalculatorHelper {
     const submitButton = this.page.getByRole('button', { name: /beregn|calculate/i })
     await submitButton.click()
     
-    // Wait for calculation to complete - look for result patterns
-    await this.page.waitForSelector('text=/Score:|Total score:|Resultat:/', { timeout: 10000 })
+    // Wait for calculation to complete - wait for results section to appear
+    await this.page.waitForSelector('[data-testid="results-section"]', { timeout: 10000 })
   }
 
   async resetForm() {

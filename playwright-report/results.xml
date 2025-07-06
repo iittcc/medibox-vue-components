@@ -1,106 +1,60 @@
-<testsuites id="" name="" tests="6" failures="2" skipped="0" errors="0" time="8.020966">
-<testsuite name="westley-croup-score.spec.ts" timestamp="2025-07-06T15:42:55.043Z" hostname="chromium" tests="6" failures="2" skipped="0" time="24.96" errors="0">
-<testcase name="Westley Croup Score Calculator - Basic Functionality › should load the calculator page successfully" classname="westley-croup-score.spec.ts" time="4.116">
-</testcase>
-<testcase name="Westley Croup Score Calculator - Basic Functionality › should display all required form sections" classname="westley-croup-score.spec.ts" time="7.184">
-<failure message="westley-croup-score.spec.ts:41:3 should display all required form sections" type="FAILURE">
-<![CDATA[  [chromium] › westley-croup-score.spec.ts:41:3 › Westley Croup Score Calculator - Basic Functionality › should display all required form sections 
-
-    Error: Timed out 5000ms waiting for expect(locator).toBeVisible()
-
-    Locator: locator('text=Score ≤ 2 : Let croup')
-    Expected: visible
-    Received: <element(s) not found>
-    Call log:
-      - Expect "toBeVisible" with timeout 5000ms
-      - waiting for locator('text=Score ≤ 2 : Let croup')
-
-
-       at helpers/calculator-helpers.ts:182
-
-      180 |   async verifyScoreGuide() {
-      181 |     // Verify the score interpretation guide is displayed
-    > 182 |     await expect(this.page.locator('text=Score ≤ 2 : Let croup')).toBeVisible()
-          |                                                                   ^
-      183 |     await expect(this.page.locator('text=Score 3-5: Moderat croup')).toBeVisible()
-      184 |     await expect(this.page.locator('text=Score ≥ 6: Alvorlig croup')).toBeVisible()
-      185 |   }
-        at WestleyCroupCalculatorHelper.verifyScoreGuide (/Users/tej/localhost/medibox-vue-components/tests/playwright/helpers/calculator-helpers.ts:182:67)
-        at /Users/tej/localhost/medibox-vue-components/tests/playwright/westley-croup-score.spec.ts:44:22
-
-    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
-    test-results/westley-croup-score-Westle-ee29d--all-required-form-sections-chromium/test-failed-1.png
-    ────────────────────────────────────────────────────────────────────────────────────────────────
-
-    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
-    test-results/westley-croup-score-Westle-ee29d--all-required-form-sections-chromium/video.webm
-    ────────────────────────────────────────────────────────────────────────────────────────────────
-
-    Error Context: ../../test-results/westley-croup-score-Westle-ee29d--all-required-form-sections-chromium/error-context.md
-]]>
-</failure>
+<testsuites id="" name="" tests="1" failures="0" skipped="0" errors="0" time="11.681559">
+<testsuite name="debug-test.spec.ts" timestamp="2025-07-06T16:08:08.431Z" hostname="chromium" tests="1" failures="0" skipped="0" time="11.126" errors="0">
+<testcase name="debug page loading" classname="debug-test.spec.ts" time="11.126">
 <system-out>
-<![CDATA[
-[[ATTACHMENT|../test-results/westley-croup-score-Westle-ee29d--all-required-form-sections-chromium/test-failed-1.png]]
-
-[[ATTACHMENT|../test-results/westley-croup-score-Westle-ee29d--all-required-form-sections-chromium/video.webm]]
-
-[[ATTACHMENT|../test-results/westley-croup-score-Westle-ee29d--all-required-form-sections-chromium/error-context.md]]
+<![CDATA[Starting navigation...
+Console messages: [
+  [32m'debug: [vite] connecting...'[39m,
+  [32m'error: Failed to load resource: the server responded with a status of 500 (Internal Server Error)'[39m,
+  [32m'debug: [vite] connected.'[39m
+]
+Errors: [
+  [32m'Failed to load resource: the server responded with a status of 500 (Internal Server Error)'[39m
+]
+App element exists: [33m1[39m
+App content: 
+Medical container exists: [33m0[39m
+Network requests: []
+No Vue content found within 5 seconds
+All text contents count: [33m33[39m
+Some text content: [
+  [32m'\n'[39m +
+    [32m'    \n'[39m +
+    [32m'\n'[39m +
+    [32m'    \n'[39m +
+    [32m'    \n'[39m +
+    [32m'    \n'[39m +
+    [32m'    Westley Croup Score\n'[39m +
+    [32m'    \n'[39m +
+    [32m'      html {\n'[39m +
+    [32m'        font-size: 12px;\n'[39m +
+    [32m'      }\n'[39m +
+    [32m'    \n'[39m +
+    [32m'  \n'[39m +
+    [32m'  \n'[39m +
+    [32m'    \n'[39m +
+    [32m'    \n'[39m +
+    [32m'  \n'[39m +
+    [32m'\n'[39m,
+  [32m'\n'[39m +
+    [32m'    \n'[39m +
+    [32m'\n'[39m +
+    [32m'    \n'[39m +
+    [32m'    \n'[39m +
+    [32m'    \n'[39m +
+    [32m'    Westley Croup Score\n'[39m +
+    [32m'    \n'[39m +
+    [32m'      html {\n'[39m +
+    [32m'        font-size: 12px;\n'[39m +
+    [32m'      }\n'[39m +
+    [32m'    \n'[39m +
+    [32m'  '[39m,
+  [32m''[39m,
+  [32m''[39m,
+  [32m''[39m
+]
 ]]>
 </system-out>
-</testcase>
-<testcase name="Westley Croup Score Calculator - Basic Functionality › should display patient information section" classname="westley-croup-score.spec.ts" time="2.115">
-</testcase>
-<testcase name="Westley Croup Score Calculator - Basic Functionality › should display all medical assessment sections" classname="westley-croup-score.spec.ts" time="2.112">
-</testcase>
-<testcase name="Westley Croup Score Calculator - Basic Functionality › should display score interpretation guide" classname="westley-croup-score.spec.ts" time="7.156">
-<failure message="westley-croup-score.spec.ts:66:3 should display score interpretation guide" type="FAILURE">
-<![CDATA[  [chromium] › westley-croup-score.spec.ts:66:3 › Westley Croup Score Calculator - Basic Functionality › should display score interpretation guide 
-
-    Error: Timed out 5000ms waiting for expect(locator).toBeVisible()
-
-    Locator: locator('text=Score ≤ 2 : Let croup')
-    Expected: visible
-    Received: <element(s) not found>
-    Call log:
-      - Expect "toBeVisible" with timeout 5000ms
-      - waiting for locator('text=Score ≤ 2 : Let croup')
-
-
-       at helpers/calculator-helpers.ts:182
-
-      180 |   async verifyScoreGuide() {
-      181 |     // Verify the score interpretation guide is displayed
-    > 182 |     await expect(this.page.locator('text=Score ≤ 2 : Let croup')).toBeVisible()
-          |                                                                   ^
-      183 |     await expect(this.page.locator('text=Score 3-5: Moderat croup')).toBeVisible()
-      184 |     await expect(this.page.locator('text=Score ≥ 6: Alvorlig croup')).toBeVisible()
-      185 |   }
-        at WestleyCroupCalculatorHelper.verifyScoreGuide (/Users/tej/localhost/medibox-vue-components/tests/playwright/helpers/calculator-helpers.ts:182:67)
-        at /Users/tej/localhost/medibox-vue-components/tests/playwright/westley-croup-score.spec.ts:67:22
-
-    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
-    test-results/westley-croup-score-Westle-8a1b6--score-interpretation-guide-chromium/test-failed-1.png
-    ────────────────────────────────────────────────────────────────────────────────────────────────
-
-    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
-    test-results/westley-croup-score-Westle-8a1b6--score-interpretation-guide-chromium/video.webm
-    ────────────────────────────────────────────────────────────────────────────────────────────────
-
-    Error Context: ../../test-results/westley-croup-score-Westle-8a1b6--score-interpretation-guide-chromium/error-context.md
-]]>
-</failure>
-<system-out>
-<![CDATA[
-[[ATTACHMENT|../test-results/westley-croup-score-Westle-8a1b6--score-interpretation-guide-chromium/test-failed-1.png]]
-
-[[ATTACHMENT|../test-results/westley-croup-score-Westle-8a1b6--score-interpretation-guide-chromium/video.webm]]
-
-[[ATTACHMENT|../test-results/westley-croup-score-Westle-8a1b6--score-interpretation-guide-chromium/error-context.md]]
-]]>
-</system-out>
-</testcase>
-<testcase name="Westley Croup Score Calculator - Basic Functionality › should accept patient information input" classname="westley-croup-score.spec.ts" time="2.277">
 </testcase>
 </testsuite>
 </testsuites>

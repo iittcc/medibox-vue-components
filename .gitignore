@@ -31,3 +31,6 @@ coverage
 dist
 .env.*
 tests/browser/__screenshots__/**/*
+test-results/**/*
+tests/playwright-report/**/*
+playwright-report/**/*
