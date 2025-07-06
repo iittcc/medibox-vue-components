@@ -86,6 +86,9 @@
       </SurfaceCard>
     </div>
     </div>
+    
+    <!-- Toast component for notifications -->
+    <Toast />
   </div>
 </template>
 
@@ -99,6 +102,7 @@ import CopyDialog from "./CopyDialog.vue";
 import SurfaceCard from "./SurfaceCard.vue";
 import PersonInfo from "./PersonInfo.vue";
 import Message from '@/volt/Message.vue';
+import Toast from 'primevue/toast';
 import { useCalculatorFramework, type CalculatorConfig, type CalculatorStep } from '@/composables/useCalculatorFramework';
 import { getGenderLabel, type GenderValue } from '@/utils/genderUtils';
 
