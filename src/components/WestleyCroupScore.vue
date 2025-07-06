@@ -102,7 +102,7 @@ import CopyDialog from "./CopyDialog.vue";
 import SurfaceCard from "./SurfaceCard.vue";
 import PersonInfo from "./PersonInfo.vue";
 import Message from '@/volt/Message.vue';
-import Toast from 'primevue/toast';
+import Toast from '@/volt/Toast.vue';
 import { useCalculatorFramework, type CalculatorConfig, type CalculatorStep } from '@/composables/useCalculatorFramework';
 import { getGenderLabelByAge, type GenderValue } from '@/utils/genderUtils';
 import type { RiskLevel } from '@/types/calculatorTypes';
