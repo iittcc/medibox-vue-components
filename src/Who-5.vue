@@ -5,14 +5,6 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from "vue";
+<script setup lang="ts">
 import Who5Score from "./components/Who-5Score.vue";
-
-export default defineComponent({
-  components: {
-    Who5Score,
-  },
-});
 </script>
-

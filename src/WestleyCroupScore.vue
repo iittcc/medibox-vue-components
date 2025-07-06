@@ -1,18 +1,13 @@
-<!-- src/Danpss.vue -->
+<!-- src/WestleyCroupScore.vue -->
 <template>
   <div id="app">
     <WestleyCroupScore />
+    <Toast />
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from "vue";
+<script setup lang="ts">
 import WestleyCroupScore from "./components/WestleyCroupScore.vue";
-
-export default defineComponent({
-  components: {
-    WestleyCroupScore,
-  },
-});
+import Toast from "@/volt/Toast.vue";
 </script>
 

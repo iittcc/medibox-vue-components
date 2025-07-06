@@ -4,16 +4,9 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from "vue";
+<script setup lang="ts">
 import PasswordResetComponent from "@/components/PasswordResetComponent.vue";
-
-export default defineComponent({
-  components: {
-    PasswordResetComponent,
-  }
-});
-</script>
+</script> 
 
 <style scoped>
 @import "primeflex/primeflex.css";

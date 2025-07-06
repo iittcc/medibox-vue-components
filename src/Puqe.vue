@@ -4,14 +4,7 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from "vue";
+<script setup lang="ts">
 import PUQEScore from "./components/PUQEScore.vue";
-
-export default defineComponent({
-  components: {
-    PUQEScore,
-  },
-});
 </script>
 

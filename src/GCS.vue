@@ -5,13 +5,6 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from "vue";
+<script setup lang="ts">
 import GCSScore from "./components/GCSScore.vue";
-
-export default defineComponent({
-  components: {
-    GCSScore,
-  },
-});
 </script>

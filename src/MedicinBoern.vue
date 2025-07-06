@@ -4,13 +4,6 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue'
+<script setup lang="ts">
 import MedicinBoernScore from './components/MedicinBoernScore.vue'
-
-export default defineComponent({
-  components: {
-    MedicinBoernScore
-  }
-})
 </script>
