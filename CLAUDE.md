@@ -74,7 +74,7 @@ To write down:
 - Learnings
 - Ideas
 - Complex workflows
-- Anything else important for a succesful implemtation
+- Anything else important for a successful implementation
 
 ## Commands
 
@@ -85,7 +85,16 @@ To write down:
 - `npm run format` - Format code with Prettier
 
 ### Testing and Building
-- `npm run test` - Run in testing mode (Vite testing environment)
+- `npm run test` - Run all tests in Vitest environment
+- `npm run test:ui` - Run tests with Vitest UI interface
+- `npm run test:browser` - Run browser-based tests with Playwright
+- `npm run test:unit` - Run unit tests only
+- `npm run test:components` - Run component tests only
+- `npm run test:sequential` - Run tests sequentially with verbose output
+- `npm run test:integration` - Run integration tests only
+- `npm run test:e2e` - Run end-to-end browser tests
+- `npm run test:coverage` - Run tests with coverage reporting
+- `npm run test:watch` - Run tests in watch mode
 - `npm run build` - Full production build with type checking
 - `npm run staging` - Build for staging environment
 - `npm run production` - Build for production environment
@@ -98,8 +107,10 @@ To write down:
 ## Architecture
 
 This is a Vue 3 medical scoring application built with Vite and TypeScript using PrimeVue Volt components. The project uses a **multi-entry point architecture** where each medical scoring tool is a separate application.
-Utilized Vue 3 modern composite architecture with custom build UI components to speed up development process and reduce code. The scoring is configurable and maintainable (e.g. src/components/AuditScore.vue) and scoring have the same basic structure.
-The application MUST be structured for easy testing.
+
+The application utilizes Vue 3's modern Composition API architecture with custom-built UI components to accelerate development and reduce code duplication. The scoring system is configurable and maintainable, with all scoring tools following the same basic structure pattern.
+
+The application is structured for comprehensive testing with unit, component, integration, and end-to-end test suites.
 
 ### Entry Points
 The application has multiple entry points defined in `vite.config.ts`, each corresponding to a different medical scoring tool:
@@ -113,6 +124,7 @@ The application has multiple entry points defined in `vite.config.ts`, each corr
 - `puqe` - Pregnancy-Unique Quantification of Emesis
 - `westleycroupscore` - Croup scoring
 - `who5` - WHO-5 Well-Being Index
+- `medicinBoern` - Pediatric medication dosage calculator
 Other components:
 - `passwordReset` - Password reset functionality
 
@@ -124,27 +136,56 @@ Each entry point has:
 
 ### Component Structure
 - **Main Vue components** (`src/*.vue`) - Top-level components for each scoring tool
-- **Shared components** (`src/components/`) - Reusable UI components
+- **Shared components** (`src/components/`) - Reusable UI components including medical-specific components
 - **Volt components** (`src/volt/`) - Custom PrimeVue component wrappers with consistent styling
+- **Calculator logic** (`src/calculators/`) - Modular calculator implementations organized by medical tool
+  - Each calculator has its own directory with types, schemas, and business logic
+  - Implements consistent interfaces for scoring calculations
+- **Composables** (`src/composables/`) - Vue 3 composable functions for shared application logic
+  - `useCalculatorFramework.ts` - Framework for calculator logic
+  - `useErrorHandler.ts` - Error handling and logging
+  - `useValidation.ts` - Form validation patterns
+- **Services** (`src/services/`) - Business logic services for data export and submission
+- **Schemas** (`src/schemas/`) - Zod validation schemas for type safety and data validation
+- **Types** (`src/types/`) - TypeScript type definitions for the application
+- **Utils** (`src/utils/`) - Utility functions and helper modules
 - **Assets** (`src/assets/`) - Styles, utilities, and data files including risk calculation logic
 
+### Key Directories
+- `src/components/` - Reusable Vue components for medical calculators
+- `src/volt/` - Custom PrimeVue component wrappers with Tailwind styling
+- `src/assets/` - Styles, utilities, data files, and calculation logic
+- `src/calculators/` - Modular calculator logic organized by medical tool
+- `src/composables/` - Vue 3 composable functions for shared logic
+- `src/services/` - Business logic services (export, submission)
+- `src/schemas/` - Zod validation schemas for type safety
+- `src/types/` - TypeScript type definitions
+- `src/utils/` - Utility functions and helpers
+- `tests/` - Test files organized by type (unit, integration, browser)
+- `docs/` - Documentation including learnings and refactoring guides
+- `dist/` - Built application files for deployment
+- `public/` - Static assets served directly
+
 ### Key Technologies
-- **Vue 3** with Composition API and `<script setup lang="ts">` syntax
-- **TypeScript** with strict mode
-- **PrimeVue** UI library (unstyled) with auto-import resolver
-- **Tailwind CSS** with PrimeUI plugin
+- **Vue 3.5.13** with Composition API and `<script setup lang="ts">` syntax
+- **TypeScript 5.8.3** with strict mode
+- **PrimeVue 4.3.5** UI library (unstyled) with auto-import resolver
+- **Tailwind CSS 4.1.10** with PrimeUI plugin
 - **Volt** UI components - Custom PrimeVue wrappers for Tailwind CSS
-- **Chart.js** with data labels plugin for visualizations
-- **Zod** for schema validation
-- **Axios** for HTTP requests
-- **node-forge** for cryptographic operations
+- **Chart.js 4.5.0** with data labels plugin for visualizations
+- **Zod 3.25.67** for schema validation
+- **Axios 1.10.0** for HTTP requests
+- **node-forge 1.3.1** for cryptographic operations
+- **Vite 6.3.5** for build tooling and development server
+- **Vitest 3.2.4** for testing framework
+- **Playwright 1.53.2** for browser automation and E2E testing
 
 ### Styling System
 - **Color-coded themes** by medical domain:
   - Psyk (Psychology): Sky blue
   - Symptom score: Teal
   - Infection: Orange
-- **Tailwind configuration** with PrimeUI integration
+- **Tailwind configuration** with PrimeUI integration using volt tailwind UI components
 - **CSS files** for each scoring tool in `src/assets/`
 
 ### Build Configuration
@@ -165,11 +206,6 @@ Each entry point has:
 - `src/assets/sendDataToServer.ts` - Encrypted data transmission using hybrid AES + RSA encryption
 - `src/volt/utils.ts` - Tailwind class merging utilities for PrimeVue integration
 
-### Key Directories
-- `src/components/` - Reusable Vue components for medical calculators
-- `src/volt/` - Custom PrimeVue component wrappers with Tailwind styling
-- `src/assets/` - Styles, utilities, data files, and calculation logic
-- `dist/` - Built application files for deployment
 
 ## Code Style Guidelines
 
@@ -199,12 +235,23 @@ Each entry point has:
 
 ## Testing Instructions
 
-**Note**: This project uses manual testing rather than automated test suites.
+This project uses **Vitest** as the primary testing framework with multiple test environments:
 
-- `npm run test` - Runs Vite in testing mode
-- No dedicated testing frameworks (Jest, Vitest) are configured
-- Testing is primarily manual or handled at the parent application level
-- Type safety is enforced through `npm run type-check`
+### Test Structure
+- **Unit tests** (`tests/unit/`) - Test individual functions and utilities
+- **Component tests** (`tests/components/`) - Test Vue component behavior and rendering
+- **Integration tests** (`tests/integration/`) - Test component interactions and workflows
+- **Browser tests** (`tests/browser/`) - End-to-end tests using Playwright
+
+### Test Environments
+- **Node.js environment** (happy-dom) - For component and unit tests
+- **Browser environment** (Playwright) - For E2E and browser-specific tests
+- **UI testing** - Interactive test interface via Vitest UI
+
+### Test Configuration
+- `vitest.config.ts` - Main Vitest configuration
+- `vitest.browser.config.ts` - Browser-specific test configuration
+- Memory optimization for large test suites with garbage collection controls
 
 ## Developer Environment Setup
 
@@ -228,8 +275,17 @@ Each entry point has:
 - **Module resolution**: `Bundler`
 - **Strict mode** enabled
 - **Path aliasing**: `@/` points to `src/`
+- **Configuration files**:
+  - `tsconfig.json` - Main TypeScript configuration
+  - `tsconfig.app.json` - Application-specific settings
+  - `tsconfig.node.json` - Node.js environment settings
 
-## Avaliable MCP Servers
+### Test Configuration Files
+- **`vitest.config.ts`** - Main Vitest configuration for component and unit tests
+- **`vitest.browser.config.ts`** - Browser-specific configuration for E2E tests
+- **Memory optimization** - Configured with garbage collection controls for large test suites
+
+## Available MCP Servers
 
 ### Context7
 - Context7 MCP pulls up-to-date, version-specific documentation and code examples straight from the source — and places them directly into your prompt.
@@ -260,10 +316,8 @@ Each entry point has:
 - `.gitmodules`
 - `.gitattributes`
 
-
-
 ### Git Workflow
-- **Main branch**: `master`
+- **Main branch**: `main`
 - **Feature branches**: Use descriptive names refers to jira project name and issue number (e.g., `MED-829-gdpr-compliance`)
 - **Commit messages**: Use conventional commit format when possible
 
@@ -319,15 +373,12 @@ Each entry point has:
 
 ## Development Research Notes
 
-- **Configuration State Initialization**:
-  1. Check if configuration is being used to initialize reactive state
-  2. Add explicit initialization loop after variable declarations
-## Workflow Memory
-- 3. Test visually to confirm defaults appear
+### Configuration and State Management
+- **Configuration State Initialization**: When implementing reactive state from configuration objects, ensure explicit initialization loops are added after variable declarations and test visually to confirm defaults appear correctly.
 
-### Memories
-- Environment Variable Graceful Handling. Vue components were throwing runtime errors when VITE_API_URL was undefined, causing complete component failure. Fixed by creating .env files and using fallback values instead of throwing errors.
-- Vitest Browser API Version Compatibility. Browser tests failed because they used deprecated Vitest v2 API (browser.name, browser.headless) instead of the new v3 instances array pattern. Fixed by migrating to browser: { instances: [{ browser: 'chromium' }] } and adding proper dependency optimization.
-- PrimeVue Test Environment Configuration. PrimeVue components failed with "Cannot read properties of undefined (reading 'config')" because the plugin wasn't configured in tests. Fixed by adding global: { plugins: [[PrimeVue, { unstyled: true }]] } to component mounting in all test environments.
-- Browser vs Non-Browser Test Environment Selection. Integration tests were incorrectly using browser-specific APIs (vitest-browser-vue, @vitest/browser/context) in a happy-dom environment. Fixed by converting to Vue Test Utils (mount()) and focusing on component state testing instead of DOM interactions.
-- Vue Component State and Reactivity Testing Expectations. Tests failed because they assumed static default values, but the medical calculator used computed/reactive dosage values based on selected medicine. Fixed by testing value types and reactive behavior instead of hardcoded expectations (expect(typeof wrapper.vm.dosering).toBe('number')).
+### Testing Environment Learnings
+- **Environment Variable Handling**: Vue components require graceful handling of undefined environment variables. Use fallback values instead of throwing errors to prevent component failure.
+- **Vitest API Compatibility**: Migrated from deprecated Vitest v2 API (`browser.name`, `browser.headless`) to v3 instances array pattern (`browser: { instances: [{ browser: 'chromium' }] }`).
+- **PrimeVue Test Configuration**: PrimeVue components require plugin configuration in test environments. Add `global: { plugins: [[PrimeVue, { unstyled: true }]] }` to component mounting.
+- **Test Environment Selection**: Use appropriate APIs for each environment - Vue Test Utils for component state testing, browser APIs only for actual browser environments.
+- **Reactive Component Testing**: Test reactive behavior and value types rather than hardcoded expectations, especially for computed/reactive properties like dosage calculations.
