@@ -5,85 +5,90 @@
     <SurfaceCard title="Patient">
       <template #content>
         <PersonInfo
-          :name="name"
-          :age="age"
+          :name="framework.patientData.value.name || ''"
+          :age="framework.patientData.value.age || 35"
           :minAge="12"
           :maxAge="70"
-          :gender="gender as GenderValue"
+          :gender="framework.patientData.value.gender as GenderValue || 'female'"
           genderdisplay="block"
-          @update:name="name = $event"
-          @update:age="age = $event"
-          @update:gender="gender = $event"
+          @update:name="framework.setFieldValue('patient', 'name', $event)"
+          @update:age="framework.setFieldValue('patient', 'age', $event)"
+          @update:gender="framework.setFieldValue('patient', 'gender', $event)"
         />
       </template>
     </SurfaceCard>
     
-    <SurfaceCard title="Edinburgh postnatale depressionsscore">
+    <SurfaceCard :title="config.name">
       <template #content>
         <form @submit.prevent="handleSubmit">
           <QuestionSingleComponent
-            name="section1"
             v-for="(question, index) in questionsSection1"
             :key="index"
+            :name="question.id"
             :question="question"
             :options="getOptions(question.optionsType as keyof OptionsSets)"
             :index="index"
-            :framework-answer="question.answer ?? undefined"
-            :is-unanswered="formSubmitted && isUnanswered(question)"
+            :framework-answer="(framework.calculatorData.value as any)[question.id]"
+            :is-unanswered="formSubmitted && ((framework.calculatorData.value as any)[question.id] === null || (framework.calculatorData.value as any)[question.id] === undefined)"
             scrollHeight="18rem"
-            @update:answer="question.answer = $event"
+            @update:answer="framework.setFieldValue('calculator', question.id, $event)"
           />
           <div v-if="validationMessage" class="text-red-500 mt-5 font-bold">
             {{ validationMessage }}
           </div>
 
           <div class="flex justify-end text-right mt-5 gap-3">
-            <CopyDialog 
-              title="Kopier til Clipboard" 
-              icon="pi pi-clipboard" 
-              severity="secondary" 
-              class="mr-3" 
-              :disabled="(resultsSection ? false : true)" 
+            <CopyDialog
+              title="Kopier til Clipboard"
+              icon="pi pi-clipboard"
+              severity="secondary"
+              class="mr-3"
+              :disabled="!framework.state.value.isComplete"
             >
               <template #container>
-                <b>Edinburgh postnatale depressionsscore</b>
+                <b>{{ config.name }}</b>
                 <br /><br />
-                Navn: {{ name }} <br />
-                Køn: {{ getGenderLabel(gender as GenderValue) }} <br />
-                Alder: {{ age }} år<br /><br />
-                <div v-for="(question, index) in resultsSection1" :key="index">{{ question.text }} {{ question.score }}</div>
+                Navn: {{ framework.patientData.value.name }} <br />
+                Køn: {{ getGenderLabel(framework.patientData.value.gender as GenderValue) }} <br />
+                Alder: {{ framework.patientData.value.age }} år<br /><br />
+                <div v-for="question in resultsSection1" :key="question.id" >{{ question.text }} {{ (framework.calculatorData.value as any)[question.id] }}</div>
                 <br /><br />
-                Edinburgh postnatale depressionsscore {{ totalScore }} : {{ conclusion }}
+                Edinburgh postnatale depressionsscore {{ framework.result.value?.score }} : {{ framework.result.value?.interpretation }}
               </template>
             </CopyDialog>
-            <SecondaryButton 
-              label="Reset" 
-              icon="pi pi-sync" 
-              severity="secondary" 
-              @click="resetQuestions"
+            <SecondaryButton
+              label="Reset"
+              icon="pi pi-sync"
+              severity="secondary"
+              @click="handleReset"
             />
-          <!--  <Button label="Random" icon="pi pi-ban" severity="secondary" class="mr-3" @click="randomlyCheckQuestions"/>-->
-      
-            <Button 
-              type="submit" 
-              label="Beregn" 
-              class="pr-6 pl-6 rounded-lg" 
-              icon="pi pi-calculator"
+            <Button
+              type="submit"
+              :label="framework.state.value.isSubmitting ? '' : 'Beregn'"
+              class="pr-6 pl-6"
+              :icon="framework.state.value.isSubmitting ? 'pi pi-spin pi-spinner' : 'pi pi-calculator'"
+              :disabled="framework.state.value.isSubmitting"
             />
           </div>
         </form>
       </template>
     </SurfaceCard>
-    <div v-if="resultsSection1.length > 0" class="results" ref="resultsSection">
+    <div data-testid="results-section" v-if="framework.state.value.isComplete && framework.result.value" class="results">
       <SurfaceCard title="Resultat">
-        <template #content>          
+        <template #content>
           <br />
-          <Message class="flex justify-center p-3 text-center" :severity="conclusionSeverity"><h2>Edinburgh postnatale depressionsscore {{ totalScore }} <br /> {{ conclusion }}</h2></Message><br />
+          <Message class="flex justify-center p-3" :severity="framework.result.value.riskLevel === 'minimal' ? 'success' : 'warn'">
+            <h2>Edinburgh postnatale depressionsscore {{ framework.result.value.score }} <br /> {{ framework.result.value.interpretation }}</h2>
+          </Message>
+          <br />
           <p class="text-sm text-center ">Score ≤ 9: Ikke tegn til alvorlig depression Score ≥ 10: Behandlingskrævende depression kan foreligges</p>
         </template>
       </SurfaceCard>
     </div>
     </div>
+    
+    <!-- Toast component for notifications -->
+    <Toast />
   </div>
 </template>
 
@@ -97,7 +102,8 @@ import CopyDialog from "./CopyDialog.vue";
 import SurfaceCard from "./SurfaceCard.vue";
 import PersonInfo from "./PersonInfo.vue";
 import Message from '@/volt/Message.vue';
-import sendDataToServer from '../assets/sendDataToServer.ts';
+import Toast from 'primevue/toast';
+import { useCalculatorFramework, type CalculatorConfig, type CalculatorStep } from '@/composables/useCalculatorFramework';
 import { getGenderLabel, type GenderValue } from '@/utils/genderUtils';
 
 export interface Option {
@@ -132,24 +138,30 @@ export interface Result {
   text: string;
   score: number;
 }
-const apiUrlServer = import.meta.env.VITE_API_URL;
-const apiUrl = apiUrlServer+'/index.php/callback/LogCB/log';
-const keyUrl = apiUrlServer+'/index.php/KeyServer/getPublicKey';
 
-const resultsSection = ref<HTMLDivElement | null>(null);
-const name = ref<string>("");
-const gender = ref<GenderValue>("female");
-const age = ref<number>(35);
+const config: CalculatorConfig = {
+  type: 'epds',
+  name: 'Edinburgh postnatale depressionsscore',
+  version: '2.0.0',
+  category: 'pregnancy',
+  theme: 'teal',
+  estimatedDuration: 3,
+};
 
-const formSubmitted = ref<boolean>(false);
+const framework = useCalculatorFramework(config);
 
-const resultsSection1 = ref<Result[]>([]);
+// Form validation state
+const formSubmitted = ref(false);
+const validationMessage = ref('');
 
-const totalScore = ref<number>(0);
+const steps: CalculatorStep[] = [
+  { id: 'calculator', title: 'EPDS Questionnaire', order: 1, validation: true },
+];
+framework.initializeSteps(steps);
 
-const conclusion = ref<string>('');
-const conclusionSeverity = ref<string>('');
-const validationMessage = ref<string>('');
+// Initialize with default patient data
+framework.setFieldValue('patient', 'age', 35);
+framework.setFieldValue('patient', 'gender', 'female');
 
 const options1 = ref<Option[]>([
   { text: "Lige så meget som jeg altid har kunnet", value: 0 },
@@ -221,8 +233,9 @@ const options10 = ref<Option[]>([
   { text: "Aldrig", value: 0 }
 ]);
 
-const questionsSection1 = ref<Question[]>([
+const questionsSection1 = [
   {
+    id: 'question1',
     type: 'Listbox',
     bg: '--p-primary-100',
     text: "1. Har du de sidste 7 dage været i stand til at le og se tingene fra den humoristiske side?",
@@ -231,6 +244,7 @@ const questionsSection1 = ref<Question[]>([
     answer: options1.value[0].value
   },
   {
+    id: 'question2',
     type: 'Listbox',
     bg: '--p-primary-50',
     text: "2. Har du de sidste 7 dage kunnet se frem til ting med glæde?",
@@ -239,6 +253,7 @@ const questionsSection1 = ref<Question[]>([
     answer: options2.value[0].value
   },
   {
+    id: 'question3',
     type: 'Listbox',
     bg: '--p-primary-100',
     text: "3. Har du de sidste 7 dage unødvendigt bebrejdet dig selv, når ting ikke gik som de skulle?",
@@ -247,6 +262,7 @@ const questionsSection1 = ref<Question[]>([
     answer: options3.value[3].value
   },
   {
+    id: 'question4',
     type: 'Listbox',
     bg: '--p-primary-50',
     text: "4. Har du de sidste 7 dage været  anspændt og bekymret uden nogen særlig grund?",
@@ -255,6 +271,7 @@ const questionsSection1 = ref<Question[]>([
     answer: options4.value[0].value
   },
   {
+    id: 'question5',
     type: 'Listbox',
     bg: '--p-primary-100',
     text: "5. Har du de sidste 7 dage følt dig angst eller panikslagen uden nogen særlig grund?",
@@ -263,6 +280,7 @@ const questionsSection1 = ref<Question[]>([
     answer: options5.value[3].value
   },
   {
+    id: 'question6',
     type: 'Listbox',
     bg: '--p-primary-50',
     text: "6. Har du de sidste 7 dage følt, at tingene voksede dig over hovedet?",
@@ -271,6 +289,7 @@ const questionsSection1 = ref<Question[]>([
     answer: options6.value[3].value
   },
   {
+    id: 'question7',
     type: 'Listbox',
     bg: '--p-primary-100',
     text: "7. Har du de sidste 7 dage været så ked af det, at du har haft svært ved at sove?",
@@ -279,6 +298,7 @@ const questionsSection1 = ref<Question[]>([
     answer: options7.value[3].value
   },
   {
+    id: 'question8',
     type: 'Listbox',
     bg: '--p-primary-50',
     text: "8. Har du de sidste 7 dage følt dig trist eller elendigt til mode?",
@@ -287,6 +307,7 @@ const questionsSection1 = ref<Question[]>([
     answer: options8.value[3].value
   },
   {
+    id: 'question9',
     type: 'Listbox',
     bg: '--p-primary-100',
     text: "9. Har du de sidste 7 dage været så ulykkelig, at du har grædt?",
@@ -295,6 +316,7 @@ const questionsSection1 = ref<Question[]>([
     answer: options9.value[3].value
   },
   {
+    id: 'question10',
     type: 'Listbox',
     bg: '--p-primary-50',
     text: "10. Har tanken om at gøre skade på dig selv strejfet dig de sidste 7 dage?",
@@ -302,9 +324,7 @@ const questionsSection1 = ref<Question[]>([
     optionsType: 'options10',
     answer: options10.value[3].value
   }
-]);
-
-// Default answers are already set in question configurations above
+];
 
 const optionsSets = {
   options1,
@@ -323,97 +343,39 @@ const getOptions = (type: keyof OptionsSets): Option[] => {
   return optionsSets[type].value;
 }
 
-const handleSubmit = () => {
+const resultsSection1 = questionsSection1;
+
+// Initialize with default answers from question configurations
+questionsSection1.forEach(question => {
+  framework.setFieldValue('calculator', question.id, question.answer);
+});
+
+const handleSubmit = async () => {
   formSubmitted.value = true;
-
-  if (validateQuestions()) {
-    calculateResults();
-    scrollToResults();
-    sendDataToServer(apiUrl, keyUrl, generatePayload())
-    .then(() => {
-      //console.log('Data successfully sent');
-    })
-    .catch(() => {
-      //console.error('Failed to send data');
-    });
-  }
-};
-
-const validateQuestions = (): boolean => {
-  const allQuestions = [
-    ...questionsSection1.value,
-  ];
-  const unansweredQuestions = allQuestions.filter(
-    (question) => question.answer === null
-  );
-  if (unansweredQuestions.length > 0) {
-    validationMessage.value = 'Alle spørgsmål skal udfyldes. ';
-    return false;
-  } else {
-    validationMessage.value = '';
-    return true;
-  }
-};
-
-const isUnanswered = (question: Question): boolean => {
-  return question.answer === null
-};
-
-const calculateResults = () => {
-  const section1Results = questionsSection1.value.map((question, index) => {
-    const score = question.answer ?? 0;
-    return {
-      question: `${index + 1}`,
-      text: question.text,
-      score
-    };
-  });
-
-  resultsSection1.value = section1Results;
-  totalScore.value = (resultsSection1.value.reduce((sum, result) => sum + result.score, 0));
-
- if (totalScore.value > 10) {
-    conclusion.value = "Behandlingskrævende depression kan foreligge.";
-    conclusionSeverity.value = "error";
-  } else {
-    conclusion.value = "Ikke tegn til alvorlig depression.";
-    conclusionSeverity.value = "success";
-  }
-};
-
-const scrollToResults = () => {
-  const resultsSectionEl = resultsSection.value as HTMLElement;
-  if (resultsSectionEl) {
-    resultsSectionEl.scrollIntoView({ behavior: 'smooth' });
-  }
-};
-
-
-const resetQuestions = () => {
-  questionsSection1.value.forEach(question => {
-    if (question.optionsType) {
-      question.answer = optionsSets[question.optionsType]?.value[0]?.value;
-    }
-  });
-
-  resultsSection1.value = [];
-  totalScore.value = 0;
   validationMessage.value = '';
-  formSubmitted.value = false;
+  
+  try {
+    await framework.submitCalculation();
+  } catch (error) {
+    console.error('Submit error:', error);
+    
+    // Check if calculation succeeded despite submission error
+    if (framework.state.value.isComplete && framework.result.value) {
+      // Calculation succeeded, just submission failed
+      console.warn('Calculation succeeded but submission failed:', error);
+      validationMessage.value = 'Beregning gennemført. Indsendelse til server fejlede.';
+    } else {
+      // Actual calculation error
+      validationMessage.value = 'Der opstod en fejl ved beregning. Prøv igen.';
+    }
+  }
 };
 
-const generatePayload = () => {
-  return {
-      name: name.value,
-      age: age.value,
-      gender: gender.value,
-      answers: [
-        ...questionsSection1.value,
-      ],
-      scores: {
-        totalScore: totalScore.value
-      },
-    };
-}
+const handleReset = () => {
+  formSubmitted.value = false;
+  validationMessage.value = '';
+  
+  framework.resetCalculator();
+};
 </script>
 
