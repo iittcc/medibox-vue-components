@@ -9,7 +9,7 @@ export const WestleyCroupQuestionSchema = z.object({
     .int('Bevidsthedsniveau score skal være et helt tal'),
   cyanosis: z.number()
     .min(0, 'Cyanose score skal være mindst 0')
-    .max(2, 'Cyanose score skal være højst 2')
+    .max(5, 'Cyanose score skal være højst 5')
     .int('Cyanose score skal være et helt tal'),
   stridor: z.number()
     .min(0, 'Stridor score skal være mindst 0')

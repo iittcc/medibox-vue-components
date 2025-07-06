@@ -117,6 +117,7 @@ export type OptionsSets = {
   options2: Option[];
   options3: Option[];
   options4: Option[];
+  options5: Option[];
 };
 
 export interface Question {
@@ -158,19 +159,29 @@ const options1 = ref<Option[]>([
   { text: "Desorienteret/forvirret", value: 5 }
 ]);
 
+// Cyanosis options (0, 4, 5)
 const options2 = ref<Option[]>([
   { text: "Ingen", value: 0 },
   { text: "Ved ophidselse", value: 4 },
   { text: "I hvile", value: 5 }
 ]);
 
+// Stridor options (0, 1, 2)
 const options3 = ref<Option[]>([
+  { text: "Ingen", value: 0 },
+  { text: "Ved ophidselse", value: 1 },
+  { text: "I hvile", value: 2 }
+]);
+
+// Air entry options (0, 1, 2)
+const options4 = ref<Option[]>([
   { text: "Normal", value: 0 },
   { text: "Nedsat", value: 1 },
   { text: "Udtalt nedsat", value: 2 }
 ]);
 
-const options4 = ref<Option[]>([
+// Retractions options (0, 1, 2, 3)
+const options5 = ref<Option[]>([
   { text: "Ingen", value: 0 },
   { text: "Milde", value: 1 },
   { text: "Moderate", value: 2 },
@@ -203,8 +214,8 @@ const questionsSection1 = [
     bg: '--p-primary-100',
     text: "Stridor",
     description: "",
-    optionsType: 'options2',
-    answer: options2.value[0].value
+    optionsType: 'options3',
+    answer: options3.value[0].value
   },
   {
     id: 'airEntry',
@@ -212,8 +223,8 @@ const questionsSection1 = [
     bg: '--p-primary-50',
     text: "Luftskifte (st.p.)",
     description: "",
-    optionsType: 'options3',
-    answer: options3.value[0].value
+    optionsType: 'options4',
+    answer: options4.value[0].value
   },
   {
     id: 'retractions',
@@ -221,8 +232,8 @@ const questionsSection1 = [
     bg: '--p-primary-100',
     text: "Indtrækninger",
     description: "",
-    optionsType: 'options4',
-    answer: options4.value[0].value
+    optionsType: 'options5',
+    answer: options5.value[0].value
   }
 ];
 
@@ -230,7 +241,8 @@ const optionsSets = {
   options1,
   options2,
   options3,
-  options4
+  options4,
+  options5
 };
 
 const getOptions = (type: keyof OptionsSets): Option[] => {
