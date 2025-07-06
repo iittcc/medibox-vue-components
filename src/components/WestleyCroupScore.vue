@@ -5,76 +5,90 @@
     <SurfaceCard title="Patient">
       <template #content>
         <PersonInfo
-          :name="name"
-          :age="age"
+          :name="framework.patientData.value.name || ''"
+          :age="framework.patientData.value.age || 6"
           :minAge="0"
           :maxAge="12"
-          :gender="gender as GenderValue"
+          :gender="framework.patientData.value.gender as GenderValue || 'male'"
           genderdisplay="block"
           child="true"
-          @update:name="name = $event"
-          @update:age="age = $event"
-          @update:gender="gender = $event"
+          @update:name="framework.setFieldValue('patient', 'name', $event)"
+          @update:age="framework.setFieldValue('patient', 'age', $event)"
+          @update:gender="framework.setFieldValue('patient', 'gender', $event)"
         />
       </template>
     </SurfaceCard>
     
-    <SurfaceCard title="Westley Croup Score">
+    <SurfaceCard :title="config.name">
       <template #content>
-      <form @submit.prevent="handleSubmit">
-        <QuestionSingleComponent
-          name="section1"
-          v-for="(question, index) in questionsSection1"
-          :key="index"
-          :question="question"
-          :options="getOptions(question.optionsType as keyof OptionsSets)"
-          :index="index"
-          :framework-answer="question.answer ?? undefined"
-          :is-unanswered="formSubmitted && isUnanswered(question)"
-          @update:answer="question.answer = $event"
-        />
-       
-        <div v-if="validationMessage" class="text-red-500 mt-5 font-bold">
-          {{ validationMessage }}
-        </div>
+        <form @submit.prevent="handleSubmit">
+          <QuestionSingleComponent
+            v-for="(question, index) in questionsSection1"
+            :key="index"
+            :name="question.id"
+            :question="question"
+            :options="getOptions(question.optionsType as keyof OptionsSets)"
+            :index="index"
+            :framework-answer="(framework.calculatorData.value as any)[question.id]"
+            :is-unanswered="formSubmitted && ((framework.calculatorData.value as any)[question.id] === null || (framework.calculatorData.value as any)[question.id] === undefined)"
+            @update:answer="framework.setFieldValue('calculator', question.id, $event)"
+          />
+          <div v-if="validationMessage" class="text-red-500 mt-5 font-bold">
+            {{ validationMessage }}
+          </div>
 
-        <div class="flex justify-end text-right mt-5 gap-3">
-          <CopyDialog 
-            title="Kopier til Clipboard" 
-            icon="pi pi-clipboard" 
-            severity="secondary" 
-            class="mr-3" 
-            :disabled="(resultsSection ? false : true)" 
-          >
-            <template #container>
-              <b>WESTLEY CROUP SCORE</b>
-              <br /><br />
-              Navn: {{ name }} <br />
-              Køn: {{ getGenderLabelByAge(gender as GenderValue, age) }} <br />
-              Alder: {{ age }} år<br /><br />
-              <div v-for="(question, index) in resultsSection1" :key="index">{{ question.text }} {{ question.score }}</div>
-              <br /><br />
-              Westley Croup Score {{ totalScore }} : {{ conclusion }}
-            </template>
-          </CopyDialog>
-          <SecondaryButton label="Reset" icon="pi pi-sync" severity="secondary" @click="resetQuestions"/>
-        <!--  <Button label="Random" icon="pi pi-ban" severity="secondary" class="mr-3" @click="randomlyCheckQuestions"/>-->
-     
-          <Button type="submit" label="Beregn" class="mr-3 pr-6 pl-6" icon="pi pi-calculator"/>
-        </div>
-      </form>
+          <div class="flex justify-end text-right mt-5 gap-3">
+            <CopyDialog
+              title="Kopier til Clipboard"
+              icon="pi pi-clipboard"
+              severity="secondary"
+              class="mr-3"
+              :disabled="!framework.state.value.isComplete"
+            >
+              <template #container>
+                <b>{{ config.name }}</b>
+                <br /><br />
+                Navn: {{ framework.patientData.value.name }} <br />
+                Køn: {{ getGenderLabelByAge(framework.patientData.value.gender as GenderValue, framework.patientData.value.age) }} <br />
+                Alder: {{ framework.patientData.value.age }} år<br /><br />
+                <div v-for="question in questionsSection1" :key="question.id" >{{ question.text }} {{ (framework.calculatorData.value as any)[question.id] }}</div>
+                <br /><br />
+                Westley Croup Score {{ framework.result.value?.score }} : {{ framework.result.value?.interpretation }}
+              </template>
+            </CopyDialog>
+            <SecondaryButton
+              label="Reset"
+              icon="pi pi-sync"
+              severity="secondary"
+              @click="handleReset"
+            />
+            <Button
+              type="submit"
+              :label="framework.state.value.isSubmitting ? '' : 'Beregn'"
+              class="pr-6 pl-6"
+              :icon="framework.state.value.isSubmitting ? 'pi pi-spin pi-spinner' : 'pi pi-calculator'"
+              :disabled="framework.state.value.isSubmitting"
+            />
+          </div>
+        </form>
       </template>
     </SurfaceCard>
-    <div v-if="resultsSection1.length > 0" class="results" ref="resultsSection">
-  <SurfaceCard title="Resultat">
-    <template #content>          
+    <div data-testid="results-section" v-if="framework.state.value.isComplete && framework.result.value" class="results">
+      <SurfaceCard title="Resultat">
+        <template #content>
           <br />
-          <Message class="flex justify-center p-3" :severity="conclusionSeverity"><h2>Westley Croup Score {{ totalScore }} : {{ conclusion }}</h2></Message><br />
-          <p class="text-sm text-center ">Score ≤ 2 : Mild pseudocroup | Score 3-7: Moderat pseudocroup | Score ≥ 8: Svær pseudocroup</p>
-      </template>
-        </SurfaceCard>
-      </div>
+          <Message class="flex justify-center p-3" :severity="getSeverityFromRiskLevel(framework.result.value.riskLevel)">
+            <h2>Westley Croup Score {{ framework.result.value.score }} : {{ framework.result.value.interpretation }}</h2>
+          </Message>
+          <br />
+          <p class="text-sm text-center ">Score ≤ 2 : Let croup | Score 3-5: Moderat croup | Score ≥ 6: Alvorlig croup</p>
+        </template>
+      </SurfaceCard>
     </div>
+    </div>
+    
+    <!-- Toast component for notifications -->
+    <Toast />
   </div>
 </template>
 
@@ -88,8 +102,10 @@ import CopyDialog from "./CopyDialog.vue";
 import SurfaceCard from "./SurfaceCard.vue";
 import PersonInfo from "./PersonInfo.vue";
 import Message from '@/volt/Message.vue';
-import sendDataToServer from '../assets/sendDataToServer.ts';
+import Toast from 'primevue/toast';
+import { useCalculatorFramework, type CalculatorConfig, type CalculatorStep } from '@/composables/useCalculatorFramework';
 import { getGenderLabelByAge, type GenderValue } from '@/utils/genderUtils';
+import type { RiskLevel } from '@/types/calculatorTypes';
 
 export interface Option {
   text: string;
@@ -104,6 +120,7 @@ export type OptionsSets = {
 };
 
 export interface Question {
+  id: string;
   type: string;
   bg?: string;
   text: string;
@@ -112,29 +129,29 @@ export interface Question {
   answer: number | null;
 }
 
-export interface Result {
-  question: string;
-  text: string;
-  score: number;
-}
-const apiUrlServer = import.meta.env.VITE_API_URL;
-const apiUrl = apiUrlServer+'/index.php/callback/LogCB/log';
-const keyUrl = apiUrlServer+'/index.php/KeyServer/getPublicKey';
+const config: CalculatorConfig = {
+  type: 'westleycroupscore',
+  name: 'Westley Croup Score',
+  version: '2.0.0',
+  category: 'general',
+  theme: 'orange',
+  estimatedDuration: 2,
+};
 
-const resultsSection = ref<HTMLDivElement | null>(null);
-const name = ref<string>("");
-const gender = ref<GenderValue>("male");
-const age = ref<number>(6);
+const framework = useCalculatorFramework(config);
 
-const formSubmitted = ref<boolean>(false);
+// Form validation state
+const formSubmitted = ref(false);
+const validationMessage = ref('');
 
-const resultsSection1 = ref<Result[]>([]);
+const steps: CalculatorStep[] = [
+  { id: 'calculator', title: 'Westley Croup Assessment', order: 1, validation: true },
+];
+framework.initializeSteps(steps);
 
-const totalScore = ref<number>(0);
-
-const conclusion = ref<string>('');
-const conclusionSeverity = ref<string>('');
-const validationMessage = ref<string>('');
+// Initialize with default patient data
+framework.setFieldValue('patient', 'age', 6);
+framework.setFieldValue('patient', 'gender', 'male');
 
 const options1 = ref<Option[]>([
   { text: "Vågen (eller sovende)", value: 0 },
@@ -161,8 +178,9 @@ const options4 = ref<Option[]>([
 ]);
 
 
-const questionsSection1 = ref<Question[]>([
+const questionsSection1 = [
   {
+    id: 'levelOfConsciousness',
     type: 'Listbox',
     bg: '--p-primary-100',
     text: "Bevidsthedsniveau",
@@ -171,6 +189,7 @@ const questionsSection1 = ref<Question[]>([
     answer: options1.value[0].value
   },
   {
+    id: 'cyanosis',
     type: 'Listbox',
     bg: '--p-primary-50',
     text: "Cyanose",
@@ -179,6 +198,7 @@ const questionsSection1 = ref<Question[]>([
     answer: options2.value[0].value
   },
   {
+    id: 'stridor',
     type: 'Listbox',
     bg: '--p-primary-100',
     text: "Stridor",
@@ -187,6 +207,7 @@ const questionsSection1 = ref<Question[]>([
     answer: options2.value[0].value
   },
   {
+    id: 'airEntry',
     type: 'Listbox',
     bg: '--p-primary-50',
     text: "Luftskifte (st.p.)",
@@ -195,6 +216,7 @@ const questionsSection1 = ref<Question[]>([
     answer: options3.value[0].value
   },
   {
+    id: 'retractions',
     type: 'Listbox',
     bg: '--p-primary-100',
     text: "Indtrækninger",
@@ -202,9 +224,7 @@ const questionsSection1 = ref<Question[]>([
     optionsType: 'options4',
     answer: options4.value[0].value
   }
-]);
-
-// Default answers are already set in question configurations above
+];
 
 const optionsSets = {
   options1,
@@ -217,120 +237,50 @@ const getOptions = (type: keyof OptionsSets): Option[] => {
   return optionsSets[type].value;
 }
 
-const handleSubmit = () => {
+// Initialize with default answers from question configurations
+questionsSection1.forEach(question => {
+  framework.setFieldValue('calculator', question.id, question.answer);
+});
+
+const handleSubmit = async () => {
   formSubmitted.value = true;
-
-  if (validateQuestions()) {
-    calculateResults();
-    scrollToResults();
-    sendDataToServer(apiUrl, keyUrl, generatePayload())
-    .then((_data) => {
-      //console.log('Data successfully sent:', data);
-    })
-    .catch((_error) => {
-      //console.error('Failed to send data:', error.message);
-    });
-  }
-};
-
-const validateQuestions = (): boolean => {
-  const allQuestions = [
-    ...questionsSection1.value,
-  ];
-  const unansweredQuestions = allQuestions.filter(
-    (question) => question.answer === null
-  );
-  if (unansweredQuestions.length > 0) {
-    validationMessage.value = 'Alle spørgsmål skal udfyldes.';
-    return false;
-  } else {
-    validationMessage.value = '';
-    return true;
-  }
-};
-
-const isUnanswered = (question: Question): boolean => {
-  return question.answer === null
-};
-
-const calculateResults = () => {
-  const section1Results = questionsSection1.value.map((question, index) => {
-    const score = question.answer ?? 0;
-    return {
-      question: `${index + 1}`,
-      text: question.text,
-      score
-    };
-  });
-
-  resultsSection1.value = section1Results;
-  totalScore.value = resultsSection1.value.reduce((sum, result) => sum + result.score, 0);
-
-  if (totalScore.value > 7) {
-    conclusion.value = "Svær  pseudocroup ≥ 8";
-    conclusionSeverity.value = "error";
-  } else if (totalScore.value >= 3) {
-    conclusion.value = "Moderat pseudocroup 3-7";
-    conclusionSeverity.value = "warn";
-  } else {
-    conclusion.value = "Mild pseudocroup ≤ 2";
-    conclusionSeverity.value = "success";
-  }
-};
-
-const scrollToResults = () => {
-  const resultsSectionEl = resultsSection.value as HTMLElement;
-  if (resultsSectionEl) {
-    resultsSectionEl.scrollIntoView({ behavior: 'smooth' });
-  }
-};
-
-const _randomlyCheckQuestions = () => {
-  const randomValue = (options: Option[]) => options[Math.floor(Math.random() * options.length)].value;
-
-  questionsSection1.value.forEach(question => {
-    if (question.optionsType) {
-      question.answer = randomValue(optionsSets[question.optionsType]?.value);
-    }
-  });
-};
-
-const _clearAllQuestionsAndResults = () => {
-  questionsSection1.value.forEach(question => {
-    question.answer = null;
-  });
-
-  resultsSection1.value = [];
-  totalScore.value = 0;
   validationMessage.value = '';
-  formSubmitted.value = false;
-};
-
-const resetQuestions = () => {
-  questionsSection1.value.forEach(question => {
-    if (question.optionsType) {
-      question.answer = optionsSets[question.optionsType]?.value[0]?.value;
+  
+  try {
+    await framework.submitCalculation();
+  } catch (error) {
+    console.error('Submit error:', error);
+    
+    // Check if calculation succeeded despite submission error
+    if (framework.state.value.isComplete && framework.result.value) {
+      // Calculation succeeded, just submission failed
+      console.warn('Calculation succeeded but submission failed:', error);
+      validationMessage.value = 'Beregning gennemført. Indsendelse til server fejlede.';
+    } else {
+      // Actual calculation error
+      validationMessage.value = 'Der opstod en fejl ved beregning. Prøv igen.';
     }
-  });
-
-  resultsSection1.value = [];
-  totalScore.value = 0;
-  validationMessage.value = '';
-  formSubmitted.value = false;
+  }
 };
 
-const generatePayload = () => {
-  return {
-      name: name.value,
-      age: age.value,
-      gender: gender.value,
-      answers: [
-        ...questionsSection1.value,
-      ],
-      scores: {
-        totalScore: totalScore.value
-      },
-    };
-}
+const handleReset = () => {
+  formSubmitted.value = false;
+  validationMessage.value = '';
+  
+  framework.resetCalculator();
+};
+
+const getSeverityFromRiskLevel = (riskLevel: RiskLevel): string => {
+  switch (riskLevel) {
+    case 'mild':
+      return 'success';
+    case 'moderate':
+      return 'warn';
+    case 'severe':
+      return 'error';
+    default:
+      return 'info';
+  }
+};
 </script>
 

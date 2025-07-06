@@ -34,7 +34,6 @@ declare module 'vue' {
     RiskAssessment: typeof import('./src/components/RiskAssessment.vue')['default']
     SurfaceCard: typeof import('./src/components/SurfaceCard.vue')['default']
     SurfaceCardItem: typeof import('./src/components/SurfaceCardItem.vue')['default']
-    Toast: typeof import('primevue/toast')['default']
     WestleyCroupScore: typeof import('./src/components/WestleyCroupScore.vue')['default']
     Who5Score: typeof import('./src/components/Who-5Score.vue')['default']
   }
