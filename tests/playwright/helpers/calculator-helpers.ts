@@ -306,13 +306,13 @@ export async function takeScreenshot(page: Page, name: string) {
 }
 
 export async function logConsoleErrors(page: Page) {
-  page.on('console', (msg: any) => {
+  page.on('console', (msg) => {
     if (msg.type() === 'error') {
       console.error('Console error:', msg.text())
     }
   })
-  
-  page.on('pageerror', (error: any) => {
+
+  page.on('pageerror', (error) => {
     console.error('Page error:', error.message)
   })
 }
