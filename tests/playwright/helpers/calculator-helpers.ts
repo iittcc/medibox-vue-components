@@ -163,8 +163,8 @@ export class WestleyCroupCalculatorHelper {
     const interpretation = await this.getInterpretation()
     
     if (interpretation.includes('Let')) return 'low'
-    if (interpretation.includes('Moderat')) return 'moderate' 
-    if (interpretation.includes('Alvorlig')) return 'severe'
+    if (interpretation.includes('Moderat')) return 'moderate'
+    if (interpretation.includes('Alvorlig')) return 'high'
     
     return 'unknown'
   }
