@@ -35,7 +35,7 @@ export const WestleyCroupSchema = z.object({
   responses: WestleyCroupQuestionSchema,
   totalScore: z.number()
     .min(0, 'Total score skal være mindst 0')
-    .max(14, 'Total score skal være højst 14')
+    .max(17, 'Total score skal være højst 17')
     .int('Total score skal være et helt tal'),
   severity: z.enum(['mild', 'moderate', 'severe']),
   treatmentRecommendation: z.enum(['observation', 'nebulized_epinephrine', 'steroid_therapy', 'hospital_admission']),

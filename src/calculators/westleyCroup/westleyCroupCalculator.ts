@@ -14,7 +14,7 @@ export class WestleyCroupCalculator extends BaseCalculator<WestleyCroupResponses
 
   readonly scoreRange: ScoreRange = {
     min: 0,
-    max: 14
+    max: 17
   }
 
   validate(responses: WestleyCroupResponses): ValidationResult {

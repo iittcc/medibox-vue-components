@@ -134,7 +134,7 @@ export const testScenarios: TestScenario[] = [
     }
   },
   {
-    name: 'Maximum score - Alvorlig croup (Score 13)',
+    name: 'High score example - Alvorlig croup (Score 13)',
     patient: testPatients[2],
     inputs: {
       levelOfConsciousness: 5, // Desorienteret/forvirret
@@ -145,6 +145,22 @@ export const testScenarios: TestScenario[] = [
     },
     expected: {
       score: 13,
+      interpretation: 'Alvorlig croup',
+      riskLevel: 'high'
+    }
+  },
+  {
+    name: 'Maximum possible score - Alvorlig croup (Score 17)',
+    patient: testPatients[3],
+    inputs: {
+      levelOfConsciousness: 5, // Desorienteret/forvirret (5)
+      cyanosis: 5,            // I hvile (5)
+      stridor: 2,             // I hvile (2)
+      airEntry: 2,            // Udtalt nedsat (2)
+      retractions: 3          // Svære (3)
+    },
+    expected: {
+      score: 17,
       interpretation: 'Alvorlig croup',
       riskLevel: 'high'
     }
