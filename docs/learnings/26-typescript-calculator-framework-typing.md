@@ -54,7 +54,7 @@ export interface Question {
 ```typescript
 // Type-safe utility functions
 const getOptions = (type: keyof OptionsSets): Option[] => {
-  return optionsSets[type].value;
+  return optionsSets[type];
 }
 
 const getSeverityFromRiskLevel = (riskLevel: RiskLevel): string => {
