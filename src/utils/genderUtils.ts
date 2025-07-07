@@ -40,5 +40,6 @@ export function getGenderLabel(gender: GenderValue, isChild: boolean = false): s
  * @returns Danish gender label
  */
 export function getGenderLabelByAge(gender: GenderValue, age: number | null | undefined): string {
-  return getGenderLabel(gender, age ? age <= 16 : false);
+  return getGenderLabel(gender, typeof age === 'number' ? age <= 16 : false);
+}
 }
