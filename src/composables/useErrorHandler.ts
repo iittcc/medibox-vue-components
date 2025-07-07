@@ -1,6 +1,9 @@
 import { ref, computed, readonly, onMounted, onUnmounted } from 'vue'
 import { useToast } from 'primevue/usetoast'
 import { errorBoundaryManager, type ErrorInfo, ErrorType } from '@/utils/errorBoundary'
+import { useEventManager } from '@/utils/eventManager'
+import { useNetworkStatus } from './useNetworkStatus'
+import { ErrorFactory, type ErrorContext } from '@/utils/errorFactory'
 
 export interface ErrorHandlerOptions {
   showToasts?: boolean
@@ -15,9 +18,9 @@ export interface ErrorHandlerOptions {
 
 export function useErrorHandler(options: ErrorHandlerOptions = {}) {
   const toast = useToast()
+  const eventManager = useEventManager()
+  const { isOnline } = useNetworkStatus()
   const errors = ref<ErrorInfo[]>([])
-   
-  const isOnline = ref(navigator.onLine)
   const retryAttempts = ref<Map<string, number>>(new Map())
 
   const {
@@ -53,25 +56,16 @@ export function useErrorHandler(options: ErrorHandlerOptions = {}) {
   // Error handling methods
   const handleError = async (
     error: Error, 
-    context?: { 
-      component?: string
-      calculator?: string
-      action?: string
-      data?: any
-    }
+    context?: ErrorContext
   ) => {
     const errorType = categorizeError(error)
-    const errorKey = `${context?.component || 'unknown'}-${context?.action || 'unknown'}`
-    
-    const errorInfo: ErrorInfo = {
-      componentName: context?.component,
-      errorMessage: error.message,
-      errorStack: error.stack,
-      timestamp: new Date(),
-      calculatorType: context?.calculator,
+    const errorInfo = ErrorFactory.createErrorInfo(
+      error,
       errorType,
-      recoverable: isRecoverable(errorType)
-    }
+      context,
+      isRecoverable(errorType)
+    )
+    const errorKey = ErrorFactory.createErrorKey(errorInfo, context)
 
     errors.value.push(errorInfo)
 
@@ -244,9 +238,6 @@ export function useErrorHandler(options: ErrorHandlerOptions = {}) {
 
   // Network status handling
   const handleOnlineStatusChange = () => {
-     
-    isOnline.value = navigator.onLine
-    
     if (isOnline.value && networkErrors.value.length > 0) {
       showInfo('Internetforbindelse genoprettet', 'Forsøger at gensende data...')
       
@@ -261,56 +252,42 @@ export function useErrorHandler(options: ErrorHandlerOptions = {}) {
     }
   }
 
-  // Store event listener functions for proper cleanup
-   
-  const handleMedicalCalculatorError = ((event: CustomEvent) => {
-    const errorInfo = event.detail as ErrorInfo
-    errors.value.push(errorInfo)
-    
-    if (showToasts) {
-      showErrorToast(errorInfo)
-    }
-  }) as /* eslint-disable-line no-undef */ EventListener
 
-   
-  const handleMedicalCalculatorRecovery = ((event: CustomEvent) => {
-    const errorInfo = event.detail as ErrorInfo
-    if (onRecovery) {
-      onRecovery(errorInfo)
-    }
-  }) as /* eslint-disable-line no-undef */ EventListener
-
-   
-  const handleShowErrorToast = ((event: CustomEvent) => {
-    const toastOptions = event.detail
-    toast.add(toastOptions)
-  }) as /* eslint-disable-line no-undef */ EventListener
-
-  // Lifecycle hooks
+  // Lifecycle hooks with type-safe event management
   onMounted(() => {
-     
-    window.addEventListener('online', handleOnlineStatusChange)
-     
-    window.addEventListener('offline', handleOnlineStatusChange)
-     
-    window.addEventListener('medicalCalculatorError', handleMedicalCalculatorError)
-     
-    window.addEventListener('medicalCalculatorRecovery', handleMedicalCalculatorRecovery)
-     
-    window.addEventListener('showErrorToast', handleShowErrorToast)
+    // Network status events
+    eventManager.subscribe('network:online', () => {
+      handleOnlineStatusChange()
+    })
+    
+    eventManager.subscribe('network:offline', () => {
+      handleOnlineStatusChange()
+    })
+    
+    // Error events
+    eventManager.subscribe('error:medical-calculator', (errorInfo) => {
+      errors.value.push(errorInfo)
+      if (showToasts) {
+        showErrorToast(errorInfo)
+      }
+    })
+    
+    // Recovery events
+    eventManager.subscribe('error:recovery', (errorInfo) => {
+      if (onRecovery) {
+        onRecovery(errorInfo)
+      }
+    })
+    
+    // Toast events
+    eventManager.subscribe('notification:show-toast', (toastOptions) => {
+      toast.add(toastOptions)
+    })
   })
 
   onUnmounted(() => {
-     
-    window.removeEventListener('online', handleOnlineStatusChange)
-     
-    window.removeEventListener('offline', handleOnlineStatusChange)
-     
-    window.removeEventListener('medicalCalculatorError', handleMedicalCalculatorError)
-     
-    window.removeEventListener('medicalCalculatorRecovery', handleMedicalCalculatorRecovery)
-     
-    window.removeEventListener('showErrorToast', handleShowErrorToast)
+    // Cleanup all event listeners automatically
+    eventManager.cleanup()
   })
 
   return {
