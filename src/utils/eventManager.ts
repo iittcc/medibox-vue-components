@@ -22,8 +22,8 @@ export interface MedicalCalculatorEventMap {
  * Provides automatic cleanup and proper TypeScript support
  */
 export class TypeSafeEventManager {
-  private listeners = new Map<keyof MedicalCalculatorEventMap, Set<Function>>()
-  private cleanupFunctions = new Map<Function, () => void>()
+  private listeners = new Map<keyof MedicalCalculatorEventMap, Set<(data: any) => void>>()
+  private cleanupFunctions = new Map<(data: any) => void, () => void>()
 
   /**
    * Subscribe to an event with type safety
