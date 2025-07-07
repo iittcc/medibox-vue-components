@@ -154,11 +154,7 @@ const emit = defineEmits<{
 const currentAnswer = computed({
   get: () => props.frameworkAnswer,
   set: (value: number | null) => {
-    // Prevent deselection (setting to null) when there's already a selected value
-    // This ensures all medical scoring questions always have an answer
-    if (value === null && props.frameworkAnswer !== null) {
-      return // Don't emit the change, keep the current value
-    }
+
     emit('update:answer', value)
   }
 })
