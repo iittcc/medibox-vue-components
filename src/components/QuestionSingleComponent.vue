@@ -153,7 +153,7 @@ const emit = defineEmits<{
 // Use framework answer as the single source of truth
 const currentAnswer = computed({
   get: () => props.frameworkAnswer,
-  set: (value) => emit('update:answer', value)
+  set: (value: number | null) => emit('update:answer', value)
 })
 
 const isSelected = (value: number): boolean => {
