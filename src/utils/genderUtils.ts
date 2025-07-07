@@ -42,4 +42,3 @@ export function getGenderLabel(gender: GenderValue, isChild: boolean = false): s
 export function getGenderLabelByAge(gender: GenderValue, age: number | null | undefined): string {
   return getGenderLabel(gender, typeof age === 'number' ? age <= 16 : false);
 }
-}
