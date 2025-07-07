@@ -4,8 +4,8 @@ import type { ErrorInfo } from './errorBoundary'
  * Type-safe event map for medical calculator events
  */
 export interface MedicalCalculatorEventMap {
-  'network:online': undefined
-  'network:offline': undefined
+  'network:online': void
+  'network:offline': void
   'error:medical-calculator': ErrorInfo
   'error:recovery': ErrorInfo & { action?: string }
   'notification:show-toast': {
@@ -45,12 +45,10 @@ export class TypeSafeEventManager {
     
     // Create typed event handler
     const handler = (e: Event) => {
-    const handler = (e: Event) => {
       if (event === 'network:online' || event === 'network:offline') {
-        // These events have no data, pass undefined
-        callback(undefined as MedicalCalculatorEventMap[K])
+        callback(undefined as any)
       } else if (e instanceof CustomEvent) {
-        callback(e.detail as MedicalCalculatorEventMap[K])
+        callback(e.detail)
       }
     }
 
