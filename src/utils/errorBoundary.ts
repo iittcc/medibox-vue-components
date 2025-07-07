@@ -1,4 +1,6 @@
 import { type App, h, ref, onErrorCaptured, type Component } from 'vue'
+import { useEventManager } from './eventManager'
+import { ErrorFactory, type ErrorContext } from './errorFactory'
 
 export interface ErrorInfo {
   componentName?: string
@@ -83,6 +85,7 @@ export interface ErrorBoundaryConfig {
 class ErrorBoundaryManager {
   private errors = ref<ErrorInfo[]>([])
   private retryCount = ref<Map<string, number>>(new Map())
+  private eventManager = useEventManager()
   private config: ErrorBoundaryConfig = {
     enableAutoRecovery: true,
     maxRetries: 3,
@@ -199,20 +202,21 @@ class ErrorBoundaryManager {
 
   async handleError(error: Error, componentName?: string, calculatorType?: string, context?: Record<string, any>): Promise<void> {
     const errorType = this.categorizeError(error)
-    // Create a more robust error key to prevent collisions
-    const _errorKey = `${context?.component || componentName || 'unknown'}-${errorType}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
-    const retryKey = `${context?.component || componentName || 'unknown'}-${errorType}` // Keep simpler key for retry logic
+    const errorContext: ErrorContext = {
+      component: context?.component || componentName,
+      calculator: calculatorType,
+      ...context
+    }
+    
+    const retryKey = `${errorContext.component || 'unknown'}-${errorType}` // Keep simpler key for retry logic
     const currentRetries = this.retryCount.value.get(retryKey) || 0
     
-    const errorInfo: ErrorInfo = {
-      componentName,
-      errorMessage: error.message,
-      errorStack: error.stack,
-      timestamp: new Date(),
-      calculatorType,
+    const errorInfo = ErrorFactory.createErrorInfo(
+      error,
       errorType,
-      recoverable: this.isRecoverable(errorType) && currentRetries < this.config.maxRetries!
-    }
+      errorContext,
+      this.isRecoverable(errorType) && currentRetries < this.config.maxRetries!
+    )
 
     this.errors.value.push(errorInfo)
 
@@ -244,27 +248,21 @@ class ErrorBoundaryManager {
   }
 
   private emitErrorEvent(errorInfo: ErrorInfo) {
-    window.dispatchEvent(new CustomEvent('medicalCalculatorError', {
-      detail: errorInfo
-    }))
+    this.eventManager.emit('error:medical-calculator', errorInfo)
   }
 
   private emitRecoveryEvent(errorInfo: ErrorInfo) {
-    window.dispatchEvent(new CustomEvent('medicalCalculatorRecovery', {
-      detail: { ...errorInfo, action: 'retry' }
-    }))
+    this.eventManager.emit('error:recovery', { ...errorInfo, action: 'retry' })
   }
 
   private showErrorToast(errorInfo: ErrorInfo) {
     // This will be handled by the component using the error boundary
-    window.dispatchEvent(new CustomEvent('showErrorToast', {
-      detail: {
-        severity: errorInfo.errorType === ErrorType.NETWORK ? 'warn' : 'error',
-        summary: 'Fejl',
-        detail: this.getUserFriendlyMessage(errorInfo.errorType, { message: errorInfo.errorMessage } as Error),
-        life: errorInfo.recoverable ? 5000 : 10000
-      }
-    }))
+    this.eventManager.emit('notification:show-toast', {
+      severity: errorInfo.errorType === ErrorType.NETWORK ? 'warn' : 'error',
+      summary: 'Fejl',
+      detail: this.getUserFriendlyMessage(errorInfo.errorType, { message: errorInfo.errorMessage } as Error),
+      life: errorInfo.recoverable ? 5000 : 10000
+    })
   }
 
   clearErrors() {
@@ -308,7 +306,7 @@ export const ErrorBoundary = {
     // Use onErrorCaptured hook instead of errorCaptured method
     onErrorCaptured((err: Error, instance: any) => {
       const componentName = instance?.$options?.name || 'Unknown'
-      const context = { component: componentName, vueInstance: true }
+      const context: ErrorContext = { component: componentName, vueInstance: true }
       
       errorBoundaryManager.handleError(err, componentName, undefined, context)
       
@@ -365,13 +363,13 @@ export function withErrorBoundary(app: App, config?: ErrorBoundaryConfig) {
   app.config.errorHandler = (err: unknown, instance: any, info: string) => {
     const error = err instanceof Error ? err : new Error(String(err));
     const componentName = instance?.$options?.name || 'Unknown'
-    const context = { component: componentName, vueInfo: info, globalHandler: true }
+    const context: ErrorContext = { component: componentName, vueInfo: info, globalHandler: true }
     errorBoundaryManager.handleError(error, componentName, undefined, context)
   }
 
   // Store global event handler for proper cleanup
   const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
-    const context = { component: 'Global', promiseRejection: true, reason: event.reason }
+    const context: ErrorContext = { component: 'Global', promiseRejection: true, reason: event.reason }
     errorBoundaryManager.handleError(
       new Error(event.reason?.message || 'Unhandled Promise Rejection'),
       'Global',
