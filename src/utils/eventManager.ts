@@ -4,8 +4,8 @@ import type { ErrorInfo } from './errorBoundary'
  * Type-safe event map for medical calculator events
  */
 export interface MedicalCalculatorEventMap {
-  'network:online': void
-  'network:offline': void
+  'network:online': undefined
+  'network:offline': undefined
   'error:medical-calculator': ErrorInfo
   'error:recovery': ErrorInfo & { action?: string }
   'notification:show-toast': {
