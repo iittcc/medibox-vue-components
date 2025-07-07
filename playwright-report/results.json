@@ -1,0 +1,1063 @@
+{
+  "config": {
+    "configFile": "/Users/tej/localhost/medibox-vue-components/playwright.config.ts",
+    "rootDir": "/Users/tej/localhost/medibox-vue-components/tests/playwright",
+    "forbidOnly": false,
+    "fullyParallel": true,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 7
+    },
+    "preserveOutput": "always",
+    "reporter": [
+      [
+        "html",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "playwright-report/results.json"
+        }
+      ],
+      [
+        "junit",
+        {
+          "outputFile": "playwright-report/results.xml"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "quiet": false,
+    "projects": [
+      {
+        "outputDir": "/Users/tej/localhost/medibox-vue-components/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 7
+        },
+        "id": "chromium",
+        "name": "chromium",
+        "testDir": "/Users/tej/localhost/medibox-vue-components/tests/playwright",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/Users/tej/localhost/medibox-vue-components/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 7
+        },
+        "id": "firefox",
+        "name": "firefox",
+        "testDir": "/Users/tej/localhost/medibox-vue-components/tests/playwright",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/Users/tej/localhost/medibox-vue-components/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 7
+        },
+        "id": "webkit",
+        "name": "webkit",
+        "testDir": "/Users/tej/localhost/medibox-vue-components/tests/playwright",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/Users/tej/localhost/medibox-vue-components/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 7
+        },
+        "id": "Mobile Chrome",
+        "name": "Mobile Chrome",
+        "testDir": "/Users/tej/localhost/medibox-vue-components/tests/playwright",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/Users/tej/localhost/medibox-vue-components/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 7
+        },
+        "id": "Mobile Safari",
+        "name": "Mobile Safari",
+        "testDir": "/Users/tej/localhost/medibox-vue-components/tests/playwright",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/Users/tej/localhost/medibox-vue-components/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 7
+        },
+        "id": "Microsoft Edge",
+        "name": "Microsoft Edge",
+        "testDir": "/Users/tej/localhost/medibox-vue-components/tests/playwright",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/Users/tej/localhost/medibox-vue-components/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 7
+        },
+        "id": "Google Chrome",
+        "name": "Google Chrome",
+        "testDir": "/Users/tej/localhost/medibox-vue-components/tests/playwright",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "shard": null,
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.53.2",
+    "workers": 7,
+    "webServer": {
+      "command": "npm run dev",
+      "url": "http://localhost:5174",
+      "reuseExistingServer": true,
+      "timeout": 120000
+    }
+  },
+  "suites": [
+    {
+      "title": "westley-croup-score.spec.ts",
+      "file": "westley-croup-score.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Westley Croup Score Calculator - Medical Logic",
+          "file": "westley-croup-score.spec.ts",
+          "line": 90,
+          "column": 6,
+          "specs": [
+            {
+              "title": "should calculate correctly: Minimal symptoms - Let croup (Score 0)",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 6,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 12362,
+                      "error": {
+                        "message": "TimeoutError: page.waitForSelector: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"results-section\"]') to be visible\u001b[22m\n",
+                        "stack": "TimeoutError: page.waitForSelector: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"results-section\"]') to be visible\u001b[22m\n\n    at WestleyCroupCalculatorHelper.submitCalculation (/Users/tej/localhost/medibox-vue-components/tests/playwright/helpers/calculator-helpers.ts:178:21)\n    at /Users/tej/localhost/medibox-vue-components/tests/playwright/westley-croup-score.spec.ts:114:7",
+                        "location": {
+                          "file": "/Users/tej/localhost/medibox-vue-components/tests/playwright/helpers/calculator-helpers.ts",
+                          "column": 21,
+                          "line": 178
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39mhelpers/calculator-helpers.ts:178\n\n\u001b[0m \u001b[90m 176 |\u001b[39m     \n \u001b[90m 177 |\u001b[39m     \u001b[90m// Wait for calculation to complete - wait for results section to appear\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 178 |\u001b[39m     \u001b[36mawait\u001b[39m \u001b[36mthis\u001b[39m\u001b[33m.\u001b[39mpage\u001b[33m.\u001b[39mwaitForSelector(\u001b[32m'[data-testid=\"results-section\"]'\u001b[39m\u001b[33m,\u001b[39m { timeout\u001b[33m:\u001b[39m \u001b[35m10000\u001b[39m })\n \u001b[90m     |\u001b[39m                     \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 179 |\u001b[39m   }\n \u001b[90m 180 |\u001b[39m\n \u001b[90m 181 |\u001b[39m   \u001b[36masync\u001b[39m resetForm() {\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Users/tej/localhost/medibox-vue-components/tests/playwright/helpers/calculator-helpers.ts",
+                            "column": 21,
+                            "line": 178
+                          },
+                          "message": "TimeoutError: page.waitForSelector: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"results-section\"]') to be visible\u001b[22m\n\n\n\u001b[90m   at \u001b[39mhelpers/calculator-helpers.ts:178\n\n\u001b[0m \u001b[90m 176 |\u001b[39m     \n \u001b[90m 177 |\u001b[39m     \u001b[90m// Wait for calculation to complete - wait for results section to appear\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 178 |\u001b[39m     \u001b[36mawait\u001b[39m \u001b[36mthis\u001b[39m\u001b[33m.\u001b[39mpage\u001b[33m.\u001b[39mwaitForSelector(\u001b[32m'[data-testid=\"results-section\"]'\u001b[39m\u001b[33m,\u001b[39m { timeout\u001b[33m:\u001b[39m \u001b[35m10000\u001b[39m })\n \u001b[90m     |\u001b[39m                     \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 179 |\u001b[39m   }\n \u001b[90m 180 |\u001b[39m\n \u001b[90m 181 |\u001b[39m   \u001b[36masync\u001b[39m resetForm() {\u001b[0m\n\u001b[2m    at WestleyCroupCalculatorHelper.submitCalculation (/Users/tej/localhost/medibox-vue-components/tests/playwright/helpers/calculator-helpers.ts:178:21)\u001b[22m\n\u001b[2m    at /Users/tej/localhost/medibox-vue-components/tests/playwright/westley-croup-score.spec.ts:114:7\u001b[22m"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-07-07T17:37:42.695Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/tej/localhost/medibox-vue-components/test-results/westley-croup-score-Westle-f0d5c-mptoms---Let-croup-Score-0--chromium/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/tej/localhost/medibox-vue-components/test-results/westley-croup-score-Westle-f0d5c-mptoms---Let-croup-Score-0--chromium/video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/Users/tej/localhost/medibox-vue-components/test-results/westley-croup-score-Westle-f0d5c-mptoms---Let-croup-Score-0--chromium/error-context.md"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/tej/localhost/medibox-vue-components/test-results/westley-croup-score-Westle-f0d5c-mptoms---Let-croup-Score-0--chromium/trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/tej/localhost/medibox-vue-components/tests/playwright/helpers/calculator-helpers.ts",
+                        "column": 21,
+                        "line": 178
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "90c1d638dedb0d0d3710-f1d7c225b4e206c3b836",
+              "file": "westley-croup-score.spec.ts",
+              "line": 106,
+              "column": 5
+            },
+            {
+              "title": "should calculate correctly: Mild symptoms - Let croup (Score 2)",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 7,
+                      "parallelIndex": 1,
+                      "status": "failed",
+                      "duration": 12360,
+                      "error": {
+                        "message": "TimeoutError: page.waitForSelector: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"results-section\"]') to be visible\u001b[22m\n",
+                        "stack": "TimeoutError: page.waitForSelector: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"results-section\"]') to be visible\u001b[22m\n\n    at WestleyCroupCalculatorHelper.submitCalculation (/Users/tej/localhost/medibox-vue-components/tests/playwright/helpers/calculator-helpers.ts:178:21)\n    at /Users/tej/localhost/medibox-vue-components/tests/playwright/westley-croup-score.spec.ts:114:7",
+                        "location": {
+                          "file": "/Users/tej/localhost/medibox-vue-components/tests/playwright/helpers/calculator-helpers.ts",
+                          "column": 21,
+                          "line": 178
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39mhelpers/calculator-helpers.ts:178\n\n\u001b[0m \u001b[90m 176 |\u001b[39m     \n \u001b[90m 177 |\u001b[39m     \u001b[90m// Wait for calculation to complete - wait for results section to appear\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 178 |\u001b[39m     \u001b[36mawait\u001b[39m \u001b[36mthis\u001b[39m\u001b[33m.\u001b[39mpage\u001b[33m.\u001b[39mwaitForSelector(\u001b[32m'[data-testid=\"results-section\"]'\u001b[39m\u001b[33m,\u001b[39m { timeout\u001b[33m:\u001b[39m \u001b[35m10000\u001b[39m })\n \u001b[90m     |\u001b[39m                     \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 179 |\u001b[39m   }\n \u001b[90m 180 |\u001b[39m\n \u001b[90m 181 |\u001b[39m   \u001b[36masync\u001b[39m resetForm() {\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Users/tej/localhost/medibox-vue-components/tests/playwright/helpers/calculator-helpers.ts",
+                            "column": 21,
+                            "line": 178
+                          },
+                          "message": "TimeoutError: page.waitForSelector: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"results-section\"]') to be visible\u001b[22m\n\n\n\u001b[90m   at \u001b[39mhelpers/calculator-helpers.ts:178\n\n\u001b[0m \u001b[90m 176 |\u001b[39m     \n \u001b[90m 177 |\u001b[39m     \u001b[90m// Wait for calculation to complete - wait for results section to appear\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 178 |\u001b[39m     \u001b[36mawait\u001b[39m \u001b[36mthis\u001b[39m\u001b[33m.\u001b[39mpage\u001b[33m.\u001b[39mwaitForSelector(\u001b[32m'[data-testid=\"results-section\"]'\u001b[39m\u001b[33m,\u001b[39m { timeout\u001b[33m:\u001b[39m \u001b[35m10000\u001b[39m })\n \u001b[90m     |\u001b[39m                     \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 179 |\u001b[39m   }\n \u001b[90m 180 |\u001b[39m\n \u001b[90m 181 |\u001b[39m   \u001b[36masync\u001b[39m resetForm() {\u001b[0m\n\u001b[2m    at WestleyCroupCalculatorHelper.submitCalculation (/Users/tej/localhost/medibox-vue-components/tests/playwright/helpers/calculator-helpers.ts:178:21)\u001b[22m\n\u001b[2m    at /Users/tej/localhost/medibox-vue-components/tests/playwright/westley-croup-score.spec.ts:114:7\u001b[22m"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-07-07T17:37:42.695Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/tej/localhost/medibox-vue-components/test-results/westley-croup-score-Westle-f0c95-mptoms---Let-croup-Score-2--chromium/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/tej/localhost/medibox-vue-components/test-results/westley-croup-score-Westle-f0c95-mptoms---Let-croup-Score-2--chromium/video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/Users/tej/localhost/medibox-vue-components/test-results/westley-croup-score-Westle-f0c95-mptoms---Let-croup-Score-2--chromium/error-context.md"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/tej/localhost/medibox-vue-components/test-results/westley-croup-score-Westle-f0c95-mptoms---Let-croup-Score-2--chromium/trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/tej/localhost/medibox-vue-components/tests/playwright/helpers/calculator-helpers.ts",
+                        "column": 21,
+                        "line": 178
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "90c1d638dedb0d0d3710-64243205533e23b92788",
+              "file": "westley-croup-score.spec.ts",
+              "line": 106,
+              "column": 5
+            },
+            {
+              "title": "should calculate correctly: Moderate symptoms - Moderat croup (Score 3)",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 8,
+                      "parallelIndex": 2,
+                      "status": "failed",
+                      "duration": 12380,
+                      "error": {
+                        "message": "TimeoutError: page.waitForSelector: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"results-section\"]') to be visible\u001b[22m\n",
+                        "stack": "TimeoutError: page.waitForSelector: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"results-section\"]') to be visible\u001b[22m\n\n    at WestleyCroupCalculatorHelper.submitCalculation (/Users/tej/localhost/medibox-vue-components/tests/playwright/helpers/calculator-helpers.ts:178:21)\n    at /Users/tej/localhost/medibox-vue-components/tests/playwright/westley-croup-score.spec.ts:114:7",
+                        "location": {
+                          "file": "/Users/tej/localhost/medibox-vue-components/tests/playwright/helpers/calculator-helpers.ts",
+                          "column": 21,
+                          "line": 178
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39mhelpers/calculator-helpers.ts:178\n\n\u001b[0m \u001b[90m 176 |\u001b[39m     \n \u001b[90m 177 |\u001b[39m     \u001b[90m// Wait for calculation to complete - wait for results section to appear\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 178 |\u001b[39m     \u001b[36mawait\u001b[39m \u001b[36mthis\u001b[39m\u001b[33m.\u001b[39mpage\u001b[33m.\u001b[39mwaitForSelector(\u001b[32m'[data-testid=\"results-section\"]'\u001b[39m\u001b[33m,\u001b[39m { timeout\u001b[33m:\u001b[39m \u001b[35m10000\u001b[39m })\n \u001b[90m     |\u001b[39m                     \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 179 |\u001b[39m   }\n \u001b[90m 180 |\u001b[39m\n \u001b[90m 181 |\u001b[39m   \u001b[36masync\u001b[39m resetForm() {\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Users/tej/localhost/medibox-vue-components/tests/playwright/helpers/calculator-helpers.ts",
+                            "column": 21,
+                            "line": 178
+                          },
+                          "message": "TimeoutError: page.waitForSelector: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"results-section\"]') to be visible\u001b[22m\n\n\n\u001b[90m   at \u001b[39mhelpers/calculator-helpers.ts:178\n\n\u001b[0m \u001b[90m 176 |\u001b[39m     \n \u001b[90m 177 |\u001b[39m     \u001b[90m// Wait for calculation to complete - wait for results section to appear\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 178 |\u001b[39m     \u001b[36mawait\u001b[39m \u001b[36mthis\u001b[39m\u001b[33m.\u001b[39mpage\u001b[33m.\u001b[39mwaitForSelector(\u001b[32m'[data-testid=\"results-section\"]'\u001b[39m\u001b[33m,\u001b[39m { timeout\u001b[33m:\u001b[39m \u001b[35m10000\u001b[39m })\n \u001b[90m     |\u001b[39m                     \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 179 |\u001b[39m   }\n \u001b[90m 180 |\u001b[39m\n \u001b[90m 181 |\u001b[39m   \u001b[36masync\u001b[39m resetForm() {\u001b[0m\n\u001b[2m    at WestleyCroupCalculatorHelper.submitCalculation (/Users/tej/localhost/medibox-vue-components/tests/playwright/helpers/calculator-helpers.ts:178:21)\u001b[22m\n\u001b[2m    at /Users/tej/localhost/medibox-vue-components/tests/playwright/westley-croup-score.spec.ts:114:7\u001b[22m"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-07-07T17:37:42.698Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/tej/localhost/medibox-vue-components/test-results/westley-croup-score-Westle-cdbe0-ms---Moderat-croup-Score-3--chromium/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/tej/localhost/medibox-vue-components/test-results/westley-croup-score-Westle-cdbe0-ms---Moderat-croup-Score-3--chromium/video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/Users/tej/localhost/medibox-vue-components/test-results/westley-croup-score-Westle-cdbe0-ms---Moderat-croup-Score-3--chromium/error-context.md"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/tej/localhost/medibox-vue-components/test-results/westley-croup-score-Westle-cdbe0-ms---Moderat-croup-Score-3--chromium/trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/tej/localhost/medibox-vue-components/tests/playwright/helpers/calculator-helpers.ts",
+                        "column": 21,
+                        "line": 178
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "90c1d638dedb0d0d3710-10818d57fe28c7b523c9",
+              "file": "westley-croup-score.spec.ts",
+              "line": 106,
+              "column": 5
+            },
+            {
+              "title": "should calculate correctly: Moderate-high symptoms - Moderat croup (Score 5)",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 9,
+                      "parallelIndex": 3,
+                      "status": "failed",
+                      "duration": 12358,
+                      "error": {
+                        "message": "TimeoutError: page.waitForSelector: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"results-section\"]') to be visible\u001b[22m\n",
+                        "stack": "TimeoutError: page.waitForSelector: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"results-section\"]') to be visible\u001b[22m\n\n    at WestleyCroupCalculatorHelper.submitCalculation (/Users/tej/localhost/medibox-vue-components/tests/playwright/helpers/calculator-helpers.ts:178:21)\n    at /Users/tej/localhost/medibox-vue-components/tests/playwright/westley-croup-score.spec.ts:114:7",
+                        "location": {
+                          "file": "/Users/tej/localhost/medibox-vue-components/tests/playwright/helpers/calculator-helpers.ts",
+                          "column": 21,
+                          "line": 178
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39mhelpers/calculator-helpers.ts:178\n\n\u001b[0m \u001b[90m 176 |\u001b[39m     \n \u001b[90m 177 |\u001b[39m     \u001b[90m// Wait for calculation to complete - wait for results section to appear\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 178 |\u001b[39m     \u001b[36mawait\u001b[39m \u001b[36mthis\u001b[39m\u001b[33m.\u001b[39mpage\u001b[33m.\u001b[39mwaitForSelector(\u001b[32m'[data-testid=\"results-section\"]'\u001b[39m\u001b[33m,\u001b[39m { timeout\u001b[33m:\u001b[39m \u001b[35m10000\u001b[39m })\n \u001b[90m     |\u001b[39m                     \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 179 |\u001b[39m   }\n \u001b[90m 180 |\u001b[39m\n \u001b[90m 181 |\u001b[39m   \u001b[36masync\u001b[39m resetForm() {\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Users/tej/localhost/medibox-vue-components/tests/playwright/helpers/calculator-helpers.ts",
+                            "column": 21,
+                            "line": 178
+                          },
+                          "message": "TimeoutError: page.waitForSelector: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"results-section\"]') to be visible\u001b[22m\n\n\n\u001b[90m   at \u001b[39mhelpers/calculator-helpers.ts:178\n\n\u001b[0m \u001b[90m 176 |\u001b[39m     \n \u001b[90m 177 |\u001b[39m     \u001b[90m// Wait for calculation to complete - wait for results section to appear\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 178 |\u001b[39m     \u001b[36mawait\u001b[39m \u001b[36mthis\u001b[39m\u001b[33m.\u001b[39mpage\u001b[33m.\u001b[39mwaitForSelector(\u001b[32m'[data-testid=\"results-section\"]'\u001b[39m\u001b[33m,\u001b[39m { timeout\u001b[33m:\u001b[39m \u001b[35m10000\u001b[39m })\n \u001b[90m     |\u001b[39m                     \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 179 |\u001b[39m   }\n \u001b[90m 180 |\u001b[39m\n \u001b[90m 181 |\u001b[39m   \u001b[36masync\u001b[39m resetForm() {\u001b[0m\n\u001b[2m    at WestleyCroupCalculatorHelper.submitCalculation (/Users/tej/localhost/medibox-vue-components/tests/playwright/helpers/calculator-helpers.ts:178:21)\u001b[22m\n\u001b[2m    at /Users/tej/localhost/medibox-vue-components/tests/playwright/westley-croup-score.spec.ts:114:7\u001b[22m"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-07-07T17:37:42.695Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/tej/localhost/medibox-vue-components/test-results/westley-croup-score-Westle-57b6a-ms---Moderat-croup-Score-5--chromium/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/tej/localhost/medibox-vue-components/test-results/westley-croup-score-Westle-57b6a-ms---Moderat-croup-Score-5--chromium/video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/Users/tej/localhost/medibox-vue-components/test-results/westley-croup-score-Westle-57b6a-ms---Moderat-croup-Score-5--chromium/error-context.md"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/tej/localhost/medibox-vue-components/test-results/westley-croup-score-Westle-57b6a-ms---Moderat-croup-Score-5--chromium/trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/tej/localhost/medibox-vue-components/tests/playwright/helpers/calculator-helpers.ts",
+                        "column": 21,
+                        "line": 178
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "90c1d638dedb0d0d3710-db6fabdb70b740bdce83",
+              "file": "westley-croup-score.spec.ts",
+              "line": 106,
+              "column": 5
+            },
+            {
+              "title": "should calculate correctly: Severe symptoms - Alvorlig croup (Score 6)",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 10,
+                      "parallelIndex": 4,
+                      "status": "failed",
+                      "duration": 12382,
+                      "error": {
+                        "message": "TimeoutError: page.waitForSelector: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"results-section\"]') to be visible\u001b[22m\n",
+                        "stack": "TimeoutError: page.waitForSelector: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"results-section\"]') to be visible\u001b[22m\n\n    at WestleyCroupCalculatorHelper.submitCalculation (/Users/tej/localhost/medibox-vue-components/tests/playwright/helpers/calculator-helpers.ts:178:21)\n    at /Users/tej/localhost/medibox-vue-components/tests/playwright/westley-croup-score.spec.ts:114:7",
+                        "location": {
+                          "file": "/Users/tej/localhost/medibox-vue-components/tests/playwright/helpers/calculator-helpers.ts",
+                          "column": 21,
+                          "line": 178
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39mhelpers/calculator-helpers.ts:178\n\n\u001b[0m \u001b[90m 176 |\u001b[39m     \n \u001b[90m 177 |\u001b[39m     \u001b[90m// Wait for calculation to complete - wait for results section to appear\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 178 |\u001b[39m     \u001b[36mawait\u001b[39m \u001b[36mthis\u001b[39m\u001b[33m.\u001b[39mpage\u001b[33m.\u001b[39mwaitForSelector(\u001b[32m'[data-testid=\"results-section\"]'\u001b[39m\u001b[33m,\u001b[39m { timeout\u001b[33m:\u001b[39m \u001b[35m10000\u001b[39m })\n \u001b[90m     |\u001b[39m                     \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 179 |\u001b[39m   }\n \u001b[90m 180 |\u001b[39m\n \u001b[90m 181 |\u001b[39m   \u001b[36masync\u001b[39m resetForm() {\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Users/tej/localhost/medibox-vue-components/tests/playwright/helpers/calculator-helpers.ts",
+                            "column": 21,
+                            "line": 178
+                          },
+                          "message": "TimeoutError: page.waitForSelector: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"results-section\"]') to be visible\u001b[22m\n\n\n\u001b[90m   at \u001b[39mhelpers/calculator-helpers.ts:178\n\n\u001b[0m \u001b[90m 176 |\u001b[39m     \n \u001b[90m 177 |\u001b[39m     \u001b[90m// Wait for calculation to complete - wait for results section to appear\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 178 |\u001b[39m     \u001b[36mawait\u001b[39m \u001b[36mthis\u001b[39m\u001b[33m.\u001b[39mpage\u001b[33m.\u001b[39mwaitForSelector(\u001b[32m'[data-testid=\"results-section\"]'\u001b[39m\u001b[33m,\u001b[39m { timeout\u001b[33m:\u001b[39m \u001b[35m10000\u001b[39m })\n \u001b[90m     |\u001b[39m                     \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 179 |\u001b[39m   }\n \u001b[90m 180 |\u001b[39m\n \u001b[90m 181 |\u001b[39m   \u001b[36masync\u001b[39m resetForm() {\u001b[0m\n\u001b[2m    at WestleyCroupCalculatorHelper.submitCalculation (/Users/tej/localhost/medibox-vue-components/tests/playwright/helpers/calculator-helpers.ts:178:21)\u001b[22m\n\u001b[2m    at /Users/tej/localhost/medibox-vue-components/tests/playwright/westley-croup-score.spec.ts:114:7\u001b[22m"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-07-07T17:37:42.696Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/tej/localhost/medibox-vue-components/test-results/westley-croup-score-Westle-d7eb3-s---Alvorlig-croup-Score-6--chromium/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/tej/localhost/medibox-vue-components/test-results/westley-croup-score-Westle-d7eb3-s---Alvorlig-croup-Score-6--chromium/video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/Users/tej/localhost/medibox-vue-components/test-results/westley-croup-score-Westle-d7eb3-s---Alvorlig-croup-Score-6--chromium/error-context.md"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/tej/localhost/medibox-vue-components/test-results/westley-croup-score-Westle-d7eb3-s---Alvorlig-croup-Score-6--chromium/trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/tej/localhost/medibox-vue-components/tests/playwright/helpers/calculator-helpers.ts",
+                        "column": 21,
+                        "line": 178
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "90c1d638dedb0d0d3710-3d15ccf0d493b755fca7",
+              "file": "westley-croup-score.spec.ts",
+              "line": 106,
+              "column": 5
+            },
+            {
+              "title": "should calculate correctly: Critical symptoms - Alvorlig croup (Score 10)",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 11,
+                      "parallelIndex": 5,
+                      "status": "failed",
+                      "duration": 12404,
+                      "error": {
+                        "message": "TimeoutError: page.waitForSelector: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"results-section\"]') to be visible\u001b[22m\n",
+                        "stack": "TimeoutError: page.waitForSelector: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"results-section\"]') to be visible\u001b[22m\n\n    at WestleyCroupCalculatorHelper.submitCalculation (/Users/tej/localhost/medibox-vue-components/tests/playwright/helpers/calculator-helpers.ts:178:21)\n    at /Users/tej/localhost/medibox-vue-components/tests/playwright/westley-croup-score.spec.ts:114:7",
+                        "location": {
+                          "file": "/Users/tej/localhost/medibox-vue-components/tests/playwright/helpers/calculator-helpers.ts",
+                          "column": 21,
+                          "line": 178
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39mhelpers/calculator-helpers.ts:178\n\n\u001b[0m \u001b[90m 176 |\u001b[39m     \n \u001b[90m 177 |\u001b[39m     \u001b[90m// Wait for calculation to complete - wait for results section to appear\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 178 |\u001b[39m     \u001b[36mawait\u001b[39m \u001b[36mthis\u001b[39m\u001b[33m.\u001b[39mpage\u001b[33m.\u001b[39mwaitForSelector(\u001b[32m'[data-testid=\"results-section\"]'\u001b[39m\u001b[33m,\u001b[39m { timeout\u001b[33m:\u001b[39m \u001b[35m10000\u001b[39m })\n \u001b[90m     |\u001b[39m                     \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 179 |\u001b[39m   }\n \u001b[90m 180 |\u001b[39m\n \u001b[90m 181 |\u001b[39m   \u001b[36masync\u001b[39m resetForm() {\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Users/tej/localhost/medibox-vue-components/tests/playwright/helpers/calculator-helpers.ts",
+                            "column": 21,
+                            "line": 178
+                          },
+                          "message": "TimeoutError: page.waitForSelector: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"results-section\"]') to be visible\u001b[22m\n\n\n\u001b[90m   at \u001b[39mhelpers/calculator-helpers.ts:178\n\n\u001b[0m \u001b[90m 176 |\u001b[39m     \n \u001b[90m 177 |\u001b[39m     \u001b[90m// Wait for calculation to complete - wait for results section to appear\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 178 |\u001b[39m     \u001b[36mawait\u001b[39m \u001b[36mthis\u001b[39m\u001b[33m.\u001b[39mpage\u001b[33m.\u001b[39mwaitForSelector(\u001b[32m'[data-testid=\"results-section\"]'\u001b[39m\u001b[33m,\u001b[39m { timeout\u001b[33m:\u001b[39m \u001b[35m10000\u001b[39m })\n \u001b[90m     |\u001b[39m                     \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 179 |\u001b[39m   }\n \u001b[90m 180 |\u001b[39m\n \u001b[90m 181 |\u001b[39m   \u001b[36masync\u001b[39m resetForm() {\u001b[0m\n\u001b[2m    at WestleyCroupCalculatorHelper.submitCalculation (/Users/tej/localhost/medibox-vue-components/tests/playwright/helpers/calculator-helpers.ts:178:21)\u001b[22m\n\u001b[2m    at /Users/tej/localhost/medibox-vue-components/tests/playwright/westley-croup-score.spec.ts:114:7\u001b[22m"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-07-07T17:37:42.698Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/tej/localhost/medibox-vue-components/test-results/westley-croup-score-Westle-e9fa9----Alvorlig-croup-Score-10--chromium/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/tej/localhost/medibox-vue-components/test-results/westley-croup-score-Westle-e9fa9----Alvorlig-croup-Score-10--chromium/video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/Users/tej/localhost/medibox-vue-components/test-results/westley-croup-score-Westle-e9fa9----Alvorlig-croup-Score-10--chromium/error-context.md"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/tej/localhost/medibox-vue-components/test-results/westley-croup-score-Westle-e9fa9----Alvorlig-croup-Score-10--chromium/trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/tej/localhost/medibox-vue-components/tests/playwright/helpers/calculator-helpers.ts",
+                        "column": 21,
+                        "line": 178
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "90c1d638dedb0d0d3710-53bd2d79784f2b05532c",
+              "file": "westley-croup-score.spec.ts",
+              "line": 106,
+              "column": 5
+            },
+            {
+              "title": "should calculate correctly: High score example - Alvorlig croup (Score 13)",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 12,
+                      "parallelIndex": 6,
+                      "status": "failed",
+                      "duration": 12349,
+                      "error": {
+                        "message": "TimeoutError: page.waitForSelector: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"results-section\"]') to be visible\u001b[22m\n",
+                        "stack": "TimeoutError: page.waitForSelector: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"results-section\"]') to be visible\u001b[22m\n\n    at WestleyCroupCalculatorHelper.submitCalculation (/Users/tej/localhost/medibox-vue-components/tests/playwright/helpers/calculator-helpers.ts:178:21)\n    at /Users/tej/localhost/medibox-vue-components/tests/playwright/westley-croup-score.spec.ts:114:7",
+                        "location": {
+                          "file": "/Users/tej/localhost/medibox-vue-components/tests/playwright/helpers/calculator-helpers.ts",
+                          "column": 21,
+                          "line": 178
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39mhelpers/calculator-helpers.ts:178\n\n\u001b[0m \u001b[90m 176 |\u001b[39m     \n \u001b[90m 177 |\u001b[39m     \u001b[90m// Wait for calculation to complete - wait for results section to appear\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 178 |\u001b[39m     \u001b[36mawait\u001b[39m \u001b[36mthis\u001b[39m\u001b[33m.\u001b[39mpage\u001b[33m.\u001b[39mwaitForSelector(\u001b[32m'[data-testid=\"results-section\"]'\u001b[39m\u001b[33m,\u001b[39m { timeout\u001b[33m:\u001b[39m \u001b[35m10000\u001b[39m })\n \u001b[90m     |\u001b[39m                     \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 179 |\u001b[39m   }\n \u001b[90m 180 |\u001b[39m\n \u001b[90m 181 |\u001b[39m   \u001b[36masync\u001b[39m resetForm() {\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Users/tej/localhost/medibox-vue-components/tests/playwright/helpers/calculator-helpers.ts",
+                            "column": 21,
+                            "line": 178
+                          },
+                          "message": "TimeoutError: page.waitForSelector: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"results-section\"]') to be visible\u001b[22m\n\n\n\u001b[90m   at \u001b[39mhelpers/calculator-helpers.ts:178\n\n\u001b[0m \u001b[90m 176 |\u001b[39m     \n \u001b[90m 177 |\u001b[39m     \u001b[90m// Wait for calculation to complete - wait for results section to appear\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 178 |\u001b[39m     \u001b[36mawait\u001b[39m \u001b[36mthis\u001b[39m\u001b[33m.\u001b[39mpage\u001b[33m.\u001b[39mwaitForSelector(\u001b[32m'[data-testid=\"results-section\"]'\u001b[39m\u001b[33m,\u001b[39m { timeout\u001b[33m:\u001b[39m \u001b[35m10000\u001b[39m })\n \u001b[90m     |\u001b[39m                     \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 179 |\u001b[39m   }\n \u001b[90m 180 |\u001b[39m\n \u001b[90m 181 |\u001b[39m   \u001b[36masync\u001b[39m resetForm() {\u001b[0m\n\u001b[2m    at WestleyCroupCalculatorHelper.submitCalculation (/Users/tej/localhost/medibox-vue-components/tests/playwright/helpers/calculator-helpers.ts:178:21)\u001b[22m\n\u001b[2m    at /Users/tej/localhost/medibox-vue-components/tests/playwright/westley-croup-score.spec.ts:114:7\u001b[22m"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-07-07T17:37:42.697Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/tej/localhost/medibox-vue-components/test-results/westley-croup-score-Westle-6d8ec----Alvorlig-croup-Score-13--chromium/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/tej/localhost/medibox-vue-components/test-results/westley-croup-score-Westle-6d8ec----Alvorlig-croup-Score-13--chromium/video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/Users/tej/localhost/medibox-vue-components/test-results/westley-croup-score-Westle-6d8ec----Alvorlig-croup-Score-13--chromium/error-context.md"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/tej/localhost/medibox-vue-components/test-results/westley-croup-score-Westle-6d8ec----Alvorlig-croup-Score-13--chromium/trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/tej/localhost/medibox-vue-components/tests/playwright/helpers/calculator-helpers.ts",
+                        "column": 21,
+                        "line": 178
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "90c1d638dedb0d0d3710-dc4027a7bc3942539ada",
+              "file": "westley-croup-score.spec.ts",
+              "line": 106,
+              "column": 5
+            },
+            {
+              "title": "should calculate correctly: Maximum possible score - Alvorlig croup (Score 17)",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 13,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 11481,
+                      "error": {
+                        "message": "TimeoutError: page.waitForSelector: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"results-section\"]') to be visible\u001b[22m\n",
+                        "stack": "TimeoutError: page.waitForSelector: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"results-section\"]') to be visible\u001b[22m\n\n    at WestleyCroupCalculatorHelper.submitCalculation (/Users/tej/localhost/medibox-vue-components/tests/playwright/helpers/calculator-helpers.ts:178:21)\n    at /Users/tej/localhost/medibox-vue-components/tests/playwright/westley-croup-score.spec.ts:114:7",
+                        "location": {
+                          "file": "/Users/tej/localhost/medibox-vue-components/tests/playwright/helpers/calculator-helpers.ts",
+                          "column": 21,
+                          "line": 178
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39mhelpers/calculator-helpers.ts:178\n\n\u001b[0m \u001b[90m 176 |\u001b[39m     \n \u001b[90m 177 |\u001b[39m     \u001b[90m// Wait for calculation to complete - wait for results section to appear\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 178 |\u001b[39m     \u001b[36mawait\u001b[39m \u001b[36mthis\u001b[39m\u001b[33m.\u001b[39mpage\u001b[33m.\u001b[39mwaitForSelector(\u001b[32m'[data-testid=\"results-section\"]'\u001b[39m\u001b[33m,\u001b[39m { timeout\u001b[33m:\u001b[39m \u001b[35m10000\u001b[39m })\n \u001b[90m     |\u001b[39m                     \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 179 |\u001b[39m   }\n \u001b[90m 180 |\u001b[39m\n \u001b[90m 181 |\u001b[39m   \u001b[36masync\u001b[39m resetForm() {\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Users/tej/localhost/medibox-vue-components/tests/playwright/helpers/calculator-helpers.ts",
+                            "column": 21,
+                            "line": 178
+                          },
+                          "message": "TimeoutError: page.waitForSelector: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"results-section\"]') to be visible\u001b[22m\n\n\n\u001b[90m   at \u001b[39mhelpers/calculator-helpers.ts:178\n\n\u001b[0m \u001b[90m 176 |\u001b[39m     \n \u001b[90m 177 |\u001b[39m     \u001b[90m// Wait for calculation to complete - wait for results section to appear\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 178 |\u001b[39m     \u001b[36mawait\u001b[39m \u001b[36mthis\u001b[39m\u001b[33m.\u001b[39mpage\u001b[33m.\u001b[39mwaitForSelector(\u001b[32m'[data-testid=\"results-section\"]'\u001b[39m\u001b[33m,\u001b[39m { timeout\u001b[33m:\u001b[39m \u001b[35m10000\u001b[39m })\n \u001b[90m     |\u001b[39m                     \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 179 |\u001b[39m   }\n \u001b[90m 180 |\u001b[39m\n \u001b[90m 181 |\u001b[39m   \u001b[36masync\u001b[39m resetForm() {\u001b[0m\n\u001b[2m    at WestleyCroupCalculatorHelper.submitCalculation (/Users/tej/localhost/medibox-vue-components/tests/playwright/helpers/calculator-helpers.ts:178:21)\u001b[22m\n\u001b[2m    at /Users/tej/localhost/medibox-vue-components/tests/playwright/westley-croup-score.spec.ts:114:7\u001b[22m"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-07-07T17:37:55.781Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/tej/localhost/medibox-vue-components/test-results/westley-croup-score-Westle-cb3e8----Alvorlig-croup-Score-17--chromium/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/tej/localhost/medibox-vue-components/test-results/westley-croup-score-Westle-cb3e8----Alvorlig-croup-Score-17--chromium/video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/Users/tej/localhost/medibox-vue-components/test-results/westley-croup-score-Westle-cb3e8----Alvorlig-croup-Score-17--chromium/error-context.md"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/tej/localhost/medibox-vue-components/test-results/westley-croup-score-Westle-cb3e8----Alvorlig-croup-Score-17--chromium/trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/tej/localhost/medibox-vue-components/tests/playwright/helpers/calculator-helpers.ts",
+                        "column": 21,
+                        "line": 178
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "90c1d638dedb0d0d3710-61ca230abc405645a982",
+              "file": "westley-croup-score.spec.ts",
+              "line": 106,
+              "column": 5
+            },
+            {
+              "title": "should handle edge case: Boundary case - Score exactly 2 (still Let croup)",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 14,
+                      "parallelIndex": 1,
+                      "status": "failed",
+                      "duration": 11460,
+                      "error": {
+                        "message": "TimeoutError: page.waitForSelector: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"results-section\"]') to be visible\u001b[22m\n",
+                        "stack": "TimeoutError: page.waitForSelector: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"results-section\"]') to be visible\u001b[22m\n\n    at WestleyCroupCalculatorHelper.submitCalculation (/Users/tej/localhost/medibox-vue-components/tests/playwright/helpers/calculator-helpers.ts:178:21)\n    at /Users/tej/localhost/medibox-vue-components/tests/playwright/westley-croup-score.spec.ts:130:7",
+                        "location": {
+                          "file": "/Users/tej/localhost/medibox-vue-components/tests/playwright/helpers/calculator-helpers.ts",
+                          "column": 21,
+                          "line": 178
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39mhelpers/calculator-helpers.ts:178\n\n\u001b[0m \u001b[90m 176 |\u001b[39m     \n \u001b[90m 177 |\u001b[39m     \u001b[90m// Wait for calculation to complete - wait for results section to appear\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 178 |\u001b[39m     \u001b[36mawait\u001b[39m \u001b[36mthis\u001b[39m\u001b[33m.\u001b[39mpage\u001b[33m.\u001b[39mwaitForSelector(\u001b[32m'[data-testid=\"results-section\"]'\u001b[39m\u001b[33m,\u001b[39m { timeout\u001b[33m:\u001b[39m \u001b[35m10000\u001b[39m })\n \u001b[90m     |\u001b[39m                     \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 179 |\u001b[39m   }\n \u001b[90m 180 |\u001b[39m\n \u001b[90m 181 |\u001b[39m   \u001b[36masync\u001b[39m resetForm() {\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Users/tej/localhost/medibox-vue-components/tests/playwright/helpers/calculator-helpers.ts",
+                            "column": 21,
+                            "line": 178
+                          },
+                          "message": "TimeoutError: page.waitForSelector: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"results-section\"]') to be visible\u001b[22m\n\n\n\u001b[90m   at \u001b[39mhelpers/calculator-helpers.ts:178\n\n\u001b[0m \u001b[90m 176 |\u001b[39m     \n \u001b[90m 177 |\u001b[39m     \u001b[90m// Wait for calculation to complete - wait for results section to appear\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 178 |\u001b[39m     \u001b[36mawait\u001b[39m \u001b[36mthis\u001b[39m\u001b[33m.\u001b[39mpage\u001b[33m.\u001b[39mwaitForSelector(\u001b[32m'[data-testid=\"results-section\"]'\u001b[39m\u001b[33m,\u001b[39m { timeout\u001b[33m:\u001b[39m \u001b[35m10000\u001b[39m })\n \u001b[90m     |\u001b[39m                     \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 179 |\u001b[39m   }\n \u001b[90m 180 |\u001b[39m\n \u001b[90m 181 |\u001b[39m   \u001b[36masync\u001b[39m resetForm() {\u001b[0m\n\u001b[2m    at WestleyCroupCalculatorHelper.submitCalculation (/Users/tej/localhost/medibox-vue-components/tests/playwright/helpers/calculator-helpers.ts:178:21)\u001b[22m\n\u001b[2m    at /Users/tej/localhost/medibox-vue-components/tests/playwright/westley-croup-score.spec.ts:130:7\u001b[22m"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-07-07T17:37:55.777Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/tej/localhost/medibox-vue-components/test-results/westley-croup-score-Westle-0ed30--exactly-2-still-Let-croup--chromium/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/tej/localhost/medibox-vue-components/test-results/westley-croup-score-Westle-0ed30--exactly-2-still-Let-croup--chromium/video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/Users/tej/localhost/medibox-vue-components/test-results/westley-croup-score-Westle-0ed30--exactly-2-still-Let-croup--chromium/error-context.md"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/tej/localhost/medibox-vue-components/test-results/westley-croup-score-Westle-0ed30--exactly-2-still-Let-croup--chromium/trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/tej/localhost/medibox-vue-components/tests/playwright/helpers/calculator-helpers.ts",
+                        "column": 21,
+                        "line": 178
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "90c1d638dedb0d0d3710-30171eb65963a4f28b3b",
+              "file": "westley-croup-score.spec.ts",
+              "line": 127,
+              "column": 5
+            },
+            {
+              "title": "should handle edge case: Boundary case - Score exactly 3 (transitions to Moderat)",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 15,
+                      "parallelIndex": 3,
+                      "status": "failed",
+                      "duration": 11458,
+                      "error": {
+                        "message": "TimeoutError: page.waitForSelector: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"results-section\"]') to be visible\u001b[22m\n",
+                        "stack": "TimeoutError: page.waitForSelector: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"results-section\"]') to be visible\u001b[22m\n\n    at WestleyCroupCalculatorHelper.submitCalculation (/Users/tej/localhost/medibox-vue-components/tests/playwright/helpers/calculator-helpers.ts:178:21)\n    at /Users/tej/localhost/medibox-vue-components/tests/playwright/westley-croup-score.spec.ts:130:7",
+                        "location": {
+                          "file": "/Users/tej/localhost/medibox-vue-components/tests/playwright/helpers/calculator-helpers.ts",
+                          "column": 21,
+                          "line": 178
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39mhelpers/calculator-helpers.ts:178\n\n\u001b[0m \u001b[90m 176 |\u001b[39m     \n \u001b[90m 177 |\u001b[39m     \u001b[90m// Wait for calculation to complete - wait for results section to appear\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 178 |\u001b[39m     \u001b[36mawait\u001b[39m \u001b[36mthis\u001b[39m\u001b[33m.\u001b[39mpage\u001b[33m.\u001b[39mwaitForSelector(\u001b[32m'[data-testid=\"results-section\"]'\u001b[39m\u001b[33m,\u001b[39m { timeout\u001b[33m:\u001b[39m \u001b[35m10000\u001b[39m })\n \u001b[90m     |\u001b[39m                     \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 179 |\u001b[39m   }\n \u001b[90m 180 |\u001b[39m\n \u001b[90m 181 |\u001b[39m   \u001b[36masync\u001b[39m resetForm() {\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Users/tej/localhost/medibox-vue-components/tests/playwright/helpers/calculator-helpers.ts",
+                            "column": 21,
+                            "line": 178
+                          },
+                          "message": "TimeoutError: page.waitForSelector: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"results-section\"]') to be visible\u001b[22m\n\n\n\u001b[90m   at \u001b[39mhelpers/calculator-helpers.ts:178\n\n\u001b[0m \u001b[90m 176 |\u001b[39m     \n \u001b[90m 177 |\u001b[39m     \u001b[90m// Wait for calculation to complete - wait for results section to appear\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 178 |\u001b[39m     \u001b[36mawait\u001b[39m \u001b[36mthis\u001b[39m\u001b[33m.\u001b[39mpage\u001b[33m.\u001b[39mwaitForSelector(\u001b[32m'[data-testid=\"results-section\"]'\u001b[39m\u001b[33m,\u001b[39m { timeout\u001b[33m:\u001b[39m \u001b[35m10000\u001b[39m })\n \u001b[90m     |\u001b[39m                     \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 179 |\u001b[39m   }\n \u001b[90m 180 |\u001b[39m\n \u001b[90m 181 |\u001b[39m   \u001b[36masync\u001b[39m resetForm() {\u001b[0m\n\u001b[2m    at WestleyCroupCalculatorHelper.submitCalculation (/Users/tej/localhost/medibox-vue-components/tests/playwright/helpers/calculator-helpers.ts:178:21)\u001b[22m\n\u001b[2m    at /Users/tej/localhost/medibox-vue-components/tests/playwright/westley-croup-score.spec.ts:130:7\u001b[22m"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-07-07T17:37:55.817Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/tej/localhost/medibox-vue-components/test-results/westley-croup-score-Westle-a7ea7-y-3-transitions-to-Moderat--chromium/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/tej/localhost/medibox-vue-components/test-results/westley-croup-score-Westle-a7ea7-y-3-transitions-to-Moderat--chromium/video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/Users/tej/localhost/medibox-vue-components/test-results/westley-croup-score-Westle-a7ea7-y-3-transitions-to-Moderat--chromium/error-context.md"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/tej/localhost/medibox-vue-components/test-results/westley-croup-score-Westle-a7ea7-y-3-transitions-to-Moderat--chromium/trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/tej/localhost/medibox-vue-components/tests/playwright/helpers/calculator-helpers.ts",
+                        "column": 21,
+                        "line": 178
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "90c1d638dedb0d0d3710-dc48cc15c5a11d76594a",
+              "file": "westley-croup-score.spec.ts",
+              "line": 127,
+              "column": 5
+            },
+            {
+              "title": "should validate official Westley Croup Score ranges",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 16,
+                      "parallelIndex": 6,
+                      "status": "failed",
+                      "duration": 11451,
+                      "error": {
+                        "message": "TimeoutError: page.waitForSelector: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"results-section\"]') to be visible\u001b[22m\n",
+                        "stack": "TimeoutError: page.waitForSelector: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"results-section\"]') to be visible\u001b[22m\n\n    at WestleyCroupCalculatorHelper.submitCalculation (/Users/tej/localhost/medibox-vue-components/tests/playwright/helpers/calculator-helpers.ts:178:21)\n    at /Users/tej/localhost/medibox-vue-components/tests/playwright/westley-croup-score.spec.ts:152:5",
+                        "location": {
+                          "file": "/Users/tej/localhost/medibox-vue-components/tests/playwright/helpers/calculator-helpers.ts",
+                          "column": 21,
+                          "line": 178
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39mhelpers/calculator-helpers.ts:178\n\n\u001b[0m \u001b[90m 176 |\u001b[39m     \n \u001b[90m 177 |\u001b[39m     \u001b[90m// Wait for calculation to complete - wait for results section to appear\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 178 |\u001b[39m     \u001b[36mawait\u001b[39m \u001b[36mthis\u001b[39m\u001b[33m.\u001b[39mpage\u001b[33m.\u001b[39mwaitForSelector(\u001b[32m'[data-testid=\"results-section\"]'\u001b[39m\u001b[33m,\u001b[39m { timeout\u001b[33m:\u001b[39m \u001b[35m10000\u001b[39m })\n \u001b[90m     |\u001b[39m                     \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 179 |\u001b[39m   }\n \u001b[90m 180 |\u001b[39m\n \u001b[90m 181 |\u001b[39m   \u001b[36masync\u001b[39m resetForm() {\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Users/tej/localhost/medibox-vue-components/tests/playwright/helpers/calculator-helpers.ts",
+                            "column": 21,
+                            "line": 178
+                          },
+                          "message": "TimeoutError: page.waitForSelector: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"results-section\"]') to be visible\u001b[22m\n\n\n\u001b[90m   at \u001b[39mhelpers/calculator-helpers.ts:178\n\n\u001b[0m \u001b[90m 176 |\u001b[39m     \n \u001b[90m 177 |\u001b[39m     \u001b[90m// Wait for calculation to complete - wait for results section to appear\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 178 |\u001b[39m     \u001b[36mawait\u001b[39m \u001b[36mthis\u001b[39m\u001b[33m.\u001b[39mpage\u001b[33m.\u001b[39mwaitForSelector(\u001b[32m'[data-testid=\"results-section\"]'\u001b[39m\u001b[33m,\u001b[39m { timeout\u001b[33m:\u001b[39m \u001b[35m10000\u001b[39m })\n \u001b[90m     |\u001b[39m                     \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 179 |\u001b[39m   }\n \u001b[90m 180 |\u001b[39m\n \u001b[90m 181 |\u001b[39m   \u001b[36masync\u001b[39m resetForm() {\u001b[0m\n\u001b[2m    at WestleyCroupCalculatorHelper.submitCalculation (/Users/tej/localhost/medibox-vue-components/tests/playwright/helpers/calculator-helpers.ts:178:21)\u001b[22m\n\u001b[2m    at /Users/tej/localhost/medibox-vue-components/tests/playwright/westley-croup-score.spec.ts:152:5\u001b[22m"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-07-07T17:37:55.835Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/tej/localhost/medibox-vue-components/test-results/westley-croup-score-Westle-30ffa--Westley-Croup-Score-ranges-chromium/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/tej/localhost/medibox-vue-components/test-results/westley-croup-score-Westle-30ffa--Westley-Croup-Score-ranges-chromium/video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/Users/tej/localhost/medibox-vue-components/test-results/westley-croup-score-Westle-30ffa--Westley-Croup-Score-ranges-chromium/error-context.md"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/tej/localhost/medibox-vue-components/test-results/westley-croup-score-Westle-30ffa--Westley-Croup-Score-ranges-chromium/trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/tej/localhost/medibox-vue-components/tests/playwright/helpers/calculator-helpers.ts",
+                        "column": 21,
+                        "line": 178
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "90c1d638dedb0d0d3710-de8c8a318f0b75cdce95",
+              "file": "westley-croup-score.spec.ts",
+              "line": 140,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2025-07-07T17:37:42.099Z",
+    "duration": 25571.027000000002,
+    "expected": 0,
+    "skipped": 0,
+    "unexpected": 11,
+    "flaky": 0
+  }
+}

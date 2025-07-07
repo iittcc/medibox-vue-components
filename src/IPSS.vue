@@ -5,13 +5,7 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from "vue";
+<script setup lang="ts">
 import IPSS from "./components/IPSSScore.vue";
 
-export default defineComponent({
-  components: {
-    IPSS,
-  },
-});
 </script>

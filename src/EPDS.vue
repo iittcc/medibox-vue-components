@@ -1,17 +1,12 @@
-<!-- src/Audit.vue -->
+<!-- src/EPDS.vue -->
 <template>
   <div id="app">
     <EPDSScore />
+    <Toast />
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from "vue";
+<script setup lang="ts">
 import EPDSScore from "./components/EPDSScore.vue";
-
-export default defineComponent({
-  components: {
-    EPDSScore,
-  },
-});
+import Toast from "@/volt/Toast.vue";
 </script>

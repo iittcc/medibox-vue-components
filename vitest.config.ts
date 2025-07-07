@@ -41,6 +41,7 @@ export default defineConfig({
       '**/node_modules/**',
       '**/dist/**',
       '**/tests/browser/**',
+      '**/tests/playwright/**', // Exclude Playwright tests from Vitest
       '**/tests/unit/useLogging.test.ts' // Exclude problematic test with memory leak
     ]
   },

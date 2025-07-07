@@ -5,13 +5,6 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from "vue";
+<script setup lang="ts">
 import LRTIScore from "./components/LRTIScore.vue";
-
-export default defineComponent({
-  components: {
-    LRTIScore,
-  },
-});
 </script>

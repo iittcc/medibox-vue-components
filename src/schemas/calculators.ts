@@ -247,7 +247,7 @@ export const getScoreRange = (calculatorType: string): { min: number; max: numbe
     'gcs': { min: 3, max: 15 },
     'ipss': { min: 0, max: 35 },
     'puqe': { min: 3, max: 15 },
-    'westleycroupscore': { min: 0, max: 14 },
+    'westleycroupscore': { min: 0, max: 17 },
     'who5': { min: 0, max: 100 },
     'score2': { min: 0, max: 100 },
     'lrti': { min: 0, max: 100 }

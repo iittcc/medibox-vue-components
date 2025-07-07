@@ -5,13 +5,6 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from "vue";
+<script setup lang="ts">
 import DanpssForm from "./components/DanpssForm.vue";
-
-export default defineComponent({
-  components: {
-    DanpssForm,
-  },
-});
-</script>
+</script> 

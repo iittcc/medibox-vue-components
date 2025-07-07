@@ -39,6 +39,6 @@ export function getGenderLabel(gender: GenderValue, isChild: boolean = false): s
  * @param age - The age to determine if child labels should be used
  * @returns Danish gender label
  */
-export function getGenderLabelByAge(gender: GenderValue, age: number): string {
-  return getGenderLabel(gender, age <= 16);
+export function getGenderLabelByAge(gender: GenderValue, age: number | null | undefined): string {
+  return getGenderLabel(gender, typeof age === 'number' ? age <= 16 : false);
 }

@@ -4,13 +4,6 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from "vue";
+<script setup lang="ts">
 import AuditScore from "./components/AuditScore.vue";
-
-export default defineComponent({
-  components: {
-    AuditScore
-  },
-});
 </script>
