@@ -45,10 +45,12 @@ export class TypeSafeEventManager {
     
     // Create typed event handler
     const handler = (e: Event) => {
+    const handler = (e: Event) => {
       if (event === 'network:online' || event === 'network:offline') {
-        callback(undefined as any)
+        // These events have no data, pass undefined
+        callback(undefined as MedicalCalculatorEventMap[K])
       } else if (e instanceof CustomEvent) {
-        callback(e.detail)
+        callback(e.detail as MedicalCalculatorEventMap[K])
       }
     }
 
