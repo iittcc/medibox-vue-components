@@ -1,36 +1,52 @@
 name: Claude Code Review
-
 on:
-  pull_request:
-    types: [opened, synchronize]
-    # Optional: Only run on specific file changes
-    # paths:
-    #   - "src/**/*.ts"
-    #   - "src/**/*.tsx"
-    #   - "src/**/*.js"
-    #   - "src/**/*.jsx"
+  issue_comment:
+    types: [created]
 
 jobs:
   claude-review:
-    # Optional: Filter by PR author
-    # if: |
-    #   github.event.pull_request.user.login == 'external-contributor' ||
-    #   github.event.pull_request.user.login == 'new-developer' ||
-    #   github.event.pull_request.author_association == 'FIRST_TIME_CONTRIBUTOR'
+    # Only run on PR comments that contain "@claude review"
+    if: |
+      github.event.issue.pull_request &&
+      contains(github.event.comment.body, '@claude review')
     
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      pull-requests: read
-      issues: read
+      pull-requests: write
+      issues: write
       id-token: write
     
     steps:
+      - name: Get PR details
+        id: pr
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: pullRequest } = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number
+            });
+            return pullRequest;
+      
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 1
-
+          ref: ${{ fromJson(steps.pr.outputs.result).head.sha }}
+          fetch-depth: 0
+      
+      - name: Add reaction to trigger comment
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.reactions.createForIssueComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              comment_id: context.payload.comment.id,
+              content: 'eyes'
+            });
+      
       - name: Run Claude Code Review
         id: claude-review
         uses: anthropics/claude-code-action@beta
@@ -49,27 +65,40 @@ jobs:
             - Security concerns
             - Test coverage
             
-            Be constructive and helpful in your feedback.
+            Focus on the changes in this PR. Be constructive and helpful in your feedback.
+            
+            PR Author: ${{ fromJson(steps.pr.outputs.result).user.login }}
+            PR Title: ${{ fromJson(steps.pr.outputs.result).title }}
+            PR Description: ${{ fromJson(steps.pr.outputs.result).body }}
           
-          # Optional: Customize review based on file types
+          # Optional: Customize review based on PR author experience
           # direct_prompt: |
-          #   Review this PR focusing on:
-          #   - For TypeScript files: Type safety and proper interface usage
-          #   - For API endpoints: Security, input validation, and error handling
-          #   - For React components: Performance, accessibility, and best practices
-          #   - For tests: Coverage, edge cases, and test quality
-          
-          # Optional: Different prompts for different authors
-          # direct_prompt: |
-          #   ${{ github.event.pull_request.author_association == 'FIRST_TIME_CONTRIBUTOR' && 
-          #   'Welcome! Please review this PR from a first-time contributor. Be encouraging and provide detailed explanations for any suggestions.' ||
-          #   'Please provide a thorough code review focusing on our coding standards and best practices.' }}
+          #   Review this PR with consideration for the author's experience level:
+          #   Author: ${{ fromJson(steps.pr.outputs.result).user.login }}
+          #   Association: ${{ fromJson(steps.pr.outputs.result).author_association }}
+          #   
+          #   ${{ fromJson(steps.pr.outputs.result).author_association == 'FIRST_TIME_CONTRIBUTOR' && 
+          #   'This is from a first-time contributor. Be encouraging and provide detailed explanations.' ||
+          #   'Provide thorough feedback focusing on our coding standards and best practices.' }}
+          #   
+          #   Focus on:
+          #   - Code quality and best practices
+          #   - Potential bugs or security issues
+          #   - Performance considerations
+          #   - Test coverage and edge cases
           
           # Optional: Add specific tools for running tests or linting
           # allowed_tools: "Bash(npm run test),Bash(npm run lint),Bash(npm run typecheck)"
-          
-          # Optional: Skip review for certain conditions
-          # if: |
-          #   !contains(github.event.pull_request.title, '[skip-review]') &&
-          #   !contains(github.event.pull_request.title, '[WIP]')
-
+      
+      - name: Add completion reaction
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const reaction = '${{ steps.claude-review.outcome }}' === 'success' ? '+1' : '-1';
+            github.rest.reactions.createForIssueComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              comment_id: context.payload.comment.id,
+              content: reaction
+            });
