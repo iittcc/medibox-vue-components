@@ -153,7 +153,7 @@ const emit = defineEmits<{
 // Use framework answer as the single source of truth
 const currentAnswer = computed({
   get: () => props.frameworkAnswer,
-  set: (value) => {
+  set: (value: number | null) => {
     // Prevent deselection (setting to null) when there's already a selected value
     // This ensures all medical scoring questions always have an answer
     if (value === null && props.frameworkAnswer !== null) {
