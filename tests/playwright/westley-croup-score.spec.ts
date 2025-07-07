@@ -49,7 +49,7 @@ test.describe('Westley Croup Score Calculator - Basic Functionality', () => {
   test('should display all required form sections', async () => {
     await calculator.verifyPatientSection()
     await calculator.verifyFormSections()
-    await calculator.verifyScoreGuide()
+    //await calculator.verifyScoreGuide()
   })
 
   test('should display patient information section', async () => {
@@ -72,6 +72,8 @@ test.describe('Westley Croup Score Calculator - Basic Functionality', () => {
   })
 
   test('should display score interpretation guide', async () => {
+    const submitButton = calculator.page.getByRole('button', { name: /beregn|calculate/i })
+    await submitButton.click()
     await calculator.verifyScoreGuide()
   })
 

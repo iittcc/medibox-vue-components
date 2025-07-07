@@ -1,58 +1,114 @@
-<testsuites id="" name="" tests="1" failures="0" skipped="0" errors="0" time="11.681559">
-<testsuite name="debug-test.spec.ts" timestamp="2025-07-06T16:08:08.431Z" hostname="chromium" tests="1" failures="0" skipped="0" time="11.126" errors="0">
-<testcase name="debug page loading" classname="debug-test.spec.ts" time="11.126">
+<testsuites id="" name="" tests="3" failures="2" skipped="0" errors="0" time="12.080213999999978">
+<testsuite name="westley-croup-score.spec.ts" timestamp="2025-07-06T21:11:54.188Z" hostname="chromium" tests="3" failures="2" skipped="0" time="18.409" errors="0">
+<testcase name="Westley Croup Score Calculator - Error Handling › should handle invalid age inputs gracefully" classname="westley-croup-score.spec.ts" time="1.059">
 <system-out>
-<![CDATA[Starting navigation...
-Console messages: [
-  [32m'debug: [vite] connecting...'[39m,
-  [32m'error: Failed to load resource: the server responded with a status of 500 (Internal Server Error)'[39m,
-  [32m'debug: [vite] connected.'[39m
-]
-Errors: [
-  [32m'Failed to load resource: the server responded with a status of 500 (Internal Server Error)'[39m
-]
-App element exists: [33m1[39m
-App content: 
-Medical container exists: [33m0[39m
-Network requests: []
-No Vue content found within 5 seconds
-All text contents count: [33m33[39m
-Some text content: [
-  [32m'\n'[39m +
-    [32m'    \n'[39m +
-    [32m'\n'[39m +
-    [32m'    \n'[39m +
-    [32m'    \n'[39m +
-    [32m'    \n'[39m +
-    [32m'    Westley Croup Score\n'[39m +
-    [32m'    \n'[39m +
-    [32m'      html {\n'[39m +
-    [32m'        font-size: 12px;\n'[39m +
-    [32m'      }\n'[39m +
-    [32m'    \n'[39m +
-    [32m'  \n'[39m +
-    [32m'  \n'[39m +
-    [32m'    \n'[39m +
-    [32m'    \n'[39m +
-    [32m'  \n'[39m +
-    [32m'\n'[39m,
-  [32m'\n'[39m +
-    [32m'    \n'[39m +
-    [32m'\n'[39m +
-    [32m'    \n'[39m +
-    [32m'    \n'[39m +
-    [32m'    \n'[39m +
-    [32m'    Westley Croup Score\n'[39m +
-    [32m'    \n'[39m +
-    [32m'      html {\n'[39m +
-    [32m'        font-size: 12px;\n'[39m +
-    [32m'      }\n'[39m +
-    [32m'    \n'[39m +
-    [32m'  '[39m,
-  [32m''[39m,
-  [32m''[39m,
-  [32m''[39m
-]
+<![CDATA[
+[[ATTACHMENT|../test-results/westley-croup-score-Westle-4179f-valid-age-inputs-gracefully-chromium/trace.zip]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Westley Croup Score Calculator - Error Handling › should handle network interruptions gracefully" classname="westley-croup-score.spec.ts" time="11.325">
+<failure message="westley-croup-score.spec.ts:386:3 should handle network interruptions gracefully" type="FAILURE">
+<![CDATA[  [chromium] › westley-croup-score.spec.ts:386:3 › Westley Croup Score Calculator - Error Handling › should handle network interruptions gracefully 
+
+    TimeoutError: page.waitForSelector: Timeout 10000ms exceeded.
+    Call log:
+      - waiting for locator('[data-testid="results-section"]') to be visible
+
+
+       at helpers/calculator-helpers.ts:178
+
+      176 |     
+      177 |     // Wait for calculation to complete - wait for results section to appear
+    > 178 |     await this.page.waitForSelector('[data-testid="results-section"]', { timeout: 10000 })
+          |                     ^
+      179 |   }
+      180 |
+      181 |   async resetForm() {
+        at WestleyCroupCalculatorHelper.submitCalculation (/Users/tej/localhost/medibox-vue-components/tests/playwright/helpers/calculator-helpers.ts:178:21)
+        at /Users/tej/localhost/medibox-vue-components/tests/playwright/westley-croup-score.spec.ts:393:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/westley-croup-score-Westle-46aaa-rk-interruptions-gracefully-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/westley-croup-score-Westle-46aaa-rk-interruptions-gracefully-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../test-results/westley-croup-score-Westle-46aaa-rk-interruptions-gracefully-chromium/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/westley-croup-score-Westle-46aaa-rk-interruptions-gracefully-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/westley-croup-score-Westle-46aaa-rk-interruptions-gracefully-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|../test-results/westley-croup-score-Westle-46aaa-rk-interruptions-gracefully-chromium/test-failed-1.png]]
+
+[[ATTACHMENT|../test-results/westley-croup-score-Westle-46aaa-rk-interruptions-gracefully-chromium/video.webm]]
+
+[[ATTACHMENT|../test-results/westley-croup-score-Westle-46aaa-rk-interruptions-gracefully-chromium/error-context.md]]
+
+[[ATTACHMENT|../test-results/westley-croup-score-Westle-46aaa-rk-interruptions-gracefully-chromium/trace.zip]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Westley Croup Score Calculator - Error Handling › should show appropriate error messages for incomplete forms" classname="westley-croup-score.spec.ts" time="6.025">
+<failure message="westley-croup-score.spec.ts:399:3 should show appropriate error messages for incomplete forms" type="FAILURE">
+<![CDATA[  [chromium] › westley-croup-score.spec.ts:399:3 › Westley Croup Score Calculator - Error Handling › should show appropriate error messages for incomplete forms 
+
+    Error: Timed out 5000ms waiting for expect(locator).toBeVisible()
+
+    Locator: locator('.text-red-500, .error, .validation-error')
+    Expected: visible
+    Received: <element(s) not found>
+    Call log:
+      - Expect "toBeVisible" with timeout 5000ms
+      - waiting for locator('.text-red-500, .error, .validation-error')
+
+
+      404 |     // Should show validation message
+      405 |     const errorMessage = calculator.page.locator('.text-red-500, .error, .validation-error')
+    > 406 |     await expect(errorMessage).toBeVisible({ timeout: 5000 })
+          |                                ^
+      407 |   })
+      408 | })
+        at /Users/tej/localhost/medibox-vue-components/tests/playwright/westley-croup-score.spec.ts:406:32
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/westley-croup-score-Westle-b9061-ssages-for-incomplete-forms-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/westley-croup-score-Westle-b9061-ssages-for-incomplete-forms-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../test-results/westley-croup-score-Westle-b9061-ssages-for-incomplete-forms-chromium/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/westley-croup-score-Westle-b9061-ssages-for-incomplete-forms-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/westley-croup-score-Westle-b9061-ssages-for-incomplete-forms-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|../test-results/westley-croup-score-Westle-b9061-ssages-for-incomplete-forms-chromium/test-failed-1.png]]
+
+[[ATTACHMENT|../test-results/westley-croup-score-Westle-b9061-ssages-for-incomplete-forms-chromium/video.webm]]
+
+[[ATTACHMENT|../test-results/westley-croup-score-Westle-b9061-ssages-for-incomplete-forms-chromium/error-context.md]]
+
+[[ATTACHMENT|../test-results/westley-croup-score-Westle-b9061-ssages-for-incomplete-forms-chromium/trace.zip]]
 ]]>
 </system-out>
 </testcase>
