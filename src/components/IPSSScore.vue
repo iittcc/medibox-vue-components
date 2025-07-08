@@ -5,33 +5,33 @@
     <SurfaceCard title="Patient">
       <template #content>
         <PersonInfo
-          :name="name"
-          :age="age"
-          :minAge="10"
+          :name="framework.patientData.value.name || ''"
+          :age="framework.patientData.value.age || 50"
+          :minAge="18"
           :maxAge="110"
-          :gender="gender as GenderValue"
+          :gender="framework.patientData.value.gender as GenderValue || 'male'"
           genderdisplay="none"
-          @update:name="name = $event"
-          @update:age="age = $event"
-          @update:gender="gender = $event"
+          @update:name="framework.setFieldValue('patient', 'name', $event)"
+          @update:age="framework.setFieldValue('patient', 'age', $event)"
+          @update:gender="framework.setFieldValue('patient', 'gender', $event)"
         />
       </template>
     </SurfaceCard>
     
-    <SurfaceCard title="IPSS, International prostata symptom score">
+    <SurfaceCard :title="config.name">
       <template #content>
         <form @submit.prevent="handleSubmit">
           <QuestionSingleComponent
-            name="section1"
             v-for="(question, index) in questionsSection1"
             :key="index"
+            :name="question.id"
             :question="question"
             :options="getOptions(question.optionsType as keyof OptionsSets)"
             :index="index"
-            :framework-answer="question.answer ?? undefined"
-            :is-unanswered="formSubmitted && isUnanswered(question)"
+            :framework-answer="(framework.calculatorData.value as any)[question.id]"
+            :is-unanswered="formSubmitted && ((framework.calculatorData.value as any)[question.id] === null || (framework.calculatorData.value as any)[question.id] === undefined)"
             scrollHeight="18rem"
-            @update:answer="question.answer = $event"
+            @update:answer="framework.setFieldValue('calculator', question.id, $event)"
           />
           <div v-if="validationMessage" class="text-red-500 mt-5 font-bold">
             {{ validationMessage }}
@@ -43,32 +43,44 @@
               icon="pi pi-clipboard" 
               severity="secondary" 
               class="mr-3" 
-              :disabled="(resultsSection ? false : true)" 
+              :disabled="!framework.state.value.isComplete" 
             >
               <template #container>
-                <b>IPSS, International prostata symptom score</b>
+                <b>{{ config.name }}</b>
                 <br /><br />
-                Navn: {{ name }} <br />
-                Køn: {{ getGenderLabel(gender as GenderValue) }} <br />
-                Alder: {{ age }} år<br /><br />
-                <div v-for="(question, index) in resultsSection1" :key="index">{{ question.text }} {{ question.score }}</div>
+                Navn: {{ framework.patientData.value.name }} <br />
+                Køn: {{ getGenderLabel(framework.patientData.value.gender as GenderValue) }} <br />
+                Alder: {{ framework.patientData.value.age }} år<br /><br />
+                <div v-for="question in questionsSection1" :key="question.id">{{ question.text }} {{ (framework.calculatorData.value as any)[question.id] }}</div>
                 <br /><br />
-                IPSS Score {{ totalScore }} : {{ conclusion }}
+                IPSS Score {{ framework.result.value?.score }} : {{ framework.result.value?.interpretation }}
               </template>
             </CopyDialog>
-            <SecondaryButton label="Reset" icon="pi pi-sync" severity="secondary" @click="resetQuestions"/>
-          <!--  <Button label="Random" icon="pi pi-ban" severity="secondary" class="mr-3" @click="randomlyCheckQuestions"/>-->
-      
-            <Button type="submit" label="Beregn" class="mr-3 pr-6 pl-6" icon="pi pi-calculator"/>
+            <SecondaryButton 
+              label="Reset" 
+              icon="pi pi-sync" 
+              severity="secondary" 
+              @click="handleReset"
+            />
+            <Button 
+              type="submit" 
+              :label="framework.state.value.isSubmitting ? '' : 'Beregn'" 
+              class="pr-6 pl-6" 
+              :icon="framework.state.value.isSubmitting ? 'pi pi-spin pi-spinner' : 'pi pi-calculator'"
+              :disabled="framework.state.value.isSubmitting"
+            />
           </div>
         </form>
       </template>
     </SurfaceCard>
-    <div v-if="resultsSection1.length > 0" class="results" ref="resultsSection">
+    <div data-testid="results-section" v-if="framework.state.value.isComplete && framework.result.value" class="results">
       <SurfaceCard title="Resultat">
         <template #content>          
           <br />
-          <Message class="flex justify-center p-3" :severity="conclusionSeverity"><h2>IPSS Score {{ totalScore }} : {{ conclusion }}</h2><div class="flex justify-center">{{ conclusionDescription }}</div></Message><br />
+          <Message class="flex justify-center p-3" :severity="getSeverityFromRiskLevel(framework.result.value.riskLevel)">
+            <h2>IPSS Score {{ framework.result.value.score }} : {{ framework.result.value.interpretation }}</h2>
+            <div class="flex justify-center">{{ getDetailedDescription(framework.result.value.details) }}</div>
+          </Message><br />
           
         </template>
       </SurfaceCard>
@@ -87,8 +99,10 @@ import CopyDialog from "./CopyDialog.vue";
 import SurfaceCard from "./SurfaceCard.vue";
 import PersonInfo from "./PersonInfo.vue";
 import Message from '@/volt/Message.vue';
-import sendDataToServer from '../assets/sendDataToServer.ts';
+import { useCalculatorFramework, type CalculatorConfig, type CalculatorStep } from '@/composables/useCalculatorFramework';
 import { getGenderLabel, type GenderValue } from '@/utils/genderUtils';
+import type { RiskLevel } from '@/types/calculatorTypes';
+import type { IpssDetails } from '@/calculators/ipss/ipssTypes';
 
 export interface Option {
   text: string;
@@ -101,6 +115,7 @@ export type OptionsSets = {
 };
 
 export interface Question {
+  id: string;
   type: string;
   bg?: string;
   text: string;
@@ -109,30 +124,31 @@ export interface Question {
   answer: number | null;
 }
 
-export interface Result {
-  question: string;
-  text: string;
-  score: number;
-}
-const apiUrlServer = import.meta.env.VITE_API_URL;
-const apiUrl = apiUrlServer+'/index.php/callback/LogCB/log';
-const keyUrl = apiUrlServer+'/index.php/KeyServer/getPublicKey';
+const config: CalculatorConfig = {
+  type: 'ipss',
+  name: 'IPSS, International prostata symptom score',
+  version: '2.0.0',
+  category: 'general',
+  theme: 'teal',
+  minAge: 18,
+  allowedGenders: ['male'],
+  estimatedDuration: 3,
+};
 
-const resultsSection = ref<HTMLDivElement | null>(null);
-const name = ref<string>("");
-const gender = ref<GenderValue>("male");
-const age = ref<number>(50);
+const framework = useCalculatorFramework(config);
 
-const formSubmitted = ref<boolean>(false);
+// Form validation state
+const formSubmitted = ref(false);
+const validationMessage = ref('');
 
-const resultsSection1 = ref<Result[]>([]);
+const steps: CalculatorStep[] = [
+  { id: 'calculator', title: 'IPSS Assessment', order: 1, validation: true },
+];
+framework.initializeSteps(steps);
 
-const totalScore = ref<number>(0);
-
-const conclusion = ref<string>('');
-const conclusionDescription = ref<string>('');
-const conclusionSeverity = ref<string>('');
-const validationMessage = ref<string>('');
+// Initialize with default patient data
+framework.setFieldValue('patient', 'age', 50);
+framework.setFieldValue('patient', 'gender', 'male');
 
 const options1 = ref<Option[]>([
   { text: "Aldrig", value: 0 },
@@ -154,64 +170,78 @@ const options2 = ref<Option[]>([
 
     const questionsSection1 = ref<Question[]>([
       {
+        id: 'incompleteEmptying',
         type: 'Listbox',
         bg: '--p-primary-100',
         text: "1. Ufuldstændig tømning",
         description: "I løbet af den sidste måned, hvor ofte har du haft følelsen af, at blæren ikke er blevet fuldstændig tømt efter afsluttet vandladning?",
         optionsType: 'options1',
-        answer: options1.value[0].value
+        answer: null
       },
       {
+        id: 'frequency',
         type: 'Listbox',
         bg: '--p-primary-50',
         text: "2. Vandladningsfrekvens",
         description: "I løbet af den sidste måned, hvor ofte har du måttet lade vandet på ny mindre end 2 timer efter forrige vandladning?",
         optionsType: 'options1',
-        answer: options1.value[0].value
+        answer: null
       },
       {
+        id: 'intermittency',
         type: 'Listbox',
         bg: '--p-primary-100',
         text: "3. Afbrudt vandladning",
         description: "I løbet af den sidste måned, hvor ofte har du måttet stoppe og starte igen, mens du lod vandet?",
         optionsType: 'options1',
-        answer: options1.value[0].value
+        answer: null
       },
       {
+        id: 'urgency',
         type: 'Listbox',
         bg: '--p-primary-50',
         text: "4. Vandladningstrang",
         description: "I løbet af den sidste måned, hvor ofte synes du, det har været vanskeligt at udsætte vandladningen?",
         optionsType: 'options1',
-        answer: options1.value[0].value
+        answer: null
       },
       {
+        id: 'weakStream',
         type: 'Listbox',
         bg: '--p-primary-100',
         text: "5. Svag strålekraft",
         description: "I løbet af den sidste måned, hvor ofte har du haft svag urinstråle?",
         optionsType: 'options1',
-        answer: options1.value[0].value
+        answer: null
       },
       {
+        id: 'straining',
         type: 'Listbox',
         bg: '--p-primary-50',
         text: "6. Stranguri",
         description: "I løbet af den sidste måned, hvor ofte har du måttet trykke eller presse for at lade vandet?",
         optionsType: 'options1',
-        answer: options1.value[0].value
+        answer: null
       },
       {
+        id: 'nocturia',
         type: 'Listbox',
         bg: '--p-primary-100',
         text: "7. Nykturi",
         description: "I løbet af den sidste måned, hvor mange gange har du typisk måtte stå op i løbet af natten for at lade vandet?",
         optionsType: 'options2',
-        answer: options2.value[0].value
+        answer: null
       }
     ]);
 
-// Default answers are already set in question configurations above
+// Initialize default answers
+questionsSection1.value.forEach(question => {
+  const defaultValue = question.optionsType === 'options1' ? 0 : 0;
+  framework.setFieldValue('calculator', question.id, defaultValue);
+});
+
+// Add quality of life question
+framework.setFieldValue('calculator', 'qualityOfLife', 0);
 
 const optionsSets = {
   options1,
@@ -222,30 +252,31 @@ const getOptions = (type: keyof OptionsSets): Option[] => {
   return optionsSets[type].value;
 }
 
-const handleSubmit = () => {
+const handleSubmit = async () => {
   formSubmitted.value = true;
 
   if (validateQuestions()) {
-    calculateResults();
-    scrollToResults();
-    sendDataToServer(apiUrl, keyUrl, generatePayload())
-    .then(() => {
-      //console.log('Data successfully sent');
-    })
-    .catch(() => {
-      //console.error('Failed to send data');
-    });
+    try {
+      const success = await framework.submitCalculation();
+      if (success) {
+        validationMessage.value = '';
+      }
+    } catch (error) {
+      console.error('Calculation failed:', error);
+      validationMessage.value = 'Der opstod en fejl under beregningen.';
+    }
   }
 };
 
 const validateQuestions = (): boolean => {
-  const allQuestions = [
-    ...questionsSection1.value,
-  ];
-  const unansweredQuestions = allQuestions.filter(
-    (question) => question.answer === null
+  const calculatorData = framework.calculatorData.value as any;
+  const requiredFields = ['incompleteEmptying', 'frequency', 'intermittency', 'urgency', 'weakStream', 'straining', 'nocturia'];
+  
+  const unansweredFields = requiredFields.filter(
+    field => calculatorData[field] === null || calculatorData[field] === undefined
   );
-  if (unansweredQuestions.length > 0) {
+  
+  if (unansweredFields.length > 0) {
     validationMessage.value = 'Alle spørgsmål skal udfyldes.';
     return false;
   } else {
@@ -254,74 +285,45 @@ const validateQuestions = (): boolean => {
   }
 };
 
-const isUnanswered = (question: Question): boolean => {
-  return question.answer === null
-};
-
-const calculateResults = () => {
-  const section1Results = questionsSection1.value.map((question, index) => {
-    const score = question.answer ?? 0;
-    return {
-      question: `${index + 1}`,
-      text: question.text,
-      score
-    };
-  });
-
-  resultsSection1.value = section1Results;
-  totalScore.value = resultsSection1.value.reduce((sum, result) => sum + result.score, 0);
-
-  if (totalScore.value > 19) {
-    conclusion.value = "Symptomatisk, alvorlig";
-    conclusionDescription.value = "Patienten bør eventuelt henvises til urinvejskirurg for udredning og evt. invasiv behandling";
-    conclusionSeverity.value = "error";
-  } else if (totalScore.value >= 8) {
-    conclusion.value = "Symptomatisk, moderat";
-    conclusionDescription.value = "Anses velegnet for medikamentel behandling.";
-    conclusionSeverity.value = "warn";
-  } else if (totalScore.value >= 1) {
-    conclusion.value = "Symptomatisk, mild";
-    conclusionDescription.value = "Tilstanden kan observeres (Nykturi kan behandles ved at reducere væskeindtaget om aftenen og med diuretika ved deklive ødemer, som mobiliseres og kvitteres om natten)";
-    conclusionSeverity.value = "success";
-  } else {
-    conclusion.value = "Asymptomatisk";
-    conclusionSeverity.value = "success";
-  }
-};
-
-const scrollToResults = () => {
-  const resultsSectionEl = resultsSection.value as HTMLElement;
-  if (resultsSectionEl) {
-    resultsSectionEl.scrollIntoView({ behavior: 'smooth' });
-  }
-};
-
-
-const resetQuestions = () => {
+const handleReset = () => {
+  framework.resetCalculator();
   questionsSection1.value.forEach(question => {
-    if (question.optionsType) {
-      question.answer = optionsSets[question.optionsType]?.value[0]?.value;
-    }
+    const defaultValue = question.optionsType === 'options1' ? 0 : 0;
+    framework.setFieldValue('calculator', question.id, defaultValue);
   });
-
-  resultsSection1.value = [];
-  totalScore.value = 0;
-  validationMessage.value = '';
+  framework.setFieldValue('calculator', 'qualityOfLife', 0);
   formSubmitted.value = false;
+  validationMessage.value = '';
 };
 
-const generatePayload = () => {
-  return {
-      name: name.value,
-      age: age.value,
-      gender: gender.value,
-      answers: [
-        ...questionsSection1.value,
-      ],
-      scores: {
-        totalScore: totalScore.value
-      },
-    };
+const getSeverityFromRiskLevel = (riskLevel: RiskLevel): string => {
+  switch (riskLevel) {
+    case 'mild':
+    case 'low':
+      return 'success';
+    case 'moderate':
+    case 'medium':
+      return 'warn';
+    case 'severe':
+    case 'high':
+      return 'error';
+    default:
+      return 'info';
+  }
+};
+
+const getDetailedDescription = (details: any): string => {
+  if (!details) return '';
+  
+  const ipssDetails = details as IpssDetails;
+  if (ipssDetails.symptomSeverity === 'severe') {
+    return 'Patienten bør eventuelt henvises til urinvejskirurg for udredning og evt. invasiv behandling';
+  } else if (ipssDetails.symptomSeverity === 'moderate') {
+    return 'Anses velegnet for medikamentel behandling.';
+  } else if (ipssDetails.symptomSeverity === 'mild') {
+    return 'Tilstanden kan observeres (Nykturi kan behandles ved at reducere væskeindtaget om aftenen og med diuretika ved deklive ødemer, som mobiliseres og kvitteres om natten)';
+  }
+  return '';
 }
 </script>
 
