@@ -47,20 +47,24 @@ export class PuqeCalculator extends BaseCalculator<PuqeResponses, PuqeDetails> {
     let recommendations: string[]
     let severity: 'mild' | 'moderate' | 'severe'
     let hyperemesisRisk = false
+    let clinicalDescription: string
     
     if (score <= 6) {
       interpretation = 'Mild graviditetskvalme'
       recommendations = ['Små hyppige måltider', 'Undgå trigger foods']
       severity = 'mild'
+      clinicalDescription = 'Små hyppige måltider og undgå trigger foods kan hjælpe'
     } else if (score <= 12) {
       interpretation = 'Moderat graviditetskvalme'
       recommendations = ['Kontakt jordemoder', 'Overvej anti-emetika']
       severity = 'moderate'
+      clinicalDescription = 'Kontakt jordemoder for rådgivning og eventuel behandling'
     } else {
       interpretation = 'Alvorlig graviditetskvalme (Hyperemesis)'
       recommendations = ['Kontakt læge øjeblikkeligt', 'Hospitalsindlæggelse kan være nødvendig']
       severity = 'severe'
       hyperemesisRisk = true
+      clinicalDescription = 'Patienten bør eventuelt henvises til læge for udredning og behandling af hyperemesis gravidarum'
     }
 
     const details: PuqeDetails = {
@@ -68,7 +72,8 @@ export class PuqeCalculator extends BaseCalculator<PuqeResponses, PuqeDetails> {
       vomitingEpisodes: responses.vomiting,
       retchingEpisodes: responses.retching,
       severity,
-      hyperemesisRisk
+      hyperemesisRisk,
+      clinicalDescription
     }
 
     return {

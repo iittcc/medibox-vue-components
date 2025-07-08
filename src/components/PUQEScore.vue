@@ -286,13 +286,6 @@ const getDetailedDescription = (details: any): string => {
   if (!details) return ''
   
   const puqeDetails = details as PuqeDetails
-  if (puqeDetails.severity === 'severe') {
-    return 'Patienten bør eventuelt henvises til læge for udredning og behandling af hyperemesis gravidarum'
-  } else if (puqeDetails.severity === 'moderate') {
-    return 'Kontakt jordemoder for rådgivning og eventuel behandling'
-  } else if (puqeDetails.severity === 'mild') {
-    return 'Små hyppige måltider og undgå trigger foods kan hjælpe'
-  }
-  return ''
+  return puqeDetails.clinicalDescription || ''
 }
 </script>

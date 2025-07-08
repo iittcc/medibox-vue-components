@@ -13,6 +13,7 @@ export interface PuqeDetails extends CalculatorDetails {
   retchingEpisodes: number
   severity: 'mild' | 'moderate' | 'severe'
   hyperemesisRisk: boolean
+  clinicalDescription?: string
 }
 
 export interface PuqeCalculationResult {
