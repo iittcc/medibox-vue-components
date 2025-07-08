@@ -143,8 +143,8 @@ export const DanpssSchema = z.object({
 
 // EPDS, IPSS, PUQE, WestleyCroup, WHO-5, LRTI, SCORE2 schemas moved to their respective calculator modules
 
-export const GcsSchema = z.object({
-  patient: PatientBaseSchema,
+// GCS (Glasgow Coma Scale) Schema
+export const GcsQuestionSchema = z.object({
   eyeOpening: z.number()
     .min(1, 'Eye opening score skal være mindst 1')
     .max(4, 'Eye opening score skal være højst 4')
@@ -156,7 +156,12 @@ export const GcsSchema = z.object({
   motorResponse: z.number()
     .min(1, 'Motor response score skal være mindst 1')
     .max(6, 'Motor response score skal være højst 6')
-    .int('Motor response score skal være et helt tal'),
+    .int('Motor response score skal være et helt tal')
+})
+
+export const GcsSchema = z.object({
+  patient: PatientBaseSchema,
+  responses: GcsQuestionSchema,
   totalScore: z.number()
     .min(3, 'Total GCS score skal være mindst 3')
     .max(15, 'Total GCS score skal være højst 15')
@@ -215,7 +220,7 @@ export const getCalculatorQuestionSchema = (calculatorType: string) => {
     'audit': AuditQuestionSchema,
     'danpss': DanpssQuestionSchema,
     'epds': EpdsQuestionSchema,
-    'gcs': GcsSchema, // GCS doesn't have a separate question schema
+    'gcs': GcsQuestionSchema,
     'ipss': IpssQuestionSchema,
     'lrti': LrtiQuestionSchema, // Now has proper question schema
     'puqe': PuqeQuestionSchema,
