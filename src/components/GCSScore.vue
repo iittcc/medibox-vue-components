@@ -6,9 +6,9 @@
       <template #content>
         <PersonInfo
           :name="framework.patientData.value.name || ''"
-          :age="framework.patientData.value.age || 50"
-          :minAge="5"
-          :maxAge="110"
+          :age="framework.patientData.value.age || config.age"
+          :minAge="config.minAge"
+          :maxAge="config.maxAge"
           :gender="(framework.patientData.value.gender as GenderValue) || 'male'"
           genderdisplay="block"
           @update:name="framework.setFieldValue('patient', 'name', $event)"
@@ -18,7 +18,7 @@
       </template>
     </SurfaceCard>
     
-    <SurfaceCard title="Glasgow Coma Scale">
+    <SurfaceCard :title="config.name">
       <template #content>
         <form @submit.prevent="handleSubmit">
           <QuestionSingleComponent
@@ -144,7 +144,8 @@ const config: CalculatorConfig = {
   version: '2.0.0',
   category: 'general',
   theme: 'teal',
-  minAge: 5,
+  age: 50,
+  minAge: 2,
   maxAge: 110,
   estimatedDuration: 3
 }

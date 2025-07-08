@@ -20,7 +20,7 @@ export const GcsQuestionSchema = z.object({
 export const GcsSchema = z.object({
   patient: PatientBaseSchema.extend({
     age: z.number()
-      .min(5, 'Glasgow Coma Scale er beregnet til patienter fra 5 år')
+      .min(2, 'Glasgow Coma Scale er beregnet til patienter fra 2 år; under 2 år anvendes Pediatric GCS eller AVPU')
       .max(110, 'Alder skal være under 110 år')
       .int('Alder skal være et helt tal')
   }),
