@@ -34,3 +34,6 @@ tests/browser/__screenshots__/**/*
 test-results/**/*
 tests/playwright-report/**/*
 playwright-report/**/*
+playwright-report/results.xml
+playwright-report/results.json
+playwright-report/index.html
