@@ -35,7 +35,7 @@ vi.mock('@/utils/genderUtils', () => ({
 // Define simple stubs for child components
 const SurfaceCardStub = { name: 'SurfaceCard', template: '<div data-testid="surface-card"><h3>{{ title }}</h3><slot name="content"></slot></div>', props: ['title'] }
 const PersonInfoStub = { name: 'PersonInfo', template: '<div data-testid="person-info" />', emits: ['update:name', 'update:age', 'update:gender'] }
-const QuestionSingleComponentStub = { name: 'QuestionSingleComponent', template: '<div data-testid="question-single-component">{{ question.text }}</div>', props: ['question', 'answer', 'name', 'options', 'index', 'frameworkAnswer', 'isUnanswered'], emits: ['update:answer'] }
+const QuestionSingleComponentStub = { name: 'QuestionSingleComponent', template: '<div data-testid="question-single-component">{{ question.text }}</div>', props: ['question', 'answer', 'name', 'options', 'index', 'frameworkAnswer', 'isUnanswered', 'scrollHeight'], emits: ['update:answer'] }
 const ButtonStub = { name: 'Button', template: '<button type="submit" data-testid="button" @click="$emit(\'click\')">Beregn</button>', emits: ['click'], props: ['type'] }
 const SecondaryButtonStub = { name: 'SecondaryButton', template: '<button data-testid="secondary-button" @click="$emit(\'click\')">Reset</button>', emits: ['click'] }
 const MessageStub = { name: 'Message', template: '<div data-testid="message"><slot /></div>' }

@@ -82,20 +82,26 @@
               :disabled="!framework.result.value" 
             >
               <template #container>
-                <b>Glasgow Coma Scale</b>
+                <b>{{config.name}}</b>
                 <br /><br />
                 Navn: {{ framework.patientData.value.name }} <br />
                 Køn: {{ getGenderLabel((framework.patientData.value.gender as GenderValue) || 'male') }} <br />
                 Alder: {{ framework.patientData.value.age }} år<br /><br />
-                Øjenåbning: {{ gcsData.eyeOpening || 4 }}<br />
-                Verbalt responds: {{ gcsData.verbalResponse || 5 }}<br />
-                Bedste motoriske responds: {{ gcsData.motorResponse || 6 }}<br />
+               
+                Øjenåbning: {{ gcsData.eyeOpening }}<br />
+                Verbalt responds: {{ gcsData.verbalResponse }}<br />
+                Bedste motoriske responds: {{ gcsData.motorResponse }}<br />
                 <br /><br />
                 {{ framework.result.value?.interpretation || '' }}
               </template>
             </CopyDialog>
             <SecondaryButton label="Reset" icon="pi pi-sync" severity="secondary" @click="handleReset"/>
-            <Button type="submit" label="Beregn" class="mr-3 pr-6 pl-6" icon="pi pi-calculator"/>
+            <Button type="submit"
+              :label="framework.state.value.isSubmitting ? '' : 'Beregn'"
+              class="mr-3 pr-6 pl-6"
+              :icon="framework.state.value.isSubmitting ? 'pi pi-spin pi-spinner' : 'pi pi-calculator'"
+              :disabled="framework.state.value.isSubmitting"
+            />
           </div>
         </form>
       </template>
