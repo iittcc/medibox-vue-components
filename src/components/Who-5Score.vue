@@ -161,7 +161,7 @@ const who5Questions = [
   { id: 'question2', bg: '--p-primary-50', text: '2. I de sidste 2 uger har jeg følt mig rolig og afslappet' },
   { id: 'question3', bg: '--p-primary-100', text: '3. I de sidste 2 uger har jeg følt mig aktiv og energisk' },
   { id: 'question4', bg: '--p-primary-50', text: '4. I de sidste 2 uger er jeg vågnet frisk og udhvilet' },
-  { id: 'question5', bg: '--p-primary-100', text: '5. I de sidste 2 uger har min daglig været fyldt med ting der interesserer mig' }
+  { id: 'question5', bg: '--p-primary-100', text: '5. I de sidste 2 uger har min dagligdag været fyldt med ting der interesserer mig' }
 ]
 
 // Expose options to parent component (tests)
@@ -253,7 +253,7 @@ const getQuestionShortText = (fullText: string): string => {
     '2. I de sidste 2 uger har jeg følt mig rolig og afslappet': 'Rolig og afslappet',
     '3. I de sidste 2 uger har jeg følt mig aktiv og energisk': 'Aktiv og energisk',
     '4. I de sidste 2 uger er jeg vågnet frisk og udhvilet': 'Vågnet frisk og udhvilet',
-    '5. I de sidste 2 uger har min daglig været fyldt med ting der interesserer mig': 'Daglig fyldt med interessante ting'
+    '5. I de sidste 2 uger har min dagligdag været fyldt med ting der interesserer mig': 'Dagligdag fyldt med interessante ting'
   }
   return shortTexts[fullText] || fullText
 }
