@@ -4,6 +4,7 @@ import 'material-design-icons-iconfont/dist/material-design-icons.css';
 import './assets/orange.css';
 import App from './Puqe.vue';
 import PrimeVue from 'primevue/config';
+import ToastService from 'primevue/toastservice';
 
 const app = createApp(App);
 
@@ -18,4 +19,7 @@ app.use(PrimeVue, {
         dateFormat : "dd/mm/yy" 
     }
 });
+
+app.use(ToastService)
+
 app.mount('#app');
