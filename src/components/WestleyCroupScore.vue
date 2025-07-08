@@ -6,10 +6,10 @@
       <template #content>
         <PersonInfo
           :name="framework.patientData.value.name || ''"
-          :age="framework.patientData.value.age || 6"
-          :minAge="0"
-          :maxAge="12"
-          :gender="framework.patientData.value.gender as GenderValue || 'male'"
+          :age="framework.patientData.value.age || config.defaultAge"
+          :minAge="config.minAge"
+          :maxAge="config.maxAge"
+          :gender="framework.patientData.value.gender as GenderValue || config.defaultGender"
           genderdisplay="block"
           child="true"
           @update:name="framework.setFieldValue('patient', 'name', $event)"
@@ -132,6 +132,10 @@ const config: CalculatorConfig = {
   version: '2.0.0',
   category: 'general',
   theme: 'orange',
+  defaultAge: 6,
+  defaultGender: 'male',
+  minAge: 0,
+  maxAge: 12,
   estimatedDuration: 2,
 };
 
@@ -148,7 +152,7 @@ framework.initializeSteps(steps);
 
 // Initialize with default patient data
 framework.setFieldValue('patient', 'age', 6);
-framework.setFieldValue('patient', 'gender', 'male');
+framework.setFieldValue('patient', 'gender', config.defaultGender);
 
 const options1 = ref<Option[]>([
   { text: "Vågen (eller sovende)", value: 0 },

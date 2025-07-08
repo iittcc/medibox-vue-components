@@ -35,14 +35,14 @@ export const GCS_OPTIONS = {
     { value: 1, label: 'Ingen reaktion' },
     { value: 2, label: 'Åbner øjnene ved smertestimuli' },
     { value: 3, label: 'Åbner øjnene ved verbal stimuli' },
-    { value: 4, label: 'Åbner øjnene spontant' }
+    { value: 4, label: 'Åbner øjnene spontant', default: true }
   ],
   verbalResponse: [
     { value: 1, label: 'Ingen verbal reaktion' },
     { value: 2, label: 'Uforståelige lyde' },
     { value: 3, label: 'Usammenhængende ord' },
     { value: 4, label: 'Forvirrede sætninger' },
-    { value: 5, label: 'Orienteret og sammenhængende' }
+    { value: 5, label: 'Orienteret og sammenhængende', default: true }
   ],
   motorResponse: [
     { value: 1, label: 'Ingen motorisk reaktion' },
@@ -50,6 +50,6 @@ export const GCS_OPTIONS = {
     { value: 3, label: 'Unormal fleksorbevægelse' },
     { value: 4, label: 'Trækker væk fra smerte' },
     { value: 5, label: 'Lokaliserer smerte' },
-    { value: 6, label: 'Adlyder kommandoer' }
+    { value: 6, label: 'Adlyder kommandoer', default: true }
   ]
 } as const

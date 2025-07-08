@@ -6,7 +6,7 @@
       <template #content>
         <PersonInfo
           :name="framework.patientData.value.name || ''"
-          :age="framework.patientData.value.age || config.age"
+          :age="framework.patientData.value.age || config.defaultAge"
           :minAge="config.minAge"
           :maxAge="config.maxAge"
           :gender="(framework.patientData.value.gender as GenderValue) || 'male'"
@@ -15,7 +15,7 @@
           @update:age="framework.setFieldValue('patient', 'age', $event)"
           @update:gender="framework.setFieldValue('patient', 'gender', $event)"
         />
-      </template>
+      </template> 
     </SurfaceCard>
     
     <SurfaceCard :title="config.name">
@@ -144,7 +144,8 @@ const config: CalculatorConfig = {
   version: '2.0.0',
   category: 'general',
   theme: 'teal',
-  age: 50,
+  defaultAge: 50,
+  defaultGender: 'male',
   minAge: 2,
   maxAge: 110,
   estimatedDuration: 3
@@ -186,16 +187,19 @@ const motorResponseOptions = GCS_OPTIONS.motorResponse.map(opt => ({
 // Function to set default values
 const setDefaultValues = () => {
   // Set default calculator values
-  framework.setFieldValue('calculator', 'eyeOpening', 4)
-  framework.setFieldValue('calculator', 'verbalResponse', 5)
-  framework.setFieldValue('calculator', 'motorResponse', 6)
+  const getDefaultOptionValue = (options: ReadonlyArray<{ value: number }>) =>
+    Math.max(...options.map(opt => opt.value))
+
+  framework.setFieldValue('calculator', 'eyeOpening', getDefaultOptionValue(GCS_OPTIONS.eyeOpening))
+  framework.setFieldValue('calculator', 'verbalResponse', getDefaultOptionValue(GCS_OPTIONS.verbalResponse))
+  framework.setFieldValue('calculator', 'motorResponse', getDefaultOptionValue(GCS_OPTIONS.motorResponse))
   
   // Set default patient values
   if (!framework.patientData.value.name) {
     framework.setFieldValue('patient', 'name', '')
   }
   if (!framework.patientData.value.age) {
-    framework.setFieldValue('patient', 'age', 50)
+    framework.setFieldValue('patient', 'age', config.defaultAge)
   }
   if (!framework.patientData.value.gender) {
     framework.setFieldValue('patient', 'gender', 'male')
