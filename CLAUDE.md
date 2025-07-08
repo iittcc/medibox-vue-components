@@ -6,6 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Get the console log from the browser whenever you perform any action in playwright
 - Only commit working tested code.
 - Do not assume anything about the code. Read the code.
+- Co-authored and Claude signature in commits are not allowed. Start commit message with capital letter. Add blank line after commit message summary
 
 ## CRITICAL WORKFLOW - ALWAYS FOLLOW THIS!
 Research → Plan → Implement
