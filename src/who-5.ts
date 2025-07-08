@@ -1,9 +1,10 @@
-// src/main.ts
+// src/who-5.ts
 import { createApp } from 'vue';               // Icons           // PrimeFlex
 import 'material-design-icons-iconfont/dist/material-design-icons.css';
 import './assets/sky.css';
 import App from './Who-5.vue';
 import PrimeVue from 'primevue/config';
+import ToastService from 'primevue/toastservice';
 
 const app = createApp(App);
 
@@ -18,4 +19,6 @@ app.use(PrimeVue, {
         dateFormat : "dd/mm/yy" 
     }
 });
+
+app.use(ToastService)
 app.mount('#app');

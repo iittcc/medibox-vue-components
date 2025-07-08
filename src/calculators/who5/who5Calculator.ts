@@ -42,7 +42,7 @@ export class Who5Calculator extends BaseCalculator<Who5Responses, Who5Details> {
 
   protected calculateScore(responses: Who5Responses): CalculationResult<Who5Details> {
     const rawScore = Object.values(responses).reduce((sum: number, value: any) => sum + (Number(value) || 0), 0)
-    const percentageScore = (rawScore / 25) * 100
+    const percentageScore = Math.round((rawScore / 25) * 100)
     
     let wellBeingLevel: 'poor' | 'below_average' | 'average' | 'good' | 'excellent'
     let depressionRisk = false

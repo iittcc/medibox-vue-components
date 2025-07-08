@@ -5,34 +5,40 @@
     <SurfaceCard title="Patient">
       <template #content>
         <PersonInfo
-          :name="name"
-          :age="age"
-          :minAge="16"
-          :maxAge="110"
-          :gender="gender as GenderValue"
+          :name="framework.patientData.value.name || ''"
+          :age="framework.patientData.value.age || config.defaultAge"
+          :minAge="config.minAge"
+          :maxAge="config.maxAge"
+          :gender="(framework.patientData.value.gender as GenderValue) || 'male'"
           genderdisplay="block"
-          @update:name="name = $event"
-          @update:age="age = $event"
-          @update:gender="gender = $event"
+          @update:name="framework.setFieldValue('patient', 'name', $event)"
+          @update:age="framework.setFieldValue('patient', 'age', $event)"
+          @update:gender="framework.setFieldValue('patient', 'gender', $event)"
         />
       </template>
     </SurfaceCard>
     
-    <SurfaceCard title="WHO-5 Trivselindex">
+    <SurfaceCard :title="config.name">
       <template #content>
         <form @submit.prevent="handleSubmit">
           <QuestionSingleComponent
-            name="section1"
-            v-for="(question, index) in questionsSection1"
-            :key="index"
-            :question="question"
-            :options="getOptions(question.optionsType as keyof OptionsSets)"
+            v-for="(question, index) in who5Questions"
+            :key="question.id"
+            :name="question.id"
+            :question="{ 
+              type: 'Listbox',
+              bg: question.bg,
+              text: question.text,
+              optionsType: 'wellbeing'
+            }"
+            :options="wellbeingOptions"
             :index="index"
-            :framework-answer="question.answer ?? undefined"
-            :is-unanswered="formSubmitted && isUnanswered(question)"
+            :framework-answer="who5Data[question.id as keyof Who5Responses]"
+            :is-unanswered="formSubmitted && who5Data[question.id as keyof Who5Responses] == null"
             scrollHeight="18rem"
-            @update:answer="question.answer = $event"
+            @update:answer="framework.setFieldValue('calculator', question.id, $event)"
           />
+          
           <div v-if="validationMessage" class="text-red-500 mt-5 font-bold">
             {{ validationMessage }}
           </div>
@@ -43,33 +49,50 @@
               icon="pi pi-clipboard" 
               severity="secondary" 
               class="mr-3" 
-              :disabled="(resultsSection ? false : true)" 
+              :disabled="!framework.result.value" 
             >
               <template #container>
-                <b>WHO-5 Trivselsindex</b>
+                <b>{{config.name}}</b>
                 <br /><br />
-                Navn: {{ name }} <br />
-                Køn: {{ getGenderLabel(gender as GenderValue) }} <br />
-                Alder: {{ age }} år<br /><br />
-                <div v-for="(question, index) in resultsSection1" :key="index">{{ question.text }} {{ question.score }}</div>
+                Navn: {{ framework.patientData.value.name }} <br />
+                Køn: {{ getGenderLabel((framework.patientData.value.gender as GenderValue) || 'male') }} <br />
+                Alder: {{ framework.patientData.value.age }} år<br /><br />
+               
+                <div v-for="(question, index) in who5Questions" :key="question.id">
+                  {{ index + 1 }}. {{ getQuestionShortText(question.text) }}: {{ who5Data[question.id as keyof Who5Responses] }}<br />
+                </div>
                 <br /><br />
-                WHO-5 Trivselsindex {{ totalScore }} : {{ conclusion }}
+                WHO-5 Score {{ framework.result.value?.score }} : {{ framework.result.value?.interpretation || '' }}
               </template>
             </CopyDialog>
-            <SecondaryButton label="Reset" icon="pi pi-sync" severity="secondary" @click="resetQuestions"/>
-          <!--  <Button label="Random" icon="pi pi-ban" severity="secondary" class="mr-3" @click="randomlyCheckQuestions"/>-->
-      
-            <Button type="submit" label="Beregn" class="mr-3 pr-6 pl-6" icon="pi pi-calculator"/>
+            <SecondaryButton label="Reset" icon="pi pi-sync" severity="secondary" @click="handleReset"/>
+            <Button type="submit"
+              :label="framework.state.value.isSubmitting ? '' : 'Beregn'"
+              class="mr-3 pr-6 pl-6"
+              :icon="framework.state.value.isSubmitting ? 'pi pi-spin pi-spinner' : 'pi pi-calculator'"
+              :disabled="framework.state.value.isSubmitting"
+            />
           </div>
         </form>
       </template>
     </SurfaceCard>
-    <div v-if="resultsSection1.length > 0" class="results" ref="resultsSection">
+    
+    <div v-if="framework.result.value" class="results" ref="resultsSection">
       <SurfaceCard title="Resultat">
         <template #content>          
           <br />
-          <Message class="flex justify-center p-3 text-center" :severity="conclusionSeverity"><h2>WHO-5 Trivselsindex {{ totalScore }} <br /> {{ conclusion }}</h2></Message><br />
-          <p class="text-sm text-center ">Score ≤ 35: Der kan være stor risiko for depression eller stressbelastning Score 36-50: Der kan være risiko for depression eller stressbelastning Score > 50: Der er ingen risiko for depression eller stressbelastning</p>
+          <Message class="flex justify-center p-3" :severity="getSeverityFromRiskLevel(framework.result.value.riskLevel)">
+            <h2>WHO-5 Score {{ framework.result.value.score }} : {{ framework.result.value.interpretation }}</h2>
+          </Message>
+          <br />
+          <p class="text-sm text-center">{{ config.scoreInterpretation }}</p>
+          <br />
+          <div v-if="framework.result.value.recommendations">
+            <h3 class="text-lg font-semibold mb-2">Anbefalinger:</h3>
+            <ul class="list-disc list-inside space-y-1">
+              <li v-for="rec in framework.result.value.recommendations" :key="rec">{{ rec }}</li>
+            </ul>
+          </div>
         </template>
       </SurfaceCard>
     </div>
@@ -78,216 +101,161 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, nextTick, computed, onMounted } from 'vue'
+import { useCalculatorFramework, type CalculatorConfig, type CalculatorStep } from '@/composables/useCalculatorFramework'
+import Button from '@/volt/Button.vue'
+import SecondaryButton from '@/volt/SecondaryButton.vue'
+import QuestionSingleComponent from './QuestionSingleComponent.vue'
+import CopyDialog from './CopyDialog.vue'
+import SurfaceCard from './SurfaceCard.vue'
+import PersonInfo from './PersonInfo.vue'
+import Message from '@/volt/Message.vue'
+import { getGenderLabel, type GenderValue } from '@/utils/genderUtils'
+import type { RiskLevel, Who5Responses } from '@/types/calculatorTypes'
 
-import Button from '@/volt/Button.vue';
-import SecondaryButton from '@/volt/SecondaryButton.vue';
-import QuestionSingleComponent from "./QuestionSingleComponent.vue";
-import CopyDialog from "./CopyDialog.vue";
-import SurfaceCard from "./SurfaceCard.vue";
-import PersonInfo from "./PersonInfo.vue";
-import Message from '@/volt/Message.vue';
-import sendDataToServer from '../assets/sendDataToServer.ts';
-import { getGenderLabel, type GenderValue } from '@/utils/genderUtils';
-
-export interface Option {
-  text: string;
-  value: number;
+// Framework configuration
+const config: CalculatorConfig = {
+  type: 'who5',
+  name: 'WHO-5 Trivselindex',
+  version: '2.0.0',
+  category: 'psychology',
+  theme: 'sky',
+  defaultAge: 40,
+  defaultGender: 'male',
+  minAge: 16,
+  maxAge: 110,
+  estimatedDuration: 5,
+  scoreInterpretation: 'Score ≤ 28: Dårligt velbefindende - mulig depression | Score 29-49: Under gennemsnit | Score 50-67: Gennemsnitligt | Score 68-84: Godt | Score ≥ 85: Fremragende velbefindende'
 }
 
-export type OptionsSets = {
-  options1: Option[];
-};
+// Initialize framework
+const framework = useCalculatorFramework(config)
 
-export interface Question {
-  type: string;
-  bg?: string;
-  text: string;
-  description?: string;
-  optionsType?: keyof OptionsSets;
-  answer: number | null;
-}
+// Initialize steps
+const steps: CalculatorStep[] = [
+  { id: 'calculator', title: 'WHO-5 Assessment', order: 1, validation: true }
+]
+framework.initializeSteps(steps)
 
-export interface Result {
-  question: string;
-  text: string;
-  score: number;
-}
-const apiUrlServer = import.meta.env.VITE_API_URL;
-const apiUrl = apiUrlServer+'/index.php/callback/LogCB/log';
-const keyUrl = apiUrlServer+'/index.php/KeyServer/getPublicKey';
+// State
+const formSubmitted = ref<boolean>(false)
+const validationMessage = ref<string>('')
+const resultsSection = ref<HTMLDivElement | null>(null)
 
-const resultsSection = ref<HTMLDivElement | null>(null);
-const name = ref<string>("");
-const gender = ref<GenderValue>("male");
-const age = ref<number>(50);
+// Typed calculator data
+const who5Data = computed(() => framework.calculatorData.value as Partial<Who5Responses>)
 
-const formSubmitted = ref<boolean>(false);
-
-const resultsSection1 = ref<Result[]>([]);
-
-const totalScore = ref<number>(0);
-
-const conclusion = ref<string>('');
-const conclusionSeverity = ref<string>('');
-const validationMessage = ref<string>('');
-
-const options1 = ref<Option[]>([
+// Options for WHO-5 questions
+const wellbeingOptions = [
   { text: "Hele tiden", value: 5 },
   { text: "Det mest af tiden", value: 4 },
   { text: "Lidt mere end halvdelen af tiden", value: 3 },
   { text: "Lidt mindre end halvdelen af tiden", value: 2 },
   { text: "Lidt af tiden", value: 1 },
-  { text: "På intet tidspunkt", value: 0 },
-]);
+  { text: "På intet tidspunkt", value: 0 }
+]
 
-const questionsSection1 = ref<Question[]>([
-  {
-    type: 'Listbox',
-    bg: '--p-primary-100',
-    text: "1. I de sidste 2 uger har jeg været glad og i godt humør",
-    description: "", 
-    optionsType: 'options1',
-    answer: options1.value[0].value
-  },
-  {
-    type: 'Listbox',
-    bg: '--p-primary-50',
-    text: "2. I de sidste 2 uger har jeg følt mig rolig of afslappet",
-    description: "", 
-    optionsType: 'options1',
-    answer: options1.value[0].value
-  },
-  {
-    type: 'Listbox',
-    bg: '--p-primary-100',
-    text: "3. I de sidste 2 uger har jeg følt mig aktiv og energisk",
-    description: "", 
-    optionsType: 'options1',
-    answer: options1.value[0].value
-  },
-  {
-    type: 'Listbox',
-    bg: '--p-primary-50',
-    text: "4. I de sidste 2 uger har jeg er vågnet frisk og udhvilet",
-    description: "", 
-    optionsType: 'options1',
-    answer: options1.value[0].value
-  },
-  {
-    type: 'Listbox',
-    bg: '--p-primary-100',
-    text: "5. I de sidste 2 uger har min daglig været fyldt med ting der interesserer mig",
-    description: "", 
-    optionsType: 'options1',
-    answer: options1.value[0].value
+// WHO-5 questions configuration
+const who5Questions = [
+  { id: 'question1', bg: '--p-primary-100', text: '1. I de sidste 2 uger har jeg været glad og i godt humør' },
+  { id: 'question2', bg: '--p-primary-50', text: '2. I de sidste 2 uger har jeg følt mig rolig og afslappet' },
+  { id: 'question3', bg: '--p-primary-100', text: '3. I de sidste 2 uger har jeg følt mig aktiv og energisk' },
+  { id: 'question4', bg: '--p-primary-50', text: '4. I de sidste 2 uger er jeg vågnet frisk og udhvilet' },
+  { id: 'question5', bg: '--p-primary-100', text: '5. I de sidste 2 uger har min dagligdag været fyldt med ting der interesserer mig' }
+]
+
+// Expose options to parent component (tests)
+defineExpose({ wellbeingOptions, who5Questions })
+
+// Function to set default values
+const setDefaultValues = () => {
+  // Set default calculator values (all start at 5 for WHO-5)
+  who5Questions.forEach(question => {
+    framework.setFieldValue('calculator', question.id, 5)
+  })
+  
+  // Set default patient values
+  if (!framework.patientData.value.name) {
+    framework.setFieldValue('patient', 'name', '')
   }
-]);
-
-// Default answers are already set in question configurations above
-
-const optionsSets = {
-  options1
-};
-
-const getOptions = (type: keyof OptionsSets): Option[] => {
-  return optionsSets[type].value;
+  if (!framework.patientData.value.age) {
+    framework.setFieldValue('patient', 'age', config.defaultAge)
+  }
+  if (!framework.patientData.value.gender) {
+    framework.setFieldValue('patient', 'gender', 'male')
+  }
 }
 
-const handleSubmit = () => {
-  formSubmitted.value = true;
-
-  if (validateQuestions()) {
-    calculateResults();
-    scrollToResults();
-    sendDataToServer(apiUrl, keyUrl, generatePayload())
-    .then(() => {
-      //console.log('Data successfully sent');
-    })
-    .catch(() => {
-      //console.error('Failed to send data');
-    });
+// Set default values only if data is empty
+onMounted(() => {
+  const hasAnyData = who5Questions.some(question => who5Data.value[question.id as keyof Who5Responses] != null)
+  if (!hasAnyData) {
+    setDefaultValues()
+    console.log('Default values set')
   }
-};
+})
 
-const validateQuestions = (): boolean => {
-  const allQuestions = [
-    ...questionsSection1.value,
-  ];
-  const unansweredQuestions = allQuestions.filter(
-    (question) => question.answer === null
-  );
-  if (unansweredQuestions.length > 0) {
-    validationMessage.value = 'Alle spørgsmål skal udfyldes. ';
-    return false;
-  } else {
-    validationMessage.value = '';
-    return true;
-  }
-};
-
-const isUnanswered = (question: Question): boolean => {
-  return question.answer === null
-};
-
-const calculateResults = () => {
-  const section1Results = questionsSection1.value.map((question, index) => {
-    const score = question.answer ?? 0;
-    return {
-      question: `${index + 1}`,
-      text: question.text,
-      score
-    };
-  });
-
-  resultsSection1.value = section1Results;
-  totalScore.value = (resultsSection1.value.reduce((sum, result) => sum + result.score, 0))*4;
-
- if (totalScore.value > 50) {
-    conclusion.value = "Der er ikke umiddelbart risiko for depression eller stressbelastning.";
-    conclusionSeverity.value = "success";
-  } else if (totalScore.value > 35) {
-    conclusion.value = "Der kan være risiko for depression eller stressbelastning.";
-    conclusionSeverity.value = "warn";
-  } else {
-    conclusion.value = "Der kan være stor risiko for depression eller stressbelastning.";
-    conclusionSeverity.value = "error";
-  }
-};
-
-const scrollToResults = () => {
-  const resultsSectionEl = resultsSection.value as HTMLElement;
-  if (resultsSectionEl) {
-    resultsSectionEl.scrollIntoView({ behavior: 'smooth' });
-  }
-};
-
-
-const resetQuestions = () => {
-  questionsSection1.value.forEach(question => {
-    if (question.optionsType) {
-      question.answer = optionsSets[question.optionsType]?.value[0]?.value;
+// Submit handler
+const handleSubmit = async () => {
+  formSubmitted.value = true
+  validationMessage.value = ''
+  
+  try {
+    await framework.submitCalculation()
+    await nextTick()
+    scrollToResults()
+  } catch (_error) {
+    // Handle graceful degradation
+    if (framework.state.value.isComplete && framework.result.value) {
+      validationMessage.value = 'Beregning gennemført. Indsendelse til server fejlede.'
+    } else {
+      validationMessage.value = 'Der opstod en fejl ved beregning. Prøv igen.'
     }
-  });
+  }
+}
 
-  resultsSection1.value = [];
-  totalScore.value = 0;
-  validationMessage.value = '';
-  formSubmitted.value = false;
-};
+// Reset handler - reset calculator and set default values
+const handleReset = () => {
+  framework.resetCalculator()
+  // Use nextTick to ensure the reset has completed before setting defaults
+  nextTick(() => {
+    setDefaultValues()
+  })
+}
 
-const generatePayload = () => {
-  return {
-      name: name.value,
-      age: age.value,
-      gender: gender.value,
-      answers: [
-        ...questionsSection1.value,
-      ],
-      scores: {
-        totalScore: totalScore.value
-      },
-    };
+// Helper functions
+const scrollToResults = () => {
+  const resultsSectionEl = resultsSection.value as HTMLElement
+  if (resultsSectionEl) {
+    resultsSectionEl.scrollIntoView({ behavior: 'smooth' })
+  }
+}
+
+const getSeverityFromRiskLevel = (riskLevel: RiskLevel): string => {
+  const mapping: Record<RiskLevel, string> = {
+    low: 'success',
+    mild: 'success', 
+    moderate: 'warn',
+    severe: 'error',
+    unknown: 'info',
+    minimal: 'info',
+    medium: 'info',
+    high: 'error',
+    very_high: 'error'
+  }
+  return mapping[riskLevel] || 'info'
+}
+
+const getQuestionShortText = (fullText: string): string => {
+  // Extract the short description after the question number
+  const shortTexts: { [key: string]: string } = {
+    '1. I de sidste 2 uger har jeg været glad og i godt humør': 'Glad og i godt humør',
+    '2. I de sidste 2 uger har jeg følt mig rolig og afslappet': 'Rolig og afslappet',
+    '3. I de sidste 2 uger har jeg følt mig aktiv og energisk': 'Aktiv og energisk',
+    '4. I de sidste 2 uger er jeg vågnet frisk og udhvilet': 'Vågnet frisk og udhvilet',
+    '5. I de sidste 2 uger har min dagligdag været fyldt med ting der interesserer mig': 'Dagligdag fyldt med interessante ting'
+  }
+  return shortTexts[fullText] || fullText
 }
 </script>
 
