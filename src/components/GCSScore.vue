@@ -190,6 +190,9 @@ const motorResponseOptions = GCS_OPTIONS.motorResponse.map(opt => ({
   value: opt.value 
 }))
 
+// Expose options to parent component (tests)
+defineExpose({ eyeOpeningOptions, verbalResponseOptions, motorResponseOptions })
+
 // Function to set default values
 const setDefaultValues = () => {
   // Set default calculator values
