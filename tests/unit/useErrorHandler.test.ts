@@ -5,6 +5,12 @@ import { useErrorHandler } from '@/composables/useErrorHandler'
 import { ErrorType } from '@/utils/errorBoundary'
 
 // Mock dependencies
+vi.mock('@/composables/error-handling/RecoveryManager', () => ({
+  RecoveryManager: vi.fn(() => ({
+    attemptRecovery: vi.fn(),
+  })),
+}));
+
 vi.mock('primevue/usetoast', () => ({
   useToast: vi.fn(() => ({
     add: vi.fn()
@@ -44,7 +50,12 @@ describe('useErrorHandler', () => {
     // Reset mocks
     vi.clearAllMocks()
     
-    // Setup mock implementations
+    const { RecoveryManager } = await import('@/composables/error-handling/RecoveryManager');
+    const recoveryManagerMock = {
+      attemptRecovery: vi.fn().mockResolvedValue({ success: true, shouldRetry: false }),
+    };
+    (RecoveryManager as any).mockReturnValue(recoveryManagerMock);
+
     const { useToast } = await import('primevue/usetoast')
     toastMock = {
       add: vi.fn()
@@ -467,15 +478,12 @@ describe('useErrorHandler', () => {
 
   describe('auto-retry functionality', () => {
     it('should attempt recovery for recoverable errors', async () => {
-      const onRecovery = vi.fn()
-      
       const TestComponent = defineComponent({
         setup() {
           const errorHandler = useErrorHandler({
             autoRetry: true,
             maxRetries: 1,
             retryDelay: 10, // Short delay for testing
-            onRecovery
           })
           return { errorHandler }
         },
@@ -496,7 +504,9 @@ describe('useErrorHandler', () => {
       // Wait for retry delay
       await new Promise(resolve => setTimeout(resolve, 50))
 
-      expect(onRecovery).toHaveBeenCalled()
+      const { RecoveryManager } = await import('@/composables/error-handling/RecoveryManager');
+      const recoveryManagerMock = new RecoveryManager();
+      expect(recoveryManagerMock.attemptRecovery).toHaveBeenCalled()
     })
 
     it('should not retry non-recoverable errors', async () => {
@@ -529,15 +539,12 @@ describe('useErrorHandler', () => {
     })
 
     it('should respect max retry limit', async () => {
-      const onRecovery = vi.fn()
-      
       const TestComponent = defineComponent({
         setup() {
           const errorHandler = useErrorHandler({
             autoRetry: true,
             maxRetries: 2,
             retryDelay: 10,
-            onRecovery
           })
           return { errorHandler }
         },
@@ -561,8 +568,10 @@ describe('useErrorHandler', () => {
       // Wait for retry delays
       await new Promise(resolve => setTimeout(resolve, 100))
 
+      const { RecoveryManager } = await import('@/composables/error-handling/RecoveryManager');
+      const recoveryManagerMock = new RecoveryManager();
       // Should have been called for first two errors, but not the third
-      expect(onRecovery).toHaveBeenCalledTimes(2)
+      expect(recoveryManagerMock.attemptRecovery).toHaveBeenCalledTimes(2)
     })
   })
 
