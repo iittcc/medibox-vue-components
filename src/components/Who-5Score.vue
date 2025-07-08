@@ -22,83 +22,21 @@
       <template #content>
         <form @submit.prevent="handleSubmit">
           <QuestionSingleComponent
-            name="question1"
+            v-for="(question, index) in who5Questions"
+            :key="question.id"
+            :name="question.id"
             :question="{ 
               type: 'Listbox',
-              bg: '--p-primary-100',
-              text: '1. I de sidste 2 uger har jeg været glad og i godt humør',
+              bg: question.bg,
+              text: question.text,
               optionsType: 'wellbeing'
             }"
             :options="wellbeingOptions"
-            :index="0"
-            :framework-answer="who5Data.question1"
-            :is-unanswered="formSubmitted && !who5Data.question1"
+            :index="index"
+            :framework-answer="who5Data[question.id as keyof Who5Responses]"
+            :is-unanswered="formSubmitted && !who5Data[question.id as keyof Who5Responses]"
             scrollHeight="18rem"
-            @update:answer="framework.setFieldValue('calculator', 'question1', $event)"
-          />
-          
-          <QuestionSingleComponent
-            name="question2"
-            :question="{ 
-              type: 'Listbox',
-              bg: '--p-primary-50',
-              text: '2. I de sidste 2 uger har jeg følt mig rolig og afslappet',
-              optionsType: 'wellbeing'
-            }"
-            :options="wellbeingOptions"
-            :index="1"
-            :framework-answer="who5Data.question2"
-            :is-unanswered="formSubmitted && !who5Data.question2"
-            scrollHeight="18rem"
-            @update:answer="framework.setFieldValue('calculator', 'question2', $event)"
-          />
-          
-          <QuestionSingleComponent
-            name="question3"
-            :question="{ 
-              type: 'Listbox',
-              bg: '--p-primary-100',
-              text: '3. I de sidste 2 uger har jeg følt mig aktiv og energisk',
-              optionsType: 'wellbeing'
-            }"
-            :options="wellbeingOptions"
-            :index="2"
-            :framework-answer="who5Data.question3"
-            :is-unanswered="formSubmitted && !who5Data.question3"
-            scrollHeight="18rem"
-            @update:answer="framework.setFieldValue('calculator', 'question3', $event)"
-          />
-          
-          <QuestionSingleComponent
-            name="question4"
-            :question="{ 
-              type: 'Listbox',
-              bg: '--p-primary-50',
-              text: '4. I de sidste 2 uger er jeg vågnet frisk og udhvilet',
-              optionsType: 'wellbeing'
-            }"
-            :options="wellbeingOptions"
-            :index="3"
-            :framework-answer="who5Data.question4"
-            :is-unanswered="formSubmitted && !who5Data.question4"
-            scrollHeight="18rem"
-            @update:answer="framework.setFieldValue('calculator', 'question4', $event)"
-          />
-          
-          <QuestionSingleComponent
-            name="question5"
-            :question="{ 
-              type: 'Listbox',
-              bg: '--p-primary-100',
-              text: '5. I de sidste 2 uger har min daglig været fyldt med ting der interesserer mig',
-              optionsType: 'wellbeing'
-            }"
-            :options="wellbeingOptions"
-            :index="4"
-            :framework-answer="who5Data.question5"
-            :is-unanswered="formSubmitted && !who5Data.question5"
-            scrollHeight="18rem"
-            @update:answer="framework.setFieldValue('calculator', 'question5', $event)"
+            @update:answer="framework.setFieldValue('calculator', question.id, $event)"
           />
           
           <div v-if="validationMessage" class="text-red-500 mt-5 font-bold">
@@ -120,11 +58,9 @@
                 Køn: {{ getGenderLabel((framework.patientData.value.gender as GenderValue) || 'male') }} <br />
                 Alder: {{ framework.patientData.value.age }} år<br /><br />
                
-                1. Glad og i godt humør: {{ who5Data.question1 }}<br />
-                2. Rolig og afslappet: {{ who5Data.question2 }}<br />
-                3. Aktiv og energisk: {{ who5Data.question3 }}<br />
-                4. Vågnet frisk og udhvilet: {{ who5Data.question4 }}<br />
-                5. Daglig fyldt med interessante ting: {{ who5Data.question5 }}<br />
+                <div v-for="(question, index) in who5Questions" :key="question.id">
+                  {{ index + 1 }}. {{ getQuestionShortText(question.text) }}: {{ who5Data[question.id as keyof Who5Responses] }}<br />
+                </div>
                 <br /><br />
                 WHO-5 Score {{ framework.result.value?.score }} : {{ framework.result.value?.interpretation || '' }}
               </template>
@@ -219,17 +155,24 @@ const wellbeingOptions = [
   { text: "På intet tidspunkt", value: 0 }
 ]
 
+// WHO-5 questions configuration
+const who5Questions = [
+  { id: 'question1', bg: '--p-primary-100', text: '1. I de sidste 2 uger har jeg været glad og i godt humør' },
+  { id: 'question2', bg: '--p-primary-50', text: '2. I de sidste 2 uger har jeg følt mig rolig og afslappet' },
+  { id: 'question3', bg: '--p-primary-100', text: '3. I de sidste 2 uger har jeg følt mig aktiv og energisk' },
+  { id: 'question4', bg: '--p-primary-50', text: '4. I de sidste 2 uger er jeg vågnet frisk og udhvilet' },
+  { id: 'question5', bg: '--p-primary-100', text: '5. I de sidste 2 uger har min daglig været fyldt med ting der interesserer mig' }
+]
+
 // Expose options to parent component (tests)
-defineExpose({ wellbeingOptions })
+defineExpose({ wellbeingOptions, who5Questions })
 
 // Function to set default values
 const setDefaultValues = () => {
   // Set default calculator values (all start at 5 for WHO-5)
-  framework.setFieldValue('calculator', 'question1', 5)
-  framework.setFieldValue('calculator', 'question2', 5)
-  framework.setFieldValue('calculator', 'question3', 5)
-  framework.setFieldValue('calculator', 'question4', 5)
-  framework.setFieldValue('calculator', 'question5', 5)
+  who5Questions.forEach(question => {
+    framework.setFieldValue('calculator', question.id, 5)
+  })
   
   // Set default patient values
   if (!framework.patientData.value.name) {
@@ -245,7 +188,8 @@ const setDefaultValues = () => {
 
 // Set default values only if data is empty
 onMounted(() => {
-  if (!who5Data.value.question1 && !who5Data.value.question2 && !who5Data.value.question3 && !who5Data.value.question4 && !who5Data.value.question5) {
+  const hasAnyData = who5Questions.some(question => who5Data.value[question.id as keyof Who5Responses])
+  if (!hasAnyData) {
     setDefaultValues()
     console.log('Default values set')
   }
@@ -300,6 +244,18 @@ const getSeverityFromRiskLevel = (riskLevel: RiskLevel): string => {
     very_high: 'error'
   }
   return mapping[riskLevel] || 'info'
+}
+
+const getQuestionShortText = (fullText: string): string => {
+  // Extract the short description after the question number
+  const shortTexts: { [key: string]: string } = {
+    '1. I de sidste 2 uger har jeg været glad og i godt humør': 'Glad og i godt humør',
+    '2. I de sidste 2 uger har jeg følt mig rolig og afslappet': 'Rolig og afslappet',
+    '3. I de sidste 2 uger har jeg følt mig aktiv og energisk': 'Aktiv og energisk',
+    '4. I de sidste 2 uger er jeg vågnet frisk og udhvilet': 'Vågnet frisk og udhvilet',
+    '5. I de sidste 2 uger har min daglig været fyldt med ting der interesserer mig': 'Daglig fyldt med interessante ting'
+  }
+  return shortTexts[fullText] || fullText
 }
 </script>
 
