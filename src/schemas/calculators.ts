@@ -1,8 +1,9 @@
 import { z } from 'zod'
-import { PatientBaseSchema, PatientPsychologySchema } from './patient'
+import { PatientPsychologySchema } from './patient'
 
 // Import schemas from their co-located modules
 import { EpdsQuestionSchema, EpdsSchema } from '@/calculators/epds'
+import { GcsQuestionSchema, GcsSchema } from '@/calculators/gcs'
 import { IpssQuestionSchema, IpssSchema } from '@/calculators/ipss'
 import { PuqeQuestionSchema, PuqeSchema } from '@/calculators/puqe'
 import { WestleyCroupQuestionSchema, WestleyCroupSchema } from '@/calculators/westleyCroup'
@@ -141,30 +142,7 @@ export const DanpssSchema = z.object({
 
 // EPDS (Edinburgh Postnatal Depression Scale) Schema - Moved to @/calculators/epds
 
-// EPDS, IPSS, PUQE, WestleyCroup, WHO-5, LRTI, SCORE2 schemas moved to their respective calculator modules
-
-export const GcsSchema = z.object({
-  patient: PatientBaseSchema,
-  eyeOpening: z.number()
-    .min(1, 'Eye opening score skal være mindst 1')
-    .max(4, 'Eye opening score skal være højst 4')
-    .int('Eye opening score skal være et helt tal'),
-  verbalResponse: z.number()
-    .min(1, 'Verbal response score skal være mindst 1')
-    .max(5, 'Verbal response score skal være højst 5')
-    .int('Verbal response score skal være et helt tal'),
-  motorResponse: z.number()
-    .min(1, 'Motor response score skal være mindst 1')
-    .max(6, 'Motor response score skal være højst 6')
-    .int('Motor response score skal være et helt tal'),
-  totalScore: z.number()
-    .min(3, 'Total GCS score skal være mindst 3')
-    .max(15, 'Total GCS score skal være højst 15')
-    .int('Total GCS score skal være et helt tal'),
-  severity: z.enum(['severe', 'moderate', 'mild']),
-  completedAt: z.date().optional(),
-  notes: z.string().max(500, 'Noter må højst være 500 tegn').optional()
-})
+// EPDS, IPSS, PUQE, WestleyCroup, WHO-5, LRTI, SCORE2, GCS schemas moved to their respective calculator modules
 
 export const CalculatorResultSchema = z.object({
   calculatorType: z.string(),
@@ -182,7 +160,6 @@ export const CalculatorResultSchema = z.object({
 export type AuditData = z.infer<typeof AuditSchema>
 export type DanpssData = z.infer<typeof DanpssSchema>
 export type EpdsData = z.infer<typeof EpdsSchema>
-export type GcsData = z.infer<typeof GcsSchema>
 export type IpssData = z.infer<typeof IpssSchema>
 export type LrtiData = z.infer<typeof LrtiSchema>
 export type PuqeData = z.infer<typeof PuqeSchema>
@@ -215,7 +192,7 @@ export const getCalculatorQuestionSchema = (calculatorType: string) => {
     'audit': AuditQuestionSchema,
     'danpss': DanpssQuestionSchema,
     'epds': EpdsQuestionSchema,
-    'gcs': GcsSchema, // GCS doesn't have a separate question schema
+    'gcs': GcsQuestionSchema,
     'ipss': IpssQuestionSchema,
     'lrti': LrtiQuestionSchema, // Now has proper question schema
     'puqe': PuqeQuestionSchema,

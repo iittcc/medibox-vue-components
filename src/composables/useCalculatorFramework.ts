@@ -25,8 +25,10 @@ export interface CalculatorConfig {
   author?: string
   category: 'psychology' | 'infection' | 'pregnancy' | 'general'
   theme: 'sky' | 'teal' | 'orange'
-  minAge?: number
-  maxAge?: number
+  defaultAge: number
+  defaultGender: string
+  minAge: number
+  maxAge: number
   allowedGenders?: readonly string[]
   requiredFields?: string[]
   estimatedDuration?: number // in minutes

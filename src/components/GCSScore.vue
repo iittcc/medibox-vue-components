@@ -5,34 +5,70 @@
     <SurfaceCard title="Patient">
       <template #content>
         <PersonInfo
-          :name="name"
-          :age="age"
-          :minAge="5"
-          :maxAge="110"
-          :gender="gender as GenderValue"
+          :name="framework.patientData.value.name || ''"
+          :age="framework.patientData.value.age || config.defaultAge"
+          :minAge="config.minAge"
+          :maxAge="config.maxAge"
+          :gender="(framework.patientData.value.gender as GenderValue) || 'male'"
           genderdisplay="block"
-          @update:name="name = $event"
-          @update:age="age = $event"
-          @update:gender="gender = $event"
+          @update:name="framework.setFieldValue('patient', 'name', $event)"
+          @update:age="framework.setFieldValue('patient', 'age', $event)"
+          @update:gender="framework.setFieldValue('patient', 'gender', $event)"
         />
-      </template>
+      </template> 
     </SurfaceCard>
     
-    <SurfaceCard title="Glasgow Coma Scale">
+    <SurfaceCard :title="config.name">
       <template #content>
         <form @submit.prevent="handleSubmit">
           <QuestionSingleComponent
-            name="section1"
-            v-for="(question, index) in questionsSection1"
-            :key="index"
-            :question="question"
-            :options="getOptions(question.optionsType as keyof OptionsSets)"
-            :index="index"
-            :framework-answer="question.answer ?? undefined"
-            :is-unanswered="formSubmitted && isUnanswered(question)"
+            name="eyeOpening"
+            :question="{ 
+              type: 'Listbox',
+              bg: '--p-primary-100',
+              text: 'Øjenåbning',
+              optionsType: 'eyeOpening'
+            }"
+            :options="eyeOpeningOptions"
+            :index="0"
+            :framework-answer="gcsData.eyeOpening"
+            :is-unanswered="formSubmitted && !gcsData.eyeOpening"
             scrollHeight="18rem"
-            @update:answer="question.answer = $event"
+            @update:answer="framework.setFieldValue('calculator', 'eyeOpening', $event)"
           />
+          
+          <QuestionSingleComponent
+            name="verbalResponse"
+            :question="{ 
+              type: 'Listbox',
+              bg: '--p-primary-50',
+              text: 'Verbalt responds',
+              optionsType: 'verbalResponse'
+            }"
+            :options="verbalResponseOptions"
+            :index="1"
+            :framework-answer="gcsData.verbalResponse"
+            :is-unanswered="formSubmitted && !gcsData.verbalResponse"
+            scrollHeight="18rem"
+            @update:answer="framework.setFieldValue('calculator', 'verbalResponse', $event)"
+          />
+          
+          <QuestionSingleComponent
+            name="motorResponse"
+            :question="{ 
+              type: 'Listbox',
+              bg: '--p-primary-100',
+              text: 'Bedste motoriske responds',
+              optionsType: 'motorResponse'
+            }"
+            :options="motorResponseOptions"
+            :index="2"
+            :framework-answer="gcsData.motorResponse"
+            :is-unanswered="formSubmitted && !gcsData.motorResponse"
+            scrollHeight="18rem"
+            @update:answer="framework.setFieldValue('calculator', 'motorResponse', $event)"
+          />
+          
           <div v-if="validationMessage" class="text-red-500 mt-5 font-bold">
             {{ validationMessage }}
           </div>
@@ -43,33 +79,49 @@
               icon="pi pi-clipboard" 
               severity="secondary" 
               class="mr-3" 
-              :disabled="(resultsSection ? false : true)" 
+              :disabled="!framework.result.value" 
             >
               <template #container>
-                <b>Glasgow Coma Scale</b>
+                <b>{{config.name}}</b>
                 <br /><br />
-                Navn: {{ name }} <br />
-                Køn: {{ getGenderLabel(gender as GenderValue) }} <br />
-                Alder: {{ age }} år<br /><br />
-                <div v-for="(question, index) in resultsSection1" :key="index">{{ question.text }} {{ question.score }}</div>
+                Navn: {{ framework.patientData.value.name }} <br />
+                Køn: {{ getGenderLabel((framework.patientData.value.gender as GenderValue) || 'male') }} <br />
+                Alder: {{ framework.patientData.value.age }} år<br /><br />
+               
+                Øjenåbning: {{ gcsData.eyeOpening }}<br />
+                Verbalt responds: {{ gcsData.verbalResponse }}<br />
+                Bedste motoriske responds: {{ gcsData.motorResponse }}<br />
                 <br /><br />
-                Glasgow Coma Scale Score {{ totalScore }} : {{ conclusion }}
+                {{ framework.result.value?.interpretation || '' }}
               </template>
             </CopyDialog>
-            <SecondaryButton label="Reset" icon="pi pi-sync" severity="secondary" @click="resetQuestions"/>
-          <!--  <Button label="Random" icon="pi pi-ban" severity="secondary" class="mr-3" @click="randomlyCheckQuestions"/>-->
-      
-            <Button type="submit" label="Beregn" class="mr-3 pr-6 pl-6" icon="pi pi-calculator"/>
+            <SecondaryButton label="Reset" icon="pi pi-sync" severity="secondary" @click="handleReset"/>
+            <Button type="submit"
+              :label="framework.state.value.isSubmitting ? '' : 'Beregn'"
+              class="mr-3 pr-6 pl-6"
+              :icon="framework.state.value.isSubmitting ? 'pi pi-spin pi-spinner' : 'pi pi-calculator'"
+              :disabled="framework.state.value.isSubmitting"
+            />
           </div>
         </form>
       </template>
     </SurfaceCard>
-    <div v-if="resultsSection1.length > 0" class="results" ref="resultsSection">
+    
+    <div v-if="framework.result.value" class="results" ref="resultsSection">
       <SurfaceCard title="Resultat">
         <template #content>          
           <br />
-          <Message class="flex justify-center p-3" :severity="conclusionSeverity"><h2>Glasgow Coma Scale Score {{ totalScore }} : {{ conclusion }}</h2><div class="flex justify-center">{{ conclusionDescription }}</div></Message><br />
-          
+          <Message class="flex justify-center p-3" :severity="getSeverityFromRisk(framework.result.value.riskLevel)">
+            <h2>{{ framework.result.value.interpretation }}</h2>
+            <div class="flex justify-center">{{ framework.result.value.details?.clinicalSignificance }}</div>
+          </Message>
+          <br />
+          <div v-if="framework.result.value.recommendations">
+            <h3 class="text-lg font-semibold mb-2">Anbefalinger:</h3>
+            <ul class="list-disc list-inside space-y-1">
+              <li v-for="rec in framework.result.value.recommendations" :key="rec">{{ rec }}</li>
+            </ul>
+          </div>
         </template>
       </SurfaceCard>
     </div>
@@ -78,223 +130,139 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, nextTick, computed } from 'vue'
+import { useCalculatorFramework, type CalculatorConfig, type CalculatorStep } from '@/composables/useCalculatorFramework'
+import Button from '@/volt/Button.vue'
+import SecondaryButton from '@/volt/SecondaryButton.vue'
+import QuestionSingleComponent from './QuestionSingleComponent.vue'
+import CopyDialog from './CopyDialog.vue'
+import SurfaceCard from './SurfaceCard.vue'
+import PersonInfo from './PersonInfo.vue'
+import Message from '@/volt/Message.vue'
+import { getGenderLabel, type GenderValue } from '@/utils/genderUtils'
+import type { RiskLevel, GcsResponses } from '@/types/calculatorTypes'
+import { GCS_OPTIONS } from '@/calculators/gcs/gcsTypes'
 
-import Button from '@/volt/Button.vue';
-import SecondaryButton from '@/volt/SecondaryButton.vue';
-import QuestionSingleComponent from "./QuestionSingleComponent.vue";
-import CopyDialog from "./CopyDialog.vue";
-import SurfaceCard from "./SurfaceCard.vue";
-import PersonInfo from "./PersonInfo.vue";
-import Message from '@/volt/Message.vue';
-import sendDataToServer from '../assets/sendDataToServer.ts';
-import { getGenderLabel, type GenderValue } from '@/utils/genderUtils';
-
-export interface Option {
-  text: string;
-  value: number;
+// Framework configuration
+const config: CalculatorConfig = {
+  type: 'gcs',
+  name: 'Glasgow Coma Scale',
+  version: '2.0.0',
+  category: 'general',
+  theme: 'teal',
+  defaultAge: 50,
+  defaultGender: 'male',
+  minAge: 2,
+  maxAge: 110,
+  estimatedDuration: 3
 }
 
-export type OptionsSets = {
-  options1: Option[];
-  options2: Option[];
-  options3: Option[];
-};
+// Initialize framework
+const framework = useCalculatorFramework(config)
 
-export interface Question {
-  type: string;
-  bg?: string;
-  text: string;
-  description?: string;
-  optionsType?: keyof OptionsSets;
-  answer: number | null;
+// Initialize steps
+const steps: CalculatorStep[] = [
+  { id: 'calculator', title: 'Glasgow Coma Scale Assessment', order: 1, validation: true }
+]
+framework.initializeSteps(steps)
+
+// State
+const formSubmitted = ref<boolean>(false)
+const validationMessage = ref<string>('')
+const resultsSection = ref<HTMLDivElement | null>(null)
+
+// Typed calculator data
+const gcsData = computed(() => framework.calculatorData.value as Partial<GcsResponses>)
+
+// Options from GCS configuration
+const eyeOpeningOptions = GCS_OPTIONS.eyeOpening.map(opt => ({ 
+  text: opt.label, 
+  value: opt.value 
+}))
+
+const verbalResponseOptions = GCS_OPTIONS.verbalResponse.map(opt => ({ 
+  text: opt.label, 
+  value: opt.value 
+}))
+
+const motorResponseOptions = GCS_OPTIONS.motorResponse.map(opt => ({ 
+  text: opt.label, 
+  value: opt.value 
+}))
+
+// Expose options to parent component (tests)
+defineExpose({ eyeOpeningOptions, verbalResponseOptions, motorResponseOptions })
+
+// Function to set default values
+const setDefaultValues = () => {
+  // Set default calculator values
+  const getDefaultOptionValue = (options: ReadonlyArray<{ value: number }>) =>
+    Math.max(...options.map(opt => opt.value))
+
+  framework.setFieldValue('calculator', 'eyeOpening', getDefaultOptionValue(GCS_OPTIONS.eyeOpening))
+  framework.setFieldValue('calculator', 'verbalResponse', getDefaultOptionValue(GCS_OPTIONS.verbalResponse))
+  framework.setFieldValue('calculator', 'motorResponse', getDefaultOptionValue(GCS_OPTIONS.motorResponse))
+  
+  // Set default patient values
+  if (!framework.patientData.value.name) {
+    framework.setFieldValue('patient', 'name', '')
+  }
+  if (!framework.patientData.value.age) {
+    framework.setFieldValue('patient', 'age', config.defaultAge)
+  }
+  if (!framework.patientData.value.gender) {
+    framework.setFieldValue('patient', 'gender', 'male')
+  }
 }
 
-export interface Result {
-  question: string;
-  text: string;
-  score: number;
-}
-const apiUrlServer = import.meta.env.VITE_API_URL;
-const apiUrl = apiUrlServer+'/index.php/callback/LogCB/log';
-const keyUrl = apiUrlServer+'/index.php/KeyServer/getPublicKey';
+// Set default values immediately - this ensures validation passes
+setDefaultValues()
 
-const resultsSection = ref<HTMLDivElement | null>(null);
-const name = ref<string>("");
-const gender = ref<GenderValue>("male");
-const age = ref<number>(50);
-
-const formSubmitted = ref<boolean>(false);
-
-const resultsSection1 = ref<Result[]>([]);
-
-const totalScore = ref<number>(0);
-
-const conclusion = ref<string>('');
-const conclusionDescription = ref<string>('');
-const conclusionSeverity = ref<string>('');
-const validationMessage = ref<string>('');
-
-const options1 = ref<Option[]>([
-  { text: "Spontant", value: 4 },
-  { text: "På tiltale", value: 3 },
-  { text: "På smertestimulation", value: 2 },
-  { text: "Ingen", value: 1 }
-]);
-
-const options2 = ref<Option[]>([
-  { text: "Følger opfordringer", value: 6 },
-  { text: "Målrettet reaktion", value: 5 },
-  { text: "Afværger", value: 4 },
-  { text: "Normal fleksion", value: 3 },
-  { text: "Abnorm fleksion", value: 2 },
-  { text: "Ekstension", value: 1 },
-]);
-
-const options3 = ref<Option[]>([
-  { text: "Orienteret", value: 5 },
-  { text: "Forvirret", value: 4 },
-  { text: "Usammenhængede ord", value: 3 },
-  { text: "Uforståelige lyde", value: 2 },
-  { text: "Ingen", value: 1 }
-]);
-
-const questionsSection1 = ref<Question[]>([
-  {
-    type: 'Listbox',
-    bg: '--p-primary-100',
-    text: "Øjenåbning",
-    optionsType: 'options1',
-    answer: options1.value[0].value
-  },
-  {
-    type: 'Listbox',
-    bg: '--p-primary-50',
-    text: "Verbalt responds",
-    optionsType: 'options3',
-    answer: options3.value[0].value
-  },
-  {
-    type: 'Listbox',
-    bg: '--p-primary-100',
-    text: "Bedste motoriske responds",
-    optionsType: 'options2',
-    answer: options2.value[0].value
-  }
-]);
-
-// Default answers are already set in question configurations above
-
-const optionsSets = {
-  options1,
-  options2,
-  options3
-};
-
-const getOptions = (type: keyof OptionsSets): Option[] => {
-  return optionsSets[type].value;
-}
-
-const handleSubmit = () => {
-  formSubmitted.value = true;
-
-  if (validateQuestions()) {
-    calculateResults();
-    scrollToResults();
-    sendDataToServer(apiUrl, keyUrl, generatePayload())
-    .then(() => {
-      //console.log('Data successfully sent');
-    })
-    .catch(() => {
-      //console.error('Failed to send data');
-    });
-  }
-};
-
-const validateQuestions = (): boolean => {
-  const allQuestions = [
-    ...questionsSection1.value,
-  ];
-  const unansweredQuestions = allQuestions.filter(
-    (question) => question.answer === null
-  );
-  if (unansweredQuestions.length > 0) {
-    validationMessage.value = 'Alle spørgsmål skal udfyldes.';
-    return false;
-  } else {
-    validationMessage.value = '';
-    return true;
-  }
-};
-
-const isUnanswered = (question: Question): boolean => {
-  return question.answer === null
-};
-
-const calculateResults = () => {
-  const section1Results = questionsSection1.value.map((question, index) => {
-    const score = question.answer ?? 0;
-    return {
-      question: `${index + 1}`,
-      text: question.text,
-      score
-    };
-  });
-
-  resultsSection1.value = section1Results;
-  totalScore.value = resultsSection1.value.reduce((sum, result) => sum + result.score, 0);
-
-  if (totalScore.value > 14) {
-    conclusion.value = "Fuld bevidsthed";
-    conclusionDescription.value = "";
-    conclusionSeverity.value = "success";
-  } else if (totalScore.value > 12) {
-    conclusion.value = "Lettere bevidsthedssvækkelse";
-    conclusionDescription.value = "";
-    conclusionSeverity.value = "warn";
-  } else if (totalScore.value > 8) {
-    conclusion.value = "Middelsvær bevidsthedssvækkelse";
-    conclusionDescription.value = "";
-    conclusionSeverity.value = "error";
-  } else {
-    conclusion.value = "Svær bevidsthedssvækkelse (Coma) ";
-    conclusionSeverity.value = "error";
-  }
-};
-
-const scrollToResults = () => {
-  const resultsSectionEl = resultsSection.value as HTMLElement;
-  if (resultsSectionEl) {
-    resultsSectionEl.scrollIntoView({ behavior: 'smooth' });
-  }
-};
-
-
-const resetQuestions = () => {
-  questionsSection1.value.forEach(question => {
-    if (question.optionsType) {
-      question.answer = optionsSets[question.optionsType]?.value[0]?.value;
+// Submit handler
+const handleSubmit = async () => {
+  formSubmitted.value = true
+  validationMessage.value = ''
+  
+  try {
+    await framework.submitCalculation()
+    await nextTick()
+    scrollToResults()
+  } catch (_error) {
+    // Handle graceful degradation
+    if (framework.state.value.isComplete && framework.result.value) {
+      validationMessage.value = 'Beregning gennemført. Indsendelse til server fejlede.'
+    } else {
+      validationMessage.value = 'Der opstod en fejl ved beregning. Prøv igen.'
     }
-  });
+  }
+}
 
-  resultsSection1.value = [];
-  totalScore.value = 0;
-  validationMessage.value = '';
-  formSubmitted.value = false;
-};
+// Reset handler - reset calculator and set default values
+const handleReset = () => {
+  framework.resetCalculator()
+  // Use nextTick to ensure the reset has completed before setting defaults
+  nextTick(() => {
+    setDefaultValues()
+  })
+}
 
-const generatePayload = () => {
-  return {
-      name: name.value,
-      age: age.value,
-      gender: gender.value,
-      answers: [
-        ...questionsSection1.value,
-      ],
-      scores: {
-        totalScore: totalScore.value
-      },
-    };
+// Helper functions
+const scrollToResults = () => {
+  const resultsSectionEl = resultsSection.value as HTMLElement
+  if (resultsSectionEl) {
+    resultsSectionEl.scrollIntoView({ behavior: 'smooth' })
+  }
+}
+
+const getSeverityFromRisk = (riskLevel: RiskLevel): string => {
+  const mapping = {
+    low: 'success',
+    mild: 'warn', 
+    moderate: 'error',
+    severe: 'error',
+    unknown: 'info'
+  }
+  return mapping[riskLevel as keyof typeof mapping] || 'info'
 }
 </script>
 
