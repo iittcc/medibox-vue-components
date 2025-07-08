@@ -28,6 +28,7 @@
               :question="question"
               :options="getOptions(question.optionsType as keyof OptionsSets)"
               :index="index"
+              scrollHeight="18rem"
               :framework-answer="(framework.calculatorData.value as any)[question.id]"
               :is-unanswered="formSubmitted && ((framework.calculatorData.value as any)[question.id] === null || (framework.calculatorData.value as any)[question.id] === undefined)"
               @update:answer="framework.setFieldValue('calculator', question.id, $event)"
@@ -124,9 +125,9 @@ const config: CalculatorConfig = {
   version: '2.0.0',
   category: 'psychology',
   theme: 'sky',
-  defaultAge: 10,
+  defaultAge: 50,
   defaultGender: 'male',
-  minAge: 10,
+  minAge: 14,
   maxAge: 110,
   estimatedDuration: 2,
 };
