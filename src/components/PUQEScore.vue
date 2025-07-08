@@ -5,33 +5,70 @@
     <SurfaceCard title="Patient">
       <template #content>
         <PersonInfo
-          :name="name"
-          :age="age"
-          :minAge="12"
-          :maxAge="60"
-          :gender="gender as GenderValue"
+          :name="framework.patientData.value.name || ''"
+          :age="framework.patientData.value.age || config.defaultAge"
+          :minAge="config.minAge"
+          :maxAge="config.maxAge"
+          :gender="(framework.patientData.value.gender as GenderValue) || 'female'"
           genderdisplay="none"
-          @update:name="name = $event"
-          @update:age="age = $event"
-          @update:gender="gender = $event"
+          @update:name="framework.setFieldValue('patient', 'name', $event)"
+          @update:age="framework.setFieldValue('patient', 'age', $event)"
+          @update:gender="framework.setFieldValue('patient', 'gender', $event)"
         />
       </template>
     </SurfaceCard>
     
-    <SurfaceCard title="PUQE Scoringsskema">
+    <SurfaceCard :title="config.name">
       <template #content>
         <form @submit.prevent="handleSubmit">
           <QuestionSingleComponent
-            name="section1"
-            v-for="(question, index) in questionsSection1"
-            :key="index"
-            :question="question"
-            :options="getOptions(question.optionsType as keyof OptionsSets)"
-            :index="index"
-            :framework-answer="question.answer ?? undefined"
-            :is-unanswered="formSubmitted && isUnanswered(question)"
-            @update:answer="question.answer = $event"
+            name="nausea"
+            :question="{ 
+              type: 'Listbox',
+              bg: '--p-primary-100',
+              text: '1. Hvor lang tid har du følt dig forkvalmet, i løbet af de sidste 24 timer?',
+              optionsType: 'nausea'
+            }"
+            :options="nauseaOptions"
+            :index="0"
+            :framework-answer="puqeData.nausea"
+            :is-unanswered="formSubmitted && !puqeData.nausea"
+            scrollHeight="18rem"
+            @update:answer="framework.setFieldValue('calculator', 'nausea', $event)"
           />
+          
+          <QuestionSingleComponent
+            name="vomiting"
+            :question="{ 
+              type: 'Listbox',
+              bg: '--p-primary-50',
+              text: '2. Hvor mange gange har du kastet op, i løbet af de sidste 24 timer?',
+              optionsType: 'vomiting'
+            }"
+            :options="vomitingOptions"
+            :index="1"
+            :framework-answer="puqeData.vomiting"
+            :is-unanswered="formSubmitted && !puqeData.vomiting"
+            scrollHeight="18rem"
+            @update:answer="framework.setFieldValue('calculator', 'vomiting', $event)"
+          />
+          
+          <QuestionSingleComponent
+            name="retching"
+            :question="{ 
+              type: 'Listbox',
+              bg: '--p-primary-100',
+              text: '3. Har du haft opkastningsbevægelser (uden der kommer noget med op), i løbet af de sidste 24 timer?',
+              optionsType: 'retching'
+            }"
+            :options="retchingOptions"
+            :index="2"
+            :framework-answer="puqeData.retching"
+            :is-unanswered="formSubmitted && !puqeData.retching"
+            scrollHeight="18rem"
+            @update:answer="framework.setFieldValue('calculator', 'retching', $event)"
+          />
+          
           <div v-if="validationMessage" class="text-red-500 mt-5 font-bold">
             {{ validationMessage }}
           </div>
@@ -42,32 +79,51 @@
               icon="pi pi-clipboard" 
               severity="secondary" 
               class="mr-3" 
-              :disabled="(resultsSection ? false : true)" 
+              :disabled="!framework.result.value" 
             >
               <template #container>
-                <b>PUQE SCORE</b>
+                <b>{{config.name}}</b>
                 <br /><br />
-                Navn: {{ name }} <br />
-                Alder: {{ age }} år<br /><br />
-                <div v-for="(question, index) in resultsSection1" :key="index">{{ question.text }} {{ question.score }}</div>
+                Navn: {{ framework.patientData.value.name }} <br />
+                Køn: {{ getGenderLabel((framework.patientData.value.gender as GenderValue) || 'female') }} <br />
+                Alder: {{ framework.patientData.value.age }} år<br /><br />
+               
+                1. Kvalme: {{ puqeData.nausea }}<br />
+                2. Opkastning: {{ puqeData.vomiting }}<br />
+                3. Opkastningsbevægelser: {{ puqeData.retching }}<br />
                 <br /><br />
-                PUQE Score {{ totalScore }} : {{ conclusion }}
+                PUQE Score {{ framework.result.value?.score }} : {{ framework.result.value?.interpretation || '' }}
               </template>
             </CopyDialog>
-            <SecondaryButton label="Reset" icon="pi pi-sync" severity="secondary"  @click="resetQuestions"/>
-          <!--  <Button label="Random" icon="pi pi-ban" severity="secondary" class="mr-3" @click="randomlyCheckQuestions"/>-->
-      
-            <Button type="submit" label="Beregn" class="mr-3 pr-6 pl-6" icon="pi pi-calculator"/>
+            <SecondaryButton label="Reset" icon="pi pi-sync" severity="secondary" @click="handleReset"/>
+            <Button type="submit"
+              :label="framework.state.value.isSubmitting ? '' : 'Beregn'"
+              class="mr-3 pr-6 pl-6"
+              :icon="framework.state.value.isSubmitting ? 'pi pi-spin pi-spinner' : 'pi pi-calculator'"
+              :disabled="framework.state.value.isSubmitting"
+            />
           </div>
         </form>
       </template>
     </SurfaceCard>
-    <div v-if="resultsSection1.length > 0" class="results" ref="resultsSection">
+    
+    <div v-if="framework.result.value" class="results" ref="resultsSection">
       <SurfaceCard title="Resultat">
         <template #content>          
-       
-          <Message class="flex justify-center p-3" :severity="conclusionSeverity"><h2>PUQE Score {{ totalScore }} : {{ conclusion }}</h2></Message><br />
-          <p class="text-sm text-center ">Score ≤ 6 : Mild graviditetskvalme | Score 7-12: Moderat graviditetskvalme | Score ≥ 13: Svær graviditetskvalme (Hyperemesis Gravidarum)</p>
+          <br />
+          <Message class="flex justify-center p-3" :severity="getSeverityFromRiskLevel(framework.result.value.riskLevel)">
+            <h2>PUQE Score {{ framework.result.value.score }} : {{ framework.result.value.interpretation }}</h2>
+            <div class="flex justify-center">{{ getDetailedDescription(framework.result.value.details) }}</div>
+          </Message>
+          <br />
+          <p class="text-sm text-center">Score ≤ 6 : Mild graviditetskvalme | Score 7-12: Moderat graviditetskvalme | Score ≥ 13: Svær graviditetskvalme (Hyperemesis Gravidarum)</p>
+          <br />
+          <div v-if="framework.result.value.recommendations">
+            <h3 class="text-lg font-semibold mb-2">Anbefalinger:</h3>
+            <ul class="list-disc list-inside space-y-1">
+              <li v-for="rec in framework.result.value.recommendations" :key="rec">{{ rec }}</li>
+            </ul>
+          </div>
         </template>
       </SurfaceCard>
     </div>
@@ -76,220 +132,158 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, nextTick, computed } from 'vue'
+import { useCalculatorFramework, type CalculatorConfig, type CalculatorStep } from '@/composables/useCalculatorFramework'
+import Button from '@/volt/Button.vue'
+import SecondaryButton from '@/volt/SecondaryButton.vue'
+import QuestionSingleComponent from './QuestionSingleComponent.vue'
+import CopyDialog from './CopyDialog.vue'
+import SurfaceCard from './SurfaceCard.vue'
+import PersonInfo from './PersonInfo.vue'
+import Message from '@/volt/Message.vue'
+import { getGenderLabel, type GenderValue } from '@/utils/genderUtils'
+import type { RiskLevel, PuqeResponses } from '@/types/calculatorTypes'
+import type { PuqeDetails } from '@/calculators/puqe/puqeTypes'
 
-import QuestionSingleComponent from "./QuestionSingleComponent.vue";
-import CopyDialog from "./CopyDialog.vue";
-import SurfaceCard from "./SurfaceCard.vue";
-import PersonInfo from "./PersonInfo.vue";
-import Message from '@/volt/Message.vue';
-import Button from '@/volt/Button.vue';
-import SecondaryButton from '@/volt/SecondaryButton.vue';
-import sendDataToServer from '../assets/sendDataToServer.ts';
-import { type GenderValue } from '@/utils/genderUtils';
-
-export interface Option {
-  text: string;
-  value: number;
+// Framework configuration
+const config: CalculatorConfig = {
+  type: 'puqe',
+  name: 'PUQE Scoringsskema',
+  version: '2.0.0',
+  category: 'pregnancy',
+  theme: 'teal',
+  defaultAge: 28,
+  defaultGender: 'female',
+  minAge: 12,
+  maxAge: 60,
+  estimatedDuration: 3
 }
 
-export type OptionsSets = {
-  options1: Option[];
-  options2: Option[];
-  options3: Option[];
-};
+// Initialize framework
+const framework = useCalculatorFramework(config)
 
-export interface Question {
-  type: string;
-  bg?: string;
-  text: string;
-  description?: string;
-  optionsType?: keyof OptionsSets;
-  answer: number | null;
-}
+// Initialize steps
+const steps: CalculatorStep[] = [
+  { id: 'calculator', title: 'PUQE Assessment', order: 1, validation: true }
+]
+framework.initializeSteps(steps)
 
-export interface Result {
-  question: string;
-  text: string;
-  score: number;
-}
+// State
+const formSubmitted = ref<boolean>(false)
+const validationMessage = ref<string>('')
+const resultsSection = ref<HTMLDivElement | null>(null)
 
-const apiUrlServer = import.meta.env.VITE_API_URL;
-const apiUrl = apiUrlServer+'/index.php/callback/LogCB/log';
-const keyUrl = apiUrlServer+'/index.php/KeyServer/getPublicKey';
+// Typed calculator data
+const puqeData = computed(() => framework.calculatorData.value as Partial<PuqeResponses>)
 
-const resultsSection = ref<HTMLDivElement | null>(null);
-const name = ref<string>("");
-const gender = ref<GenderValue>("female");
-const age = ref<number>(28);
-
-const formSubmitted = ref<boolean>(false);
-
-const resultsSection1 = ref<Result[]>([]);
-
-const totalScore = ref<number>(0);
-
-const conclusion = ref<string>('');
-const conclusionSeverity = ref<string>('');
-const validationMessage = ref<string>('');
-
-const options1 = ref<Option[]>([
+// Options for PUQE questions
+const nauseaOptions = [
   { text: "Slet ikke", value: 1 },
   { text: "≤ 1 time", value: 2 },
   { text: "2-3 timer", value: 3 },
   { text: "4-6 timer", value: 4 },
   { text: "> 6 timer", value: 5 }
-]);
+]
 
-const options2 = ref<Option[]>([
+const vomitingOptions = [
   { text: "Ingen opkastninger", value: 1 },
   { text: "1-2 gange", value: 2 },
   { text: "3-4 gange", value: 3 },
   { text: "5-6 gange", value: 4 },
   { text: "≥ 7 gange", value: 5 }
-]);
+]
 
-const options3 = ref<Option[]>([
+const retchingOptions = [
   { text: "Nej", value: 1 },
   { text: "1-2 gange", value: 2 },
   { text: "3-4 gange", value: 3 },
   { text: "5-6 gange", value: 4 },
   { text: "≥ 7 gange", value: 5 }
-]);
+]
 
-const questionsSection1 = ref<Question[]>([
-  {
-    type: 'Listbox',
-    bg: '--p-primary-100',
-    text: "1. Hvor lang tid har du følt dig forkvalmet, i løbet af de sidste 24 timer?",
-    description: "",
-    optionsType: 'options1',
-    answer: options1.value[0].value
-  },
-  {
-    type: 'Listbox',
-    bg: '--p-primary-50',
-    text: "2. Hvor mange gange har du kastet op, i løbet af de sidste 24 timer?",
-    description: "",
-    optionsType: 'options2',
-    answer: options2.value[0].value
-  },
-  {
-    type: 'Listbox',
-    bg: '--p-primary-100',
-    text: "3. Har du haft opkastningsbevægelser (uden der kommer noget med op), i løbet af de sidste 24 timer?",
-    description: "",
-    optionsType: 'options3',
-    answer: options3.value[0].value
-  }
-]);
+// Expose options to parent component (tests)
+defineExpose({ nauseaOptions, vomitingOptions, retchingOptions })
 
-// Default answers are already set in question configurations above
+// Function to set default values
+const setDefaultValues = () => {
+  // Set default calculator values (all start at 1 for PUQE)
+  framework.setFieldValue('calculator', 'nausea', 1)
+  framework.setFieldValue('calculator', 'vomiting', 1)
+  framework.setFieldValue('calculator', 'retching', 1)
   
-const optionsSets = {
-  options1,
-  options2,
-  options3
-};
-
-const getOptions = (type: keyof OptionsSets): Option[] => {
-  return optionsSets[type].value;
+  // Set default patient values
+  if (!framework.patientData.value.name) {
+    framework.setFieldValue('patient', 'name', '')
+  }
+  if (!framework.patientData.value.age) {
+    framework.setFieldValue('patient', 'age', config.defaultAge)
+  }
+  if (!framework.patientData.value.gender) {
+    framework.setFieldValue('patient', 'gender', 'female')
+  }
 }
 
-const handleSubmit = () => {
-  formSubmitted.value = true;
+// Set default values immediately - this ensures validation passes
+setDefaultValues()
 
-  if (validateQuestions()) {
-    calculateResults();
-    scrollToResults();
-    sendDataToServer(apiUrl, keyUrl, generatePayload())
-    .then(() => {
-      //console.log('Data successfully sent');
-    })
-    .catch(() => {
-      //console.error('Failed to send data');
-    });
-  }
-};
-
-const validateQuestions = (): boolean => {
-  const allQuestions = [
-    ...questionsSection1.value,
-  ];
-  const unansweredQuestions = allQuestions.filter(
-    (question) => question.answer === null
-  );
-  if (unansweredQuestions.length > 0) {
-    validationMessage.value = 'Alle spørgsmål om vandladningsproblemer skal udfyldes. ';
-    return false;
-  } else {
-    validationMessage.value = '';
-    return true;
-  }
-};
-
-const isUnanswered = (question: Question): boolean => {
-  return question.answer === null
-};
-
-const calculateResults = () => {
-  const section1Results = questionsSection1.value.map((question, index) => {
-    const score = question.answer ?? 0;
-    return {
-      question: `${index + 1}`,
-      text: question.text,
-      score
-    };
-  });
-
-  resultsSection1.value = section1Results;
-  totalScore.value = resultsSection1.value.reduce((sum, result) => sum + result.score, 0);
-
-  if (totalScore.value > 12) {
-    conclusion.value = "Svær graviditetskvalme (Hyperemesis Gravidarum) (PUQE ≥ 13)";
-    conclusionSeverity.value = "error";
-  } else if (totalScore.value >= 7) {
-    conclusion.value = "Moderat graviditetskvalme (PUQE 7-12)";
-    conclusionSeverity.value = "warn";
-  } else {
-    conclusion.value = "Mild graviditetskvalme (PUQE ≤ 6)";
-    conclusionSeverity.value = "success";
-  }
-};
-
-const scrollToResults = () => {
-  const resultsSectionEl = resultsSection.value as HTMLElement;
-  if (resultsSectionEl) {
-    resultsSectionEl.scrollIntoView({ behavior: 'smooth' });
-  }
-};
-
-
-const resetQuestions = () => {
-  questionsSection1.value.forEach(question => {
-    if (question.optionsType) {
-      question.answer = optionsSets[question.optionsType]?.value[0]?.value;
+// Submit handler
+const handleSubmit = async () => {
+  formSubmitted.value = true
+  validationMessage.value = ''
+  
+  try {
+    await framework.submitCalculation()
+    await nextTick()
+    scrollToResults()
+  } catch (_error) {
+    // Handle graceful degradation
+    if (framework.state.value.isComplete && framework.result.value) {
+      validationMessage.value = 'Beregning gennemført. Indsendelse til server fejlede.'
+    } else {
+      validationMessage.value = 'Der opstod en fejl ved beregning. Prøv igen.'
     }
-  });
+  }
+}
 
-  resultsSection1.value = [];
-  totalScore.value = 0;
-  validationMessage.value = '';
-  formSubmitted.value = false;
-};
+// Reset handler - reset calculator and set default values
+const handleReset = () => {
+  framework.resetCalculator()
+  // Use nextTick to ensure the reset has completed before setting defaults
+  nextTick(() => {
+    setDefaultValues()
+  })
+}
 
-const generatePayload = () => {
-  return {
-      name: name.value,
-      age: age.value,
-      gender: gender.value,
-      answers: [
-        ...questionsSection1.value,
-      ],
-      scores: {
-        totalScore: totalScore.value
-      },
-    };
+// Helper functions
+const scrollToResults = () => {
+  const resultsSectionEl = resultsSection.value as HTMLElement
+  if (resultsSectionEl) {
+    resultsSectionEl.scrollIntoView({ behavior: 'smooth' })
+  }
+}
+
+const getSeverityFromRiskLevel = (riskLevel: RiskLevel): string => {
+  const mapping = {
+    low: 'success',
+    mild: 'success', 
+    moderate: 'warn',
+    severe: 'error',
+    unknown: 'info'
+  }
+  return mapping[riskLevel as keyof typeof mapping] || 'info'
+}
+
+const getDetailedDescription = (details: any): string => {
+  if (!details) return ''
+  
+  const puqeDetails = details as PuqeDetails
+  if (puqeDetails.severity === 'severe') {
+    return 'Patienten bør eventuelt henvises til læge for udredning og behandling af hyperemesis gravidarum'
+  } else if (puqeDetails.severity === 'moderate') {
+    return 'Kontakt jordemoder for rådgivning og eventuel behandling'
+  } else if (puqeDetails.severity === 'mild') {
+    return 'Små hyppige måltider og undgå trigger foods kan hjælpe'
+  }
+  return ''
 }
 </script>
-
