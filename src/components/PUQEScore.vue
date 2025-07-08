@@ -116,7 +116,7 @@
             <div class="flex justify-center">{{ getDetailedDescription(framework.result.value.details) }}</div>
           </Message>
           <br />
-          <p class="text-sm text-center">Score ≤ 6 : Mild graviditetskvalme | Score 7-12: Moderat graviditetskvalme | Score ≥ 13: Svær graviditetskvalme (Hyperemesis Gravidarum)</p>
+          <p class="text-sm text-center">{{ config.scoreInterpretation }}</p>
           <br />
           <div v-if="framework.result.value.recommendations">
             <h3 class="text-lg font-semibold mb-2">Anbefalinger:</h3>
@@ -156,7 +156,8 @@ const config: CalculatorConfig = {
   defaultGender: 'female',
   minAge: 12,
   maxAge: 60,
-  estimatedDuration: 3
+  estimatedDuration: 3,
+  scoreInterpretation: 'Score ≤ 6 : Mild graviditetskvalme | Score 7-12: Moderat graviditetskvalme | Score ≥ 13: Svær graviditetskvalme (Hyperemesis Gravidarum)'
 }
 
 // Initialize framework
