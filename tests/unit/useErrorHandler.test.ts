@@ -589,11 +589,9 @@ describe('useErrorHandler', () => {
 
       wrapper = mount(TestComponent)
 
+      // Only network status events should be set up (from useNetworkStatus)
       expect(addEventListenerSpy).toHaveBeenCalledWith('online', expect.any(Function))
       expect(addEventListenerSpy).toHaveBeenCalledWith('offline', expect.any(Function))
-      expect(addEventListenerSpy).toHaveBeenCalledWith('medicalCalculatorError', expect.any(Function))
-      expect(addEventListenerSpy).toHaveBeenCalledWith('medicalCalculatorRecovery', expect.any(Function))
-      expect(addEventListenerSpy).toHaveBeenCalledWith('showErrorToast', expect.any(Function))
 
       addEventListenerSpy.mockRestore()
     })
@@ -612,11 +610,9 @@ describe('useErrorHandler', () => {
       wrapper = mount(TestComponent)
       wrapper.unmount()
 
+      // Only network status events should be cleaned up (from useNetworkStatus)
       expect(removeEventListenerSpy).toHaveBeenCalledWith('online', expect.any(Function))
       expect(removeEventListenerSpy).toHaveBeenCalledWith('offline', expect.any(Function))
-      expect(removeEventListenerSpy).toHaveBeenCalledWith('medicalCalculatorError', expect.any(Function))
-      expect(removeEventListenerSpy).toHaveBeenCalledWith('medicalCalculatorRecovery', expect.any(Function))
-      expect(removeEventListenerSpy).toHaveBeenCalledWith('showErrorToast', expect.any(Function))
 
       removeEventListenerSpy.mockRestore()
     })

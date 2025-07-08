@@ -24,14 +24,17 @@ export interface MedicalCalculatorEventMap {
 export class TypeSafeEventManager {
   private listeners = new Map<keyof MedicalCalculatorEventMap, Set<(data: any) => void>>()
   private cleanupFunctions = new Map<(data: any) => void, () => void>()
-
+  private componentCleanupFunctions = new Map<string, Set<() => void>>()
+  private windowListeners = new Map<string, (e: Event) => void>()
+  
   /**
    * Subscribe to an event with type safety
    * @returns Cleanup function that removes the event listener
    */
   subscribe<K extends keyof MedicalCalculatorEventMap>(
     event: K,
-    callback: (data: MedicalCalculatorEventMap[K]) => void
+    callback: (data: MedicalCalculatorEventMap[K]) => void,
+    componentId?: string
   ): () => void {
     if (!this.listeners.has(event)) {
       this.listeners.set(event, new Set())
@@ -39,30 +42,59 @@ export class TypeSafeEventManager {
 
     const listeners = this.listeners.get(event)!
     listeners.add(callback)
-
     // Map event names to window event names
     const windowEventName = this.getWindowEventName(event)
     
-    // Create typed event handler
-    const handler = (e: Event) => {
-      if (event === 'network:online' || event === 'network:offline') {
-        callback(undefined as any)
-      } else if (e instanceof CustomEvent) {
-        callback(e.detail)
+    // Create or reuse window event handler
+    if (!this.windowListeners.has(windowEventName)) {
+      const handler = (e: Event) => {
+        // Find the internal event name from the window event name
+        const internalEvent = Object.entries(this.getEventMap()).find(
+          ([, windowName]) => windowName === windowEventName
+        )?.[0] as keyof MedicalCalculatorEventMap | undefined
+        
+        if (internalEvent) {
+          const eventListeners = this.listeners.get(internalEvent)
+          if (eventListeners) {
+            eventListeners.forEach(listener => {
+              if (internalEvent === 'network:online' || internalEvent === 'network:offline') {
+                listener(undefined as any)
+              } else if (e instanceof CustomEvent) {
+                listener(e.detail)
+              }
+            })
+          }
+        }
       }
+      
+      this.windowListeners.set(windowEventName, handler)
+      window.addEventListener(windowEventName, handler)
     }
-
-    // Add event listener
-    window.addEventListener(windowEventName, handler)
 
     // Store cleanup function
     const cleanup = () => {
-      window.removeEventListener(windowEventName, handler)
       listeners.delete(callback)
       this.cleanupFunctions.delete(callback)
+      
+      // Remove window listener only if no more listeners for this event
+      if (listeners.size === 0) {
+        const windowHandler = this.windowListeners.get(windowEventName)
+        if (windowHandler) {
+          window.removeEventListener(windowEventName, windowHandler)
+          this.windowListeners.delete(windowEventName)
+        }
+      }
     }
 
     this.cleanupFunctions.set(callback, cleanup)
+
+    // Track component-specific cleanup if componentId provided
+    if (componentId) {
+      if (!this.componentCleanupFunctions.has(componentId)) {
+        this.componentCleanupFunctions.set(componentId, new Set())
+      }
+      this.componentCleanupFunctions.get(componentId)!.add(cleanup)
+    }
 
     return cleanup
   }
@@ -84,39 +116,89 @@ export class TypeSafeEventManager {
   }
 
   /**
-   * Clean up all event listeners
+   * Clean up event listeners for a specific component
    */
-  cleanup(): void {
-    this.cleanupFunctions.forEach(cleanup => cleanup())
-    this.listeners.clear()
-    this.cleanupFunctions.clear()
+  cleanupComponent(componentId: string): void {
+    const componentCleanups = this.componentCleanupFunctions.get(componentId)
+    if (componentCleanups) {
+      componentCleanups.forEach(cleanup => cleanup())
+      this.componentCleanupFunctions.delete(componentId)
+    }
   }
 
   /**
-   * Map internal event names to window event names for backward compatibility
+   * Clean up all event listeners (use with caution in shared singleton)
    */
-  private getWindowEventName(event: keyof MedicalCalculatorEventMap): string {
-    const eventMap: Record<keyof MedicalCalculatorEventMap, string> = {
+  cleanup(): void {
+    // Remove all window event listeners
+    this.windowListeners.forEach((handler, eventName) => {
+      window.removeEventListener(eventName, handler)
+    })
+    
+    this.listeners.clear()
+    this.cleanupFunctions.clear()
+    this.componentCleanupFunctions.clear()
+    this.windowListeners.clear()
+  }
+
+  /**
+   * Get the event mapping object
+   */
+  private getEventMap(): Record<keyof MedicalCalculatorEventMap, string> {
+    return {
       'network:online': 'online',
       'network:offline': 'offline',
       'error:medical-calculator': 'medicalCalculatorError',
       'error:recovery': 'medicalCalculatorRecovery',
       'notification:show-toast': 'showErrorToast'
     }
-    return eventMap[event]
+  }
+
+  /**
+   * Map internal event names to window event names for backward compatibility
+   */
+  private getWindowEventName(event: keyof MedicalCalculatorEventMap): string {
+    return this.getEventMap()[event]
   }
 }
 
-/**
- * Create a new event manager instance with Vue lifecycle integration
- */
-export function useEventManager() {
-  const manager = new TypeSafeEventManager()
+// Global singleton instance
+let globalEventManager: TypeSafeEventManager | null = null
 
-  // Return manager with cleanup method for Vue components
+/**
+ * Get or create the global event manager singleton
+ */
+function getGlobalEventManager(): TypeSafeEventManager {
+  if (!globalEventManager) {
+    globalEventManager = new TypeSafeEventManager()
+  }
+  return globalEventManager
+}
+
+/**
+ * Get the shared event manager instance for Vue components
+ * Uses singleton pattern to prevent duplicate event listeners
+ */
+export function useEventManager(componentId?: string) {
+  const manager = getGlobalEventManager()
+
+  // Create component-specific subscribe function
+  const subscribe = componentId 
+    ? <K extends keyof MedicalCalculatorEventMap>(
+        event: K,
+        callback: (data: MedicalCalculatorEventMap[K]) => void
+      ) => manager.subscribe(event, callback, componentId)
+    : manager.subscribe.bind(manager)
+
+  // Create component-specific cleanup function
+  const cleanup = componentId
+    ? () => manager.cleanupComponent(componentId)
+    : manager.cleanup.bind(manager)
+
+  // Return manager with component-aware methods
   return {
-    subscribe: manager.subscribe.bind(manager),
+    subscribe,
     emit: manager.emit.bind(manager),
-    cleanup: manager.cleanup.bind(manager)
+    cleanup
   }
 }

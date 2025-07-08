@@ -1,11 +1,13 @@
-import { ref, readonly, onMounted, onUnmounted } from 'vue'
+import { ref, readonly, watch } from 'vue'
 import { errorBoundaryManager, type ErrorInfo, ErrorType } from '@/utils/errorBoundary'
-import { useEventManager } from '@/utils/eventManager'
 import { useNetworkStatus } from './useNetworkStatus'
 import { useNotifications } from './useNotifications'
 import { RecoveryManager } from './error-handling/RecoveryManager'
 import { useErrorState } from './error-handling/useErrorState'
 import { ErrorFactory, type ErrorContext } from '@/utils/errorFactory'
+
+// Note: useErrorHandler doesn't use singleton pattern because each instance
+// needs its own error handling logic with custom options and callbacks
 
 export interface ErrorHandlerOptions {
   showToasts?: boolean
@@ -20,7 +22,6 @@ export interface ErrorHandlerOptions {
 
 export function useErrorHandler(options: ErrorHandlerOptions = {}) {
   const { showErrorToast, showSuccess, showInfo, showWarning } = useNotifications()
-  const eventManager = useEventManager()
   const recoveryManager = new RecoveryManager()
   const { 
     errors, 
@@ -129,54 +130,15 @@ export function useErrorHandler(options: ErrorHandlerOptions = {}) {
   }
 
 
-  // Lifecycle hooks with type-safe event management
-  onMounted(() => {
-    // Network status events
-    eventManager.subscribe('network:online', () => {
-      handleOnlineStatusChange()
-    })
-    
-    eventManager.subscribe('network:offline', () => {
-      handleOnlineStatusChange()
-    })
-    
-    // Error events
-    eventManager.subscribe('error:medical-calculator', (errorInfo) => {
-      addError(errorInfo)
-      if (showToasts) {
-        const message = getUserFriendlyMessage(errorInfo.errorType, { message: errorInfo.errorMessage } as Error)
-        showErrorToast(errorInfo.errorType, message, errorInfo.recoverable)
-      }
-    })
-    
-    // Recovery events
-    eventManager.subscribe('error:recovery', (errorInfo) => {
-      if (onRecovery) {
-        onRecovery(errorInfo)
-      }
-    })
-    
-    // Toast events
-    eventManager.subscribe('notification:show-toast', (toastOptions) => {
-      if (toastOptions.severity === 'success') {
-        showSuccess(toastOptions.summary, toastOptions.detail)
-      } else if (toastOptions.severity === 'info') {
-        showInfo(toastOptions.summary, toastOptions.detail)
-      } else if (toastOptions.severity === 'warn') {
-        showWarning(toastOptions.summary, toastOptions.detail)
-      } else if (toastOptions.severity === 'error') {
-        // We need an error type to call showErrorToast, but the event doesn't provide one.
-        // We'll default to UNKNOWN. A better solution would be to refactor the event
-        // to include the error type.
-        showErrorToast(ErrorType.UNKNOWN, toastOptions.detail ?? '', false)
-      }
-    })
-  })
+  // Watch network status changes instead of subscribing to events directly
+  watch(isOnline, handleOnlineStatusChange)
 
-  onUnmounted(() => {
-    // Cleanup all event listeners automatically
-    eventManager.cleanup()
-  })
+  // Note: We don't need singleton event subscriptions for useErrorHandler because:
+  // 1. Individual instances need their own error handling logic (options, callbacks)  
+  // 2. The errorBoundaryManager already handles global error events
+  // 3. Subscribing to 'error:medical-calculator' here would create circular calls
+  //
+  // Each useErrorHandler instance manages its own logic without global event subscriptions
 
   return {
     // State
