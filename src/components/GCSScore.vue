@@ -27,13 +27,12 @@
               type: 'Listbox',
               bg: '--p-primary-100',
               text: 'Øjenåbning',
-              optionsType: 'eyeOpening',
-              answer: framework.calculatorData.value.eyeOpening || 4
+              optionsType: 'eyeOpening'
             }"
             :options="eyeOpeningOptions"
             :index="0"
-            :framework-answer="framework.calculatorData.value.eyeOpening"
-            :is-unanswered="formSubmitted && !framework.calculatorData.value.eyeOpening"
+            :framework-answer="gcsData.eyeOpening"
+            :is-unanswered="formSubmitted && !gcsData.eyeOpening"
             scrollHeight="18rem"
             @update:answer="framework.setFieldValue('calculator', 'eyeOpening', $event)"
           />
@@ -44,13 +43,12 @@
               type: 'Listbox',
               bg: '--p-primary-50',
               text: 'Verbalt responds',
-              optionsType: 'verbalResponse',
-              answer: framework.calculatorData.value.verbalResponse || 5
+              optionsType: 'verbalResponse'
             }"
             :options="verbalResponseOptions"
             :index="1"
-            :framework-answer="framework.calculatorData.value.verbalResponse"
-            :is-unanswered="formSubmitted && !framework.calculatorData.value.verbalResponse"
+            :framework-answer="gcsData.verbalResponse"
+            :is-unanswered="formSubmitted && !gcsData.verbalResponse"
             scrollHeight="18rem"
             @update:answer="framework.setFieldValue('calculator', 'verbalResponse', $event)"
           />
@@ -61,13 +59,12 @@
               type: 'Listbox',
               bg: '--p-primary-100',
               text: 'Bedste motoriske responds',
-              optionsType: 'motorResponse',
-              answer: framework.calculatorData.value.motorResponse || 6
+              optionsType: 'motorResponse'
             }"
             :options="motorResponseOptions"
             :index="2"
-            :framework-answer="framework.calculatorData.value.motorResponse"
-            :is-unanswered="formSubmitted && !framework.calculatorData.value.motorResponse"
+            :framework-answer="gcsData.motorResponse"
+            :is-unanswered="formSubmitted && !gcsData.motorResponse"
             scrollHeight="18rem"
             @update:answer="framework.setFieldValue('calculator', 'motorResponse', $event)"
           />
@@ -90,14 +87,14 @@
                 Navn: {{ framework.patientData.value.name }} <br />
                 Køn: {{ getGenderLabel((framework.patientData.value.gender as GenderValue) || 'male') }} <br />
                 Alder: {{ framework.patientData.value.age }} år<br /><br />
-                Øjenåbning: {{ framework.calculatorData.value.eyeOpening || 4 }}<br />
-                Verbalt responds: {{ framework.calculatorData.value.verbalResponse || 5 }}<br />
-                Bedste motoriske responds: {{ framework.calculatorData.value.motorResponse || 6 }}<br />
+                Øjenåbning: {{ gcsData.eyeOpening || 4 }}<br />
+                Verbalt responds: {{ gcsData.verbalResponse || 5 }}<br />
+                Bedste motoriske responds: {{ gcsData.motorResponse || 6 }}<br />
                 <br /><br />
                 {{ framework.result.value?.interpretation || '' }}
               </template>
             </CopyDialog>
-            <SecondaryButton label="Reset" icon="pi pi-sync" severity="secondary" @click="framework.resetCalculator"/>
+            <SecondaryButton label="Reset" icon="pi pi-sync" severity="secondary" @click="handleReset"/>
             <Button type="submit" label="Beregn" class="mr-3 pr-6 pl-6" icon="pi pi-calculator"/>
           </div>
         </form>
@@ -127,7 +124,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, nextTick } from 'vue'
+import { ref, nextTick, computed } from 'vue'
 import { useCalculatorFramework, type CalculatorConfig, type CalculatorStep } from '@/composables/useCalculatorFramework'
 import Button from '@/volt/Button.vue'
 import SecondaryButton from '@/volt/SecondaryButton.vue'
@@ -137,7 +134,7 @@ import SurfaceCard from './SurfaceCard.vue'
 import PersonInfo from './PersonInfo.vue'
 import Message from '@/volt/Message.vue'
 import { getGenderLabel, type GenderValue } from '@/utils/genderUtils'
-import type { RiskLevel } from '@/types/calculatorTypes'
+import type { RiskLevel, GcsResponses } from '@/types/calculatorTypes'
 import { GCS_OPTIONS } from '@/calculators/gcs/gcsTypes'
 
 // Framework configuration
@@ -166,6 +163,9 @@ const formSubmitted = ref<boolean>(false)
 const validationMessage = ref<string>('')
 const resultsSection = ref<HTMLDivElement | null>(null)
 
+// Typed calculator data
+const gcsData = computed(() => framework.calculatorData.value as Partial<GcsResponses>)
+
 // Options from GCS configuration
 const eyeOpeningOptions = GCS_OPTIONS.eyeOpening.map(opt => ({ 
   text: opt.label, 
@@ -182,16 +182,27 @@ const motorResponseOptions = GCS_OPTIONS.motorResponse.map(opt => ({
   value: opt.value 
 }))
 
-// Set default values if not already set
-if (!framework.calculatorData.value.eyeOpening) {
+// Function to set default values
+const setDefaultValues = () => {
+  // Set default calculator values
   framework.setFieldValue('calculator', 'eyeOpening', 4)
-}
-if (!framework.calculatorData.value.verbalResponse) {
   framework.setFieldValue('calculator', 'verbalResponse', 5)
-}
-if (!framework.calculatorData.value.motorResponse) {
   framework.setFieldValue('calculator', 'motorResponse', 6)
+  
+  // Set default patient values
+  if (!framework.patientData.value.name) {
+    framework.setFieldValue('patient', 'name', '')
+  }
+  if (!framework.patientData.value.age) {
+    framework.setFieldValue('patient', 'age', 50)
+  }
+  if (!framework.patientData.value.gender) {
+    framework.setFieldValue('patient', 'gender', 'male')
+  }
 }
+
+// Set default values immediately - this ensures validation passes
+setDefaultValues()
 
 // Submit handler
 const handleSubmit = async () => {
@@ -212,6 +223,15 @@ const handleSubmit = async () => {
   }
 }
 
+// Reset handler - reset calculator and set default values
+const handleReset = () => {
+  framework.resetCalculator()
+  // Use nextTick to ensure the reset has completed before setting defaults
+  nextTick(() => {
+    setDefaultValues()
+  })
+}
+
 // Helper functions
 const scrollToResults = () => {
   const resultsSectionEl = resultsSection.value as HTMLElement
@@ -228,7 +248,7 @@ const getSeverityFromRisk = (riskLevel: RiskLevel): string => {
     severe: 'error',
     unknown: 'info'
   }
-  return mapping[riskLevel] || 'info'
+  return mapping[riskLevel as keyof typeof mapping] || 'info'
 }
 </script>
 

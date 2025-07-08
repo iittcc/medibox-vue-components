@@ -1,7 +1,16 @@
-import type { GcsResponses, GcsDetails } from '@/types/calculatorTypes'
+import type { GcsResponses, GcsDetails, RiskLevel } from '@/types/calculatorTypes'
 
 // Re-export types for convenience
 export type { GcsResponses, GcsDetails }
+
+// GCS-specific calculation result
+export interface GcsCalculationResult {
+  score: number
+  interpretation: string
+  recommendations: string[]
+  riskLevel: RiskLevel
+  details: GcsDetails
+}
 
 // GCS configuration
 export const GCS_CONFIG = {
