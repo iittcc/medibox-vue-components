@@ -34,7 +34,7 @@
             :options="wellbeingOptions"
             :index="index"
             :framework-answer="who5Data[question.id as keyof Who5Responses]"
-            :is-unanswered="formSubmitted && !who5Data[question.id as keyof Who5Responses]"
+            :is-unanswered="formSubmitted && who5Data[question.id as keyof Who5Responses] == null"
             scrollHeight="18rem"
             @update:answer="framework.setFieldValue('calculator', question.id, $event)"
           />
@@ -188,7 +188,7 @@ const setDefaultValues = () => {
 
 // Set default values only if data is empty
 onMounted(() => {
-  const hasAnyData = who5Questions.some(question => who5Data.value[question.id as keyof Who5Responses])
+  const hasAnyData = who5Questions.some(question => who5Data.value[question.id as keyof Who5Responses] != null)
   if (!hasAnyData) {
     setDefaultValues()
     console.log('Default values set')
