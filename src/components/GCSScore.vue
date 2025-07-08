@@ -130,7 +130,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, nextTick, computed } from 'vue'
+import { ref, nextTick, computed, onMounted } from 'vue'
 import { useCalculatorFramework, type CalculatorConfig, type CalculatorStep } from '@/composables/useCalculatorFramework'
 import Button from '@/volt/Button.vue'
 import SecondaryButton from '@/volt/SecondaryButton.vue'
@@ -215,8 +215,13 @@ const setDefaultValues = () => {
   }
 }
 
-// Set default values immediately - this ensures validation passes
-setDefaultValues()
+// Set default values only if data is empty
+onMounted(() => {
+  if (!gcsData.value.eyeOpening && !gcsData.value.verbalResponse && !gcsData.value.motorResponse) {
+    setDefaultValues()
+    console.log('Default values set')
+  }
+})
 
 // Submit handler
 const handleSubmit = async () => {
@@ -255,14 +260,18 @@ const scrollToResults = () => {
 }
 
 const getSeverityFromRisk = (riskLevel: RiskLevel): string => {
-  const mapping = {
+  const mapping: Record<RiskLevel, string> = {
     low: 'success',
     mild: 'warn', 
     moderate: 'error',
     severe: 'error',
-    unknown: 'info'
+    unknown: 'info',
+    minimal: 'info',
+    medium: 'info',
+    high: 'info',
+    very_high: 'info'
   }
-  return mapping[riskLevel as keyof typeof mapping] || 'info'
+  return mapping[riskLevel] || 'info'
 }
 </script>
 

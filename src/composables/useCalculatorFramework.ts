@@ -32,6 +32,7 @@ export interface CalculatorConfig {
   allowedGenders?: readonly string[]
   requiredFields?: string[]
   estimatedDuration?: number // in minutes
+  scoreInterpretation?: string
 }
 
 export interface CalculatorStep {
