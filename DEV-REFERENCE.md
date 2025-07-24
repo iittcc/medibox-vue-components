@@ -17,7 +17,8 @@
 - `.gitignore`: `dist/`, `node_modules/`, logs, IDE files
 
 ## Repository Structure
-- `.serena/` - Serena agent cache/memories
+- `src/` - Source files
+- `tests/` - Test files
 - `dist/` - Build output
 - `public/` - Static assets
 - `docs/` - Documentation
