@@ -1,0 +1,104 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find:*)",
+      "Bash(chmod:*)",
+      "Bash(npm run type-check:*)",
+      "WebFetch(domain:volt.primevue.org)",
+      "WebFetch(domain:primevue.org)",
+      "mcp__Context7__resolve-library-id",
+      "mcp__Context7__get-library-docs",
+      "mcp__clear-thought__sequentialthinking",
+      "Bash(npx vue-tsc:*)",
+      "WebFetch(domain:docs.anthropic.com)",
+      "mcp__ide__executeCode",
+      "Bash(node:*)",
+      "Bash(npx playwright install:*)",
+      "mcp__ide__getDiagnostics",
+      "Bash(curl:*)",
+      "Bash(for file in /Users/tej/localhost/medibox-vue-components/src/components/*.vue)",
+      "Bash(do)",
+      "Bash(if grep -q \"CopyDialog\" \"$file\")",
+      "Bash(then)",
+      "Bash(echo \"=== $file ===\")",
+      "Bash(fi)",
+      "Bash(done)",
+      "mcp__serena__initial_instructions",
+      "mcp__serena__check_onboarding_performed",
+      "mcp__serena__get_current_config",
+      "mcp__serena__activate_project",
+      "mcp__serena__onboarding",
+      "mcp__serena__list_dir",
+      "mcp__serena__read_file",
+      "mcp__serena__get_symbols_overview",
+      "mcp__serena__find_file",
+      "mcp__serena__write_memory",
+      "mcp__serena__replace_symbol_body",
+      "mcp__serena__replace_regex",
+      "mcp__serena__search_for_pattern",
+      "mcp__playwright__playwright_navigate",
+      "mcp__playwright__playwright_screenshot",
+      "mcp__playwright__playwright_close",
+      "mcp__playwright__playwright_click",
+      "mcp__playwright__playwright_get_visible_text",
+      "mcp__playwright__playwright_console_logs",
+      "mcp__serena__find_symbol",
+      "mcp__serena__think_about_collected_information",
+      "mcp__serena__think_about_task_adherence",
+      "mcp__serena__execute_shell_command",
+      "mcp__serena__read_memory",
+      "WebFetch(domain:www.typescriptlang.org)",
+      "WebFetch(domain:github.com)",
+      "Bash(git clone:*)",
+      "Bash(pnpm install:*)",
+      "Bash(pnpm bootstrap:*)",
+      "Bash(/Users/tej/mcp-servers/start-typescript-docs.sh:*)",
+      "Bash(for file in tests/components/*.test.ts)",
+      "Bash(do echo -n \"$file: \")",
+      "Bash(timeout 30s npm run test:*)",
+      "Bash(gtimeout:*)",
+      "Bash(npx vitest run:*)",
+      "Bash(NODE_OPTIONS=\"--max-old-space-size=2048\" npx vitest run tests/unit/useLogging.test.ts --no-coverage)",
+      "mcp__playwright__playwright_evaluate",
+      "mcp__playwright__playwright_get_visible_html",
+      "Bash(npx vitest:*)",
+      "mcp__clear-thought__visualreasoning",
+      "mcp__clear-thought__designpattern",
+      "Bash(gh issue list:*)",
+      "Bash(gh repo view:*)",
+      "Bash(gh issue view:*)",
+      "Bash(gh issue close:*)",
+      "Bash(gh pr create:*)",
+      "Bash(npx playwright test:*)"
+    ],
+    "deny": []
+  },
+  "enabledMcpjsonServers": [
+    "Context7",
+    "clear-thought",
+    "playwright",
+    "serena",
+    "typescript-docs"
+  ],
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".dev/.claude/hooks/log-commands.py"
+          },
+          {
+            "type": "command",
+            "command": ".dev/.claude/hooks/pre-commit-validator.py"
+          },
+          {
+            "type": "command",
+            "command": ".dev/.claude/hooks/validate-git-commit.py"
+          }
+        ]
+      }
+    ]
+  }
+}
