@@ -54,15 +54,11 @@ export class EpdsCalculator extends BaseCalculator<EpdsResponses, EpdsDetails> {
     let urgentReferralNeeded = false
     
     if (score <= 9) {
-      interpretation = 'Minimal risiko for postnatal depression'
+      interpretation = 'Ikke tegn til alvorlig depression'
       recommendations = ['Fortsat observation', 'Støt fra familie og venner']
       riskLevel = 'minimal'
-    } else if (score <= 12) {
-      interpretation = 'Mild risiko for postnatal depression'
-      recommendations = ['Tal med sundhedsplejerske', 'Overvej støttegrupper']
-      riskLevel = 'mild'
     } else {
-      interpretation = 'Moderat til høj risiko for postnatal depression'
+      interpretation = 'Behandlingskrævende depression kan foreligge'
       if (suicidalThoughts) {
         recommendations = ['Søg øjeblikkelig hjælp', 'Kontakt læge eller akutmodtagelse']
         riskLevel = 'severe'

@@ -6,10 +6,10 @@
       <template #content>
         <PersonInfo
           :name="framework.patientData.value.name || ''"
-          :age="framework.patientData.value.age || 35"
-          :minAge="12"
-          :maxAge="70"
-          :gender="framework.patientData.value.gender as GenderValue || 'female'"
+          :age="framework.patientData.value.age || config.defaultAge"
+          :minAge="config.minAge"
+          :maxAge="config.maxAge"
+          :gender="(framework.patientData.value.gender as GenderValue) || config.defaultGender"
           genderdisplay="block"
           @update:name="framework.setFieldValue('patient', 'name', $event)"
           @update:age="framework.setFieldValue('patient', 'age', $event)"
@@ -28,8 +28,8 @@
             :question="question"
             :options="getOptions(question.optionsType as keyof OptionsSets)"
             :index="index"
-            :framework-answer="(framework.calculatorData.value as any)[question.id]"
-            :is-unanswered="formSubmitted && ((framework.calculatorData.value as any)[question.id] === null || (framework.calculatorData.value as any)[question.id] === undefined)"
+            :framework-answer="(epdsData as any)[question.id]"
+            :is-unanswered="formSubmitted && ((epdsData as any)[question.id] === null || (epdsData as any)[question.id] === undefined)"
             scrollHeight="18rem"
             @update:answer="framework.setFieldValue('calculator', question.id, $event)"
           />
@@ -43,7 +43,7 @@
               icon="pi pi-clipboard"
               severity="secondary"
               class="mr-3"
-              :disabled="!framework.state.value.isComplete"
+              :disabled="!framework.result.value"
             >
               <template #container>
                 <b>{{ config.name }}</b>
@@ -51,7 +51,7 @@
                 Navn: {{ framework.patientData.value.name }} <br />
                 Køn: {{ getGenderLabel(framework.patientData.value.gender as GenderValue) }} <br />
                 Alder: {{ framework.patientData.value.age }} år<br /><br />
-                <div v-for="question in resultsSection1" :key="question.id" >{{ question.text }} {{ (framework.calculatorData.value as any)[question.id] }}</div>
+                <div v-for="question in resultsSection1" :key="question.id" >{{ question.text }} {{ (epdsData as any)[question.id] }}</div>
                 <br /><br />
                 Edinburgh postnatale depressionsscore {{ framework.result.value?.score }} : {{ framework.result.value?.interpretation }}
               </template>
@@ -73,15 +73,23 @@
         </form>
       </template>
     </SurfaceCard>
-    <div data-testid="results-section" v-if="framework.state.value.isComplete && framework.result.value" class="results">
+    <div data-testid="results-section" v-if="framework.result.value" class="results" ref="resultsSection">
       <SurfaceCard title="Resultat">
-        <template #content>
+        <template #content>          
           <br />
-          <Message class="flex justify-center p-3" :severity="framework.result.value.riskLevel === 'minimal' ? 'success' : 'warn'">
-            <h2>Edinburgh postnatale depressionsscore {{ framework.result.value.score }} <br /> {{ framework.result.value.interpretation }}</h2>
+          <Message class="flex justify-center p-3" :severity="getSeverityFromRiskLevel(framework.result.value.riskLevel)">
+            <h2>Edinburgh postnatale depressionsscore {{ framework.result.value.score }} : {{ framework.result.value.interpretation }}</h2>
+            <div class="flex justify-center" v-if="getDetailedDescription(framework.result.value.details)">{{ getDetailedDescription(framework.result.value.details) }}</div>
           </Message>
           <br />
-          <p class="text-sm text-center ">Score ≤ 9: Ikke tegn til alvorlig depression Score ≥ 10: Behandlingskrævende depression kan foreligges</p>
+          <p class="text-sm text-center">{{ config.scoreInterpretation }}</p>
+          <br />
+          <div v-if="framework.result.value.recommendations">
+            <h3 class="text-lg font-semibold mb-2">Anbefalinger:</h3>
+            <ul class="list-disc list-inside space-y-1">
+              <li v-for="rec in framework.result.value.recommendations" :key="rec">{{ rec }}</li>
+            </ul>
+          </div>
         </template>
       </SurfaceCard>
     </div>
@@ -90,17 +98,18 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
-
-import Button from '@/volt/Button.vue';
-import SecondaryButton from '@/volt/SecondaryButton.vue';
-import QuestionSingleComponent from "./QuestionSingleComponent.vue";
-import CopyDialog from "./CopyDialog.vue";
-import SurfaceCard from "./SurfaceCard.vue";
-import PersonInfo from "./PersonInfo.vue";
-import Message from '@/volt/Message.vue';
-import { useCalculatorFramework, type CalculatorConfig, type CalculatorStep } from '@/composables/useCalculatorFramework';
-import { getGenderLabel, type GenderValue } from '@/utils/genderUtils';
+import { ref, nextTick, computed, onMounted } from 'vue'
+import { useCalculatorFramework, type CalculatorConfig, type CalculatorStep } from '@/composables/useCalculatorFramework'
+import Button from '@/volt/Button.vue'
+import SecondaryButton from '@/volt/SecondaryButton.vue'
+import QuestionSingleComponent from "./QuestionSingleComponent.vue"
+import CopyDialog from "./CopyDialog.vue"
+import SurfaceCard from "./SurfaceCard.vue"
+import PersonInfo from "./PersonInfo.vue"
+import Message from '@/volt/Message.vue'
+import { getGenderLabel, type GenderValue } from '@/utils/genderUtils'
+import type { RiskLevel, EpdsResponses } from '@/types/calculatorTypes'
+import type { EpdsDetails } from '@/calculators/epds/epdsTypes'
 
 export interface Option {
   text: string;
@@ -135,29 +144,37 @@ export interface Result {
   score: number;
 }
 
+// Framework configuration
 const config: CalculatorConfig = {
   type: 'epds',
   name: 'Edinburgh postnatale depressionsscore',
   version: '2.0.0',
   category: 'pregnancy',
   theme: 'teal',
+  defaultAge: 30,
+  defaultGender: 'female',
+  minAge: 12,
+  maxAge: 50,
   estimatedDuration: 3,
-};
+  scoreInterpretation: 'Score ≤ 9: Ikke tegn til alvorlig depression | Score ≥ 10: Behandlingskrævende depression kan foreligge'
+}
 
-const framework = useCalculatorFramework(config);
+// Initialize framework
+const framework = useCalculatorFramework(config)
 
-// Form validation state
-const formSubmitted = ref(false);
-const validationMessage = ref('');
-
+// Initialize steps
 const steps: CalculatorStep[] = [
   { id: 'calculator', title: 'EPDS Questionnaire', order: 1, validation: true },
-];
-framework.initializeSteps(steps);
+]
+framework.initializeSteps(steps)
 
-// Initialize with default patient data
-framework.setFieldValue('patient', 'age', 35);
-framework.setFieldValue('patient', 'gender', 'female');
+// State
+const formSubmitted = ref<boolean>(false)
+const validationMessage = ref<string>('')
+const resultsSection = ref<HTMLDivElement | null>(null)
+
+// Typed calculator data
+const epdsData = computed(() => framework.calculatorData.value as Partial<EpdsResponses>)
 
 const options1 = ref<Option[]>([
   { text: "Lige så meget som jeg altid har kunnet", value: 0 },
@@ -341,37 +358,96 @@ const getOptions = (type: keyof OptionsSets): Option[] => {
 
 const resultsSection1 = questionsSection1;
 
-// Initialize with default answers from question configurations
-questionsSection1.forEach(question => {
-  framework.setFieldValue('calculator', question.id, question.answer);
-});
+// Expose options to parent component (tests)
+defineExpose({ options1, options2, options3, options4, options5, options6, options7, options8, options9, options10 })
 
+// Function to set default values
+const setDefaultValues = () => {
+  // Set default calculator values using question configurations
+  questionsSection1.forEach(question => {
+    framework.setFieldValue('calculator', question.id, question.answer)
+  })
+  
+  // Set default patient values
+  if (!framework.patientData.value.name) {
+    framework.setFieldValue('patient', 'name', '')
+  }
+  if (!framework.patientData.value.age) {
+    framework.setFieldValue('patient', 'age', config.defaultAge)
+  }
+  if (!framework.patientData.value.gender) {
+    framework.setFieldValue('patient', 'gender', config.defaultGender)
+  }
+}
+
+// Set default values only if data is empty
+onMounted(() => {
+  const hasData = Object.values(epdsData.value).some(value => value !== null && value !== undefined)
+  if (!hasData) {
+    setDefaultValues()
+    console.log('Default values set')
+  }
+})
+
+// Submit handler
 const handleSubmit = async () => {
-  formSubmitted.value = true;
-  validationMessage.value = '';
+  formSubmitted.value = true
+  validationMessage.value = ''
   
   try {
-    await framework.submitCalculation();
-  } catch (error) {
-    console.error('Submit error:', error);
-    
-    // Check if calculation succeeded despite submission error
+    await framework.submitCalculation()
+    await nextTick()
+    scrollToResults()
+  } catch (_error) {
+    // Handle graceful degradation
     if (framework.state.value.isComplete && framework.result.value) {
-      // Calculation succeeded, just submission failed
-      console.warn('Calculation succeeded but submission failed:', error);
-      validationMessage.value = 'Beregning gennemført. Indsendelse til server fejlede.';
+      validationMessage.value = 'Beregning gennemført. Indsendelse til server fejlede.'
     } else {
-      // Actual calculation error
-      validationMessage.value = 'Der opstod en fejl ved beregning. Prøv igen.';
+      validationMessage.value = 'Der opstod en fejl ved beregning. Prøv igen.'
     }
   }
-};
+}
 
+// Reset handler - reset calculator and set default values
 const handleReset = () => {
-  formSubmitted.value = false;
-  validationMessage.value = '';
+  formSubmitted.value = false
+  validationMessage.value = ''
   
-  framework.resetCalculator();
-};
+  framework.resetCalculator()
+  // Use nextTick to ensure the reset has completed before setting defaults
+  nextTick(() => {
+    setDefaultValues()
+  })
+}
+
+// Helper functions
+const scrollToResults = () => {
+  const resultsSectionEl = resultsSection.value as HTMLElement
+  if (resultsSectionEl) {
+    resultsSectionEl.scrollIntoView({ behavior: 'smooth' })
+  }
+}
+
+const getSeverityFromRiskLevel = (riskLevel: RiskLevel): string => {
+  const mapping: Record<RiskLevel, string> = {
+    low: 'success',
+    mild: 'success', 
+    moderate: 'warn',
+    severe: 'error',
+    unknown: 'info',
+    minimal: 'success',
+    medium: 'warn',
+    high: 'error',
+    very_high: 'error'
+  }
+  return mapping[riskLevel] || 'info'
+}
+
+const getDetailedDescription = (details: any): string => {
+  if (!details) return ''
+  
+  const epdsDetails = details as EpdsDetails
+  return epdsDetails.urgentReferralNeeded ? 'Kræver øjeblikkelig handling' : ''
+}
 </script>
 
