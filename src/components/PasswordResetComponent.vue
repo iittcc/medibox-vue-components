@@ -48,7 +48,7 @@
 </template>
 
 <script lang="ts">
-import { ref, computed } from "vue";
+import { ref, computed, watch } from "vue";
 import { zodResolver } from '@primevue/forms/resolvers/zod';
 import { z } from 'zod';
 import { Form } from '@primevue/forms';
@@ -74,6 +74,11 @@ export default {
         const isSubmitting = ref(false);
         const errorMessage = ref('');
         const successMessage = ref('');
+
+        // Watch for changes in modalState prop
+        watch(() => props.modalState, (newValue) => {
+            visible.value = newValue > 0;
+        }, { immediate: true });
 
         // Can cancel only if modalState is 1 (first time)
         const canCancel = computed(() => props.modalState === 1);

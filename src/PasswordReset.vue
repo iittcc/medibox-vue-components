@@ -1,6 +1,6 @@
 <!-- src/PasswordReset.vue -->
 <template>
-  <div id="password-reset-app" class="medical-calculator-container">
+  <div id="password-reset" class="medical-calculator-container">
     <PasswordResetComponent :modalState="modalState" />
   </div>
 </template>
@@ -23,10 +23,11 @@ export default defineComponent({
     PasswordResetComponent,
   },
   setup() {
-    const modalState = ref(0);
+    // Initialize with the correct value immediately if available
+    const modalState = ref(window.passwordResetConfig?.modalState || 0);
 
     onMounted(() => {
-      // Read configuration from window object set by PHP template
+      // Update if window config is available (fallback for cases where it wasn't set initially)
       if (window.passwordResetConfig) {
         modalState.value = window.passwordResetConfig.modalState;
       }
