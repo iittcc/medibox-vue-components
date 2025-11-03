@@ -1,6 +1,6 @@
 <template>
-    <Dialog v-model:visible="visible" modal header="Password Skal Ændres" :style="{ width: '30rem' }" :closable="canCancel">
-        <div class="medical-calculator-container">
+    <div class="medical-calculator-container">
+        <Dialog v-model:visible="visible" modal header="Password Skal Ændres" :style="{ width: '30rem' }" :closable="canCancel">
             <p class="mb-4">Administratoren har anmodet om at du ændrer dit password.</p>
 
             <Form v-slot="$form" :initialValues :resolver @submit="onFormSubmit" class="flex flex-col gap-4 w-full">
@@ -43,11 +43,11 @@
                     <Button type="submit" label="Ændre Password" :loading="isSubmitting" />
                 </div>
             </Form>
-        </div>
-    </Dialog>
+        </Dialog>
+    </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import { ref, computed, watch } from "vue";
 import { zodResolver } from '@primevue/forms/resolvers/zod';
 import { z } from 'zod';
@@ -58,126 +58,106 @@ import Message from '@/volt/Message.vue';
 import Dialog from '@/volt/Dialog.vue';
 import Divider from '@/volt/Divider.vue';
 
-export default {
-    props: {
-        modalState: {
-            type: Number,
-            required: true,
-            validator: (value: number) => [0, 1, 2].includes(value)
-        }
-    },
-    components: {
-        Form
-    },
-    setup(props) {
-        const visible = ref(props.modalState > 0);
-        const isSubmitting = ref(false);
-        const errorMessage = ref('');
-        const successMessage = ref('');
+interface Props {
+    modalState: number;
+}
 
-        // Watch for changes in modalState prop
-        watch(() => props.modalState, (newValue) => {
-            visible.value = newValue > 0;
-        }, { immediate: true });
+const props = defineProps<Props>();
 
-        // Can cancel only if modalState is 1 (first time)
-        const canCancel = computed(() => props.modalState === 1);
+const visible = ref(props.modalState > 0);
+const isSubmitting = ref(false);
+const errorMessage = ref('');
+const successMessage = ref('');
 
-        const initialValues = ref({
-            password: '',
-            confirm_password: ''
-        });
+// Watch for changes in modalState prop
+watch(() => props.modalState, (newValue) => {
+    visible.value = newValue > 0;
+}, { immediate: true });
 
-        // Password validation schema matching PHP backend requirements
-        const resolver = zodResolver(
-            z.object({
-                password: z
-                    .string()
-                    .min(8, { message: 'Minimum 8 tegn' })
-                    .refine((value) => /[a-z]/.test(value), {
-                        message: 'Minimum ét små bogstav'
-                    })
-                    .refine((value) => /[A-Z]/.test(value), {
-                        message: 'Minimum ét stort bogstav'
-                    })
-                    .refine((value) => /[0-9]/.test(value), {
-                        message: 'Minimum ét tal'
-                    })
-                    .refine((value) => /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(value), {
-                        message: 'Minimum ét specialtegn'
-                    }),
-                confirm_password: z.string()
-            }).refine((values) => values.password === values.confirm_password, {
-                message: "Password og Gentag Password skal være ens",
-                path: ["confirm_password"],
+// Can cancel only if modalState is 1 (first time)
+const canCancel = computed(() => props.modalState === 1);
+
+const initialValues = ref({
+    password: '',
+    confirm_password: ''
+});
+
+// Password validation schema matching PHP backend requirements
+const resolver = zodResolver(
+    z.object({
+        password: z
+            .string()
+            .min(8, { message: 'Minimum 8 tegn' })
+            .refine((value) => /[a-z]/.test(value), {
+                message: 'Minimum ét små bogstav'
             })
-        );
+            .refine((value) => /[A-Z]/.test(value), {
+                message: 'Minimum ét stort bogstav'
+            })
+            .refine((value) => /[0-9]/.test(value), {
+                message: 'Minimum ét tal'
+            })
+            .refine((value) => /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(value), {
+                message: 'Minimum ét specialtegn'
+            }),
+        confirm_password: z.string()
+    }).refine((values) => values.password === values.confirm_password, {
+        message: "Password og Gentag Password skal være ens",
+        path: ["confirm_password"],
+    })
+);
 
-        const onFormSubmit = async (e: any) => {
-            if (e.valid) {
-                isSubmitting.value = true;
-                errorMessage.value = '';
-                successMessage.value = '';
+const onFormSubmit = async (e: any) => {
+    if (e.valid) {
+        isSubmitting.value = true;
+        errorMessage.value = '';
+        successMessage.value = '';
 
-                try {
-                    // Create form data to match existing Credentials controller expectations
-                    const formData = new FormData();
-                    formData.append('old_password', ''); // Not required for admin-requested reset
-                    formData.append('new_password', e.values.password);
-                    formData.append('repeat_password', e.values.confirm_password);
+        try {
+            // Create form data to match existing Credentials controller expectations
+            const formData = new FormData();
+            formData.append('old_password', ''); // Not required for admin-requested reset
+            formData.append('new_password', e.values.password);
+            formData.append('repeat_password', e.values.confirm_password);
 
-                    const response = await fetch('/credentials/changePassword', {
-                        method: 'POST',
-                        body: formData
-                    });
+            const response = await fetch('/credentials/changePassword', {
+                method: 'POST',
+                body: formData
+            });
 
-                    if (response.ok || response.redirected) {
-                        successMessage.value = 'Password ændret med succes!';
-                        setTimeout(() => {
-                            window.location.reload();
-                        }, 1500);
-                    } else {
-                        errorMessage.value = 'Der opstod en fejl ved ændring af password.';
-                    }
-                } catch (error) {
-                    errorMessage.value = 'Netværksfejl. Prøv igen senere.';
-                } finally {
-                    isSubmitting.value = false;
-                }
-            }
-        };
-
-        const handleCancel = async () => {
-            try {
-                const response = await fetch('/credentials/cancelPasswordReset', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    }
-                });
-
-                if (response.ok) {
-                    // Reload page to update modal state
+            if (response.ok || response.redirected) {
+                successMessage.value = 'Password ændret med succes!';
+                setTimeout(() => {
                     window.location.reload();
-                } else {
-                    errorMessage.value = 'Kunne ikke annullere anmodningen.';
-                }
-            } catch (error) {
-                errorMessage.value = 'Netværksfejl. Prøv igen senere.';
+                }, 1500);
+            } else {
+                errorMessage.value = 'Der opstod en fejl ved ændring af password.';
             }
-        };
-
-        return {
-            initialValues,
-            resolver,
-            onFormSubmit,
-            handleCancel,
-            visible,
-            canCancel,
-            isSubmitting,
-            errorMessage,
-            successMessage
+        } catch (error) {
+            errorMessage.value = 'Netværksfejl. Prøv igen senere.';
+        } finally {
+            isSubmitting.value = false;
         }
     }
-}
+};
+
+const handleCancel = async () => {
+    try {
+        const response = await fetch('/credentials/cancelPasswordReset', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        });
+
+        if (response.ok) {
+            // Reload page to update modal state
+            window.location.reload();
+        } else {
+            errorMessage.value = 'Kunne ikke annullere anmodningen.';
+        }
+    } catch (error) {
+        errorMessage.value = 'Netværksfejl. Prøv igen senere.';
+    }
+};
 </script>
