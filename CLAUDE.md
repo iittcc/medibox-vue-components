@@ -5,12 +5,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Commands
 
 ### Development
+
 - `npm run dev` - Start development server with hot reload
 - `npm run type-check` - Run TypeScript type checking
 - `npm run lint` - Lint and fix code issues with ESLint
 - `npm run format` - Format code with Prettier
 
 ### Testing and Building
+
 - `npm run test` - Run in testing mode (Vite testing environment)
 - `npm run build` - Full production build with type checking
 - `npm run staging` - Build for staging environment
@@ -19,6 +21,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `npm run preview` - Preview built application
 
 ### Deployment
+
 - `gulp vue` - Copy built components from dist folder to webapp assets
 
 ## Architecture
@@ -28,7 +31,9 @@ Utilized Vue 3 modern composite architecture with custom build UI components to 
 The application MUST be structured for easy testing.
 
 ### Entry Points
-The application has multiple entry points defined in `vite.config.ts`, each corresponding to a different medical scoring tool:
+
+The application has multiple entry points defined in `vite.config.ts`, each corresponding to a different medical scoring tool and visual components:
+
 - `score2` - Risk assessment calculation
 - `danpss` - Depression/anxiety scoring
 - `audit` - Alcohol use assessment
@@ -39,21 +44,27 @@ The application has multiple entry points defined in `vite.config.ts`, each corr
 - `puqe` - Pregnancy-Unique Quantification of Emesis
 - `westleycroupscore` - Croup scoring
 - `who5` - WHO-5 Well-Being Index
+
+**Other components**
+
 - `passwordReset` - Password reset functionality
 
 Each entry point has:
+
 - A TypeScript file in `src/` (e.g., `audit.ts`)
 - A Vue file in `src/` (e.g., `Audit.vue`)
 - A corresponding Vue components in `src/components` (e.g., `AuditScore.vue`)
 - An HTML file for standalone use (e.g., `audit.html`)
 
 ### Component Structure
+
 - **Main Vue components** (`src/*.vue`) - Top-level components for each scoring tool
 - **Shared components** (`src/components/`) - Reusable UI components
 - **Volt components** (`src/volt/`) - Custom PrimeVue component wrappers with consistent styling
 - **Assets** (`src/assets/`) - Styles, utilities, and data files including risk calculation logic
 
 ### Key Technologies
+
 - **Vue 3** with Composition API and `<script setup lang="ts">` syntax
 - **TypeScript** with strict mode
 - **PrimeVue** UI library (unstyled) with auto-import resolver
@@ -65,6 +76,7 @@ Each entry point has:
 - **node-forge** for cryptographic operations
 
 ### Styling System
+
 - **Color-coded themes** by medical domain:
   - Psyk (Psychology): Sky blue
   - Symptom score: Teal
@@ -73,12 +85,14 @@ Each entry point has:
 - **CSS files** for each scoring tool in `src/assets/`
 
 ### Build Configuration
+
 - **Multi-entry build** generates separate JS files for each scoring tool
 - **Asset naming** follows `[name].[ext]` pattern
 - **CSS code splitting** enabled for better performance
 - **Auto-import** for PrimeVue components
 
 ### Development Notes
+
 - The app uses Danish locale settings for PrimeVue components
 - Risk calculation logic is centralized in `src/assets/riskCalculator.ts`
 - Components follow a pattern of form input → calculation logic → result display
@@ -87,10 +101,12 @@ Each entry point has:
 ## Core Files and Utilities
 
 ### Critical Utility Files
+
 - `src/assets/sendDataToServer.ts` - Encrypted data transmission using hybrid AES + RSA encryption
 - `src/volt/utils.ts` - Tailwind class merging utilities for PrimeVue integration
 
 ### Key Directories
+
 - `src/components/` - Reusable Vue components for medical calculators
 - `src/volt/` - Custom PrimeVue component wrappers with Tailwind styling
 - `src/assets/` - Styles, utilities, data files, and calculation logic
@@ -99,6 +115,7 @@ Each entry point has:
 ## Code Style Guidelines
 
 ### Prettier Configuration
+
 - **No semicolons** (`"semi": false`)
 - **Single quotes** (`"singleQuote": true`)
 - **2-space indentation** (`"tabWidth": 2`)
@@ -106,17 +123,20 @@ Each entry point has:
 - **No trailing commas** (`"trailingComma": "none"`)
 
 ### ESLint Configuration
+
 - Vue 3 essential rules with TypeScript support
 - Prettier integration (skips formatting conflicts)
 - Modern ECMAScript standards
 
 ### Naming Conventions
+
 - **PascalCase** for Vue components
 - **camelCase** for variables and functions
 - **kebab-case** for CSS classes and HTML attributes
 - **Danish locale** for medical terms and UI labels
 
 ### Vue 3 Patterns
+
 - All components use **`<script setup lang="ts">`** syntax
 - **Composition API** with reactive variables via `ref()`
 - **Exported interfaces** for better TypeScript support
@@ -134,21 +154,25 @@ Each entry point has:
 ## Developer Environment Setup
 
 ### Prerequisites
+
 - **Node.js** (no specific version pinned)
 - **npm** for package management
 
 ### IDE Setup (Recommended)
+
 - **VSCode** with extensions:
   - `Vue.volar` - Vue language support
   - `dbaeumer.vscode-eslint` - ESLint integration
   - `esbenp.prettier-vscode` - Prettier formatting
 
 ### Environment Variables
+
 - `.env.testing` - Points to `https://test.medibox.dk`
 - `.env.staging` - Points to `https://test.medibox.dk`
 - `.env.production` - Points to `https://www.medibox.dk`
 
 ### TypeScript Configuration
+
 - **Target**: `esnext`
 - **Module resolution**: `Bundler`
 - **Strict mode** enabled
@@ -157,11 +181,13 @@ Each entry point has:
 ## Repository Etiquette
 
 ### Git Workflow
+
 - **Main branch**: `master`
 - **Feature branches**: Use descriptive names refers to jira project name and issue number (e.g., `MED-829-gdpr-compliance`)
 - **Commit messages**: Use conventional commit format when possible
 
 ### File Management
+
 - `.gitignore` excludes `dist/`, `node_modules/`, logs, and IDE files
 - VSCode workspace includes recommended extensions
 - Follow existing directory structure for new components
@@ -169,6 +195,7 @@ Each entry point has:
 ## Important Behaviors and Warnings
 
 ### Tailwind CSS Scoping
+
 ⚠️ **Critical**: All Vue components must be wrapped in `<div class="medical-calculator-container">` to prevent Bootstrap conflicts from the parent application.
 
 - Uses `important: '.medical-calculator-container'` to scope utilities
@@ -176,17 +203,20 @@ Each entry point has:
 - Custom Volt components provide consistent PrimeVue + Tailwind integration
 
 ### PrimeVue Integration
+
 - Uses **unstyled PrimeVue components** with custom Volt wrappers
 - **Danish locale** configuration in each entry point
 - **Auto-import resolver** for PrimeVue components
 - Components are themed per medical domain (sky, teal, orange)
 
 ### Security Implementation
+
 - **Hybrid encryption** (AES + RSA) for server communication via `sendDataToServer.ts`
 - Uses `node-forge` library for cryptographic operations
 - All patient data is encrypted before transmission
 
 ### Multi-Entry Build System
+
 - Each calculator builds as **separate JS file**
 - **No CSS code splitting** between calculators
 - **Custom asset naming**: `[name].[ext]` pattern
@@ -195,17 +225,20 @@ Each entry point has:
 ## Medical Domain Specifics
 
 ### Color-Coded Themes
+
 - **Psychology (Psyk)**: Sky blue (`sky.css`)
 - **Symptom scores**: Teal (`teal.css`)
 - **Infection**: Orange (`orange.css`)
 
 ### Component Patterns
+
 - **Form input** → **calculation logic** → **result display**
 - Shared components for patient info, scoring, and results
 - Consistent use of Vue slots for flexible layouts
 - Event-driven updates using Vue's reactivity system
 
 ### Calculation Logic
+
 - Medical scoring algorithms implemented in TypeScript
 - Risk assessment logic centralized in utility files
 - Danish medical terminology and scoring standards
