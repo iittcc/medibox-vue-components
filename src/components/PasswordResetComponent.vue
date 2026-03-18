@@ -58,7 +58,7 @@ import Message from '@/volt/Message.vue';
 import Dialog from '@/volt/Dialog.vue';
 import Divider from '@/volt/Divider.vue';
 
-interface Props {
+export interface Props {
     modalState: number;
 }
 

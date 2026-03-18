@@ -41,7 +41,6 @@ export default defineComponent({
 </script>
 
 <style scoped>
-@import "primeflex/primeflex.css";
 html {
   font-size: 12px;
 }
