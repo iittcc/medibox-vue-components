@@ -63,8 +63,10 @@
     "src/components/NumberSliderInput.vue",
     "src/components/DanpssForm.vue",
     "src/components/CustomIcon.vue",
-    "src/components/MedicinBoernScore.vue"
+    "src/components/MedicinBoernScore.vue",
+    "src/calendarFull.ts",
+    "src/calendarWidget.ts"
 
-    
+
   ]
 }
