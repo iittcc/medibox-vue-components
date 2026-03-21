@@ -1,0 +1,40 @@
+.calendar-container {
+  --fc-border-color: #e2e8f0;
+  --fc-button-bg-color: #3b82f6;
+  --fc-button-border-color: #3b82f6;
+  --fc-button-hover-bg-color: #2563eb;
+  --fc-button-hover-border-color: #2563eb;
+  --fc-button-active-bg-color: #1d4ed8;
+  --fc-button-active-border-color: #1d4ed8;
+  --fc-today-bg-color: #eff6ff;
+  --fc-event-bg-color: #3b82f6;
+  --fc-event-border-color: #2563eb;
+  --fc-event-text-color: #fff;
+}
+
+.calendar-container .fc-day-sat,
+.calendar-container .fc-day-sun {
+  background-color: #f8fafc;
+}
+
+.calendar-container .past-event.fc-event {
+  opacity: 0.7;
+}
+
+.calendar-container .fc-multimonth .fc-daygrid-week-number {
+  font-size: 0.7em;
+  opacity: 0.5;
+}
+
+.calendar-container .fc-daygrid-day-frame {
+  min-height: 60px;
+}
+
+.calendar-container .fc-daygrid-day-top {
+  padding: 2px 4px;
+}
+
+.calendar-container .fc-yearGrid-button,
+.calendar-container .fc-yearStack-button {
+  display: none;
+}
