@@ -70,7 +70,9 @@
     "src/calendarWidget.ts",
     "src/calendarWidget.vue",
     "src/components/calendar/EventModal.vue",
-    "src/components/calendar/RecurrenceForm.vue"
+    "src/components/calendar/RecurrenceForm.vue",
+
+    "src/tailwind.ts",
 
 
   ]

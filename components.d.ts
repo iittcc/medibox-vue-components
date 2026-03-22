@@ -14,7 +14,6 @@ declare module 'vue' {
     CustomIcon: typeof import('./src/components/CustomIcon.vue')['default']
     CustomSlider: typeof import('./src/components/CustomSlider.vue')['default']
     DanpssForm: typeof import('./src/components/DanpssForm.vue')['default']
-    DatePicker: typeof import('primevue/datepicker')['default']
     Dialog: typeof import('primevue/dialog')['default']
     Divider: typeof import('primevue/divider')['default']
     Editor: typeof import('primevue/editor')['default']
@@ -42,7 +41,6 @@ declare module 'vue' {
     RiskAssessment: typeof import('./src/components/RiskAssessment.vue')['default']
     SurfaceCard: typeof import('./src/components/SurfaceCard.vue')['default']
     SurfaceCardItem: typeof import('./src/components/SurfaceCardItem.vue')['default']
-    TextArea: typeof import('primevue/textarea')['default']
     WestleyCroupScore: typeof import('./src/components/WestleyCroupScore.vue')['default']
     Who5Score: typeof import('./src/components/Who-5Score.vue')['default']
   }

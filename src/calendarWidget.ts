@@ -7,7 +7,7 @@
 
 import { createApp } from 'vue'
 import './assets/calendar.css'
-import App from './CalendarWidget.vue'
+import App from './calendarWidget.vue'
 import PrimeVue from 'primevue/config'
 
 const mountEl = document.getElementById('calendar-widget-app')
