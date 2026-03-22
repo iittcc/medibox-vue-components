@@ -1,5 +1,5 @@
 <template>
-  <div class="calendar-container">
+  <div class="medical-calculator-container">
     <!-- Frequency + Interval row -->
     <div class="flex flex-wrap gap-4 items-end">
       <div class="flex flex-col gap-1">
@@ -28,7 +28,7 @@
             showButtons
             class="w-20"
           />
-          <span class="text-sm text-surface-600 dark:text-surface-300">
+          <span class="text-sm text-surface-600 dark:text-surface-300 z-2">
             {{ intervalLabel }}
           </span>
         </div>
@@ -99,19 +99,19 @@
         <label for="end-date" class="text-sm text-surface-700 dark:text-surface-200 cursor-pointer">
           På dato:
         </label>
-        <input
-          type="date"
-          :value="props.untilDate ?? ''"
-          @input="onDateInput"
+        <DatePicker
+          :modelValue="props.untilDate ?? ''"
+          @update:modelValue="updateField('untilDate', $event)"
           :disabled="config.endType !== 'date'"
-          class="border border-surface-300 dark:border-surface-700 rounded-md px-2 py-1 text-sm
-            bg-surface-0 dark:bg-surface-950 text-surface-700 dark:text-surface-0
-            disabled:opacity-50 disabled:cursor-not-allowed"
+          dateFormat="dd/mm/yy"
+          :firstDayOfWeek="1"
+          showIcon fluid iconDisplay="input"
+          class="w-32"
         />
       </div>
 
       <!-- After count -->
-      <div class="flex items-center gap-2">
+        <div class="flex items-center gap-2">
         <RadioButton
           :modelValue="config.endType"
           @update:modelValue="updateField('endType', $event)"
@@ -130,7 +130,7 @@
           showButtons
           class="w-24"
         />
-        <span class="text-sm text-surface-600 dark:text-surface-300">gentagelser</span>
+        <span class="text-sm text-surface-600 dark:text-surface-300 z-2">gentagelser</span>
       </div>
     </div>
   </div>
@@ -142,6 +142,7 @@ import Select from '@/volt/Select.vue'
 import InputNumber from '@/volt/InputNumber.vue'
 import ToggleButton from '@/volt/ToggleButton.vue'
 import RadioButton from '@/volt/RadioButton.vue'
+import DatePicker from '@/volt/DatePicker.vue'
 import type { RRuleConfig } from '@/composables/useRecurrence'
 
 const props = defineProps<{

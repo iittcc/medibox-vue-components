@@ -109,12 +109,6 @@
         border-radius: 0.5rem !important;
     }
     
-    button:not([data-p-severity="secondary"], [data-p="stacked"], div[data-pc-name="selectbutton"] button,[data-pc-name="togglebutton"]) {
-      background-color: var(--p-primary-color) !important;
-      color: var(--p-surface-0) !important;
-      border-color: var(--p-primary-color) !important;
-      
-    }
 
     .bg-primary {
       background-color: var(--p-primary-color) !important;

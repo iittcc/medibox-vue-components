@@ -64,8 +64,13 @@
     "src/components/DanpssForm.vue",
     "src/components/CustomIcon.vue",
     "src/components/MedicinBoernScore.vue",
+    "src/composables/useRecurrence.ts",
+    "src/composables/useCalendarEvents.ts",
     "src/calendarFull.ts",
-    "src/calendarWidget.ts"
+    "src/calendarWidget.ts",
+    "src/calendarWidget.vue",
+    "src/components/calendar/EventModal.vue",
+    "src/components/calendar/RecurrenceForm.vue"
 
 
   ]

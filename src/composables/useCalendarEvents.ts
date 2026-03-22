@@ -5,6 +5,23 @@
  */
 
 import axios from 'axios'
+import type { EventInput } from '@fullcalendar/core'
+
+// Why: CodeIgniter 3 CSRF protection rejects POST requests without a valid token.
+// jQuery's ajaxPrefilter handles this for $.ajax, but axios needs manual injection.
+const CSRF_TOKEN_NAME = 'csrf_test_name'
+
+function getCsrfToken(): string {
+  const meta = document.querySelector('meta[name="csrf-token"]')
+  return meta ? meta.getAttribute('content') || '' : ''
+}
+
+function appendCsrf(formData: FormData): void {
+  const token = getCsrfToken()
+  if (token) {
+    formData.append(CSRF_TOKEN_NAME, token)
+  }
+}
 
 export interface CalendarEventData {
   id?: string | number
@@ -59,8 +76,8 @@ export function useCalendarEvents(
    */
   async function fetchEvents(
     fetchInfo: FetchInfo,
-    successCb: (events: unknown[]) => void,
-    failureCb: (error: unknown) => void
+    successCb: (events: EventInput[]) => void,
+    failureCb: (error: Error) => void
   ): Promise<void> {
     const formData = new FormData()
     formData.append('c_id', String(calendarId))
@@ -71,10 +88,11 @@ export function useCalendarEvents(
     formData.append('end', String(Math.floor(fetchInfo.end.getTime() / 1000)))
 
     try {
+      appendCsrf(formData)
       const response = await axios.post(callbackBase, formData)
       successCb(response.data.events)
     } catch (error) {
-      failureCb(error)
+      failureCb(error instanceof Error ? error : new Error(String(error)))
     }
   }
 
@@ -88,7 +106,7 @@ export function useCalendarEvents(
    */
   async function saveEvent(data: CalendarEventData): Promise<number | boolean> {
     const formData = new FormData()
-    formData.append('c_id', String(data.calendarId))
+    formData.append('calendar_id', String(data.calendarId))
     formData.append('g_id', String(data.groupId))
     formData.append('start', data.start)
     formData.append('end', data.end)
@@ -108,13 +126,14 @@ export function useCalendarEvents(
     }
 
     if (data.untilDate !== null) {
-      formData.append('untilDate', data.untilDate)
+      formData.append('until_date', data.untilDate)
     }
 
     if (data.parentEventId !== null) {
-      formData.append('parentEventId', String(data.parentEventId))
+      formData.append('parent_event_id', String(data.parentEventId))
     }
 
+    appendCsrf(formData)
     const response = await axios.post(
       `${callbackBase}/add_event`,
       formData,
@@ -136,6 +155,7 @@ export function useCalendarEvents(
     formData.append('g_id', String(groupId))
     formData.append('id', String(id))
 
+    appendCsrf(formData)
     const response = await axios.post(
       `${callbackBase}/delete_event`,
       formData,

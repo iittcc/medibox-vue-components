@@ -1,6 +1,19 @@
 <template>
-  <div class="calendar-container">
-    <FullCalendar :options="calendarOptions" ref="calendarRef" />
+  <div class="medical-calculator-container" ref="containerRef" :class="{ 'calendar-expanded': isFullscreen }">
+    <div class="calendar-layout">
+      <div class="calendar-sidebar">
+        <DatePicker
+          v-model="navigatorDate"
+          inline
+          showWeek
+          :firstDayOfWeek="1"
+          @update:modelValue="onNavigatorDateChange"
+        />
+      </div>
+      <div class="calendar-main" ref="calendarMainRef">
+        <FullCalendar :options="calendarOptions" ref="calendarRef" />
+      </div>
+    </div>
     <EventModal
       v-model:visible="modalVisible"
       :event="selectedEvent"
@@ -21,17 +34,18 @@
  *      Danish locale, and connects to the backend via useCalendarEvents composable.
  */
 
-import { ref, reactive } from 'vue'
+import { ref, reactive, nextTick } from 'vue'
 import FullCalendar from '@fullcalendar/vue3'
 import dayGridPlugin from '@fullcalendar/daygrid'
 import timeGridPlugin from '@fullcalendar/timegrid'
 import listPlugin from '@fullcalendar/list'
 import interactionPlugin from '@fullcalendar/interaction'
 import multiMonthPlugin from '@fullcalendar/multimonth'
-import type { CalendarOptions, DateSelectArg, EventClickArg, EventDropArg } from '@fullcalendar/core'
+import type { CalendarOptions, DateSelectArg, EventClickArg, EventDropArg, EventInput } from '@fullcalendar/core'
 import type { EventResizeDoneArg } from '@fullcalendar/interaction'
 import daLocale from '@fullcalendar/core/locales/da'
 import EventModal from '@/components/calendar/EventModal.vue'
+import DatePicker from '@/volt/DatePicker.vue'
 import { useCalendarEvents } from '@/composables/useCalendarEvents'
 import type { CalendarEventData } from '@/composables/useCalendarEvents'
 
@@ -44,7 +58,11 @@ const props = defineProps<{
 
 const events = useCalendarEvents(props.baseUrl, props.calendarId, props.groupId)
 
+const containerRef = ref<HTMLElement>()
 const calendarRef = ref<InstanceType<typeof FullCalendar>>()
+const calendarMainRef = ref<HTMLElement>()
+const isFullscreen = ref(false)
+const navigatorDate = ref<Date>(new Date())
 const modalVisible = ref(false)
 const modalMode = ref<'create' | 'edit' | 'view'>('create')
 const selectedEvent = ref<CalendarEventData | null>(null)
@@ -55,6 +73,72 @@ const selectedEvent = ref<CalendarEventData | null>(null)
  */
 function getApi() {
   return calendarRef.value?.getApi()
+}
+
+/**
+ * What: Navigates FullCalendar to the date selected in the inline DatePicker.
+ * How: Determines slide direction by comparing old and new dates, applies a
+ *      CSS slide animation, then calls gotoDate on the FullCalendar API.
+ */
+function onNavigatorDateChange(value: Date | null) {
+  if (!value) return
+  const api = getApi()
+  if (!api) return
+
+  // Why: Compare against current FullCalendar date to determine slide direction
+  const currentDate = api.getDate()
+  const goingForward = value.getTime() > currentDate.getTime()
+
+  nudgeCalendar(goingForward)
+  api.gotoDate(value)
+}
+
+/**
+ * What: Plays a subtle slide animation on the calendar to signal a date change.
+ * How: Applies a CSS class that translates the element, then removes it after
+ *      the transition completes.
+ */
+function nudgeCalendar(forward: boolean) {
+  const el = calendarMainRef.value
+  if (!el) return
+
+  const cls = forward ? 'nudge-left' : 'nudge-right'
+  el.classList.remove('nudge-left', 'nudge-right')
+  // Why: Force reflow so the animation restarts even if the same direction
+  void el.offsetWidth
+  el.classList.add(cls)
+  el.addEventListener('animationend', () => el.classList.remove(cls), { once: true })
+}
+
+/**
+ * What: Syncs the inline DatePicker when FullCalendar navigates.
+ * How: Updates navigatorDate from the datesSet callback so the
+ *      DatePicker highlights the current month/date.
+ */
+function syncNavigatorDate(info: { view: { currentStart: Date } }) {
+  navigatorDate.value = new Date(info.view.currentStart)
+}
+
+/**
+ * What: Toggles the calendar into a full-window modal overlay.
+ * How: Toggles the isFullscreen ref which adds a fixed-position CSS class,
+ *      then triggers a FullCalendar resize so it fills the new space.
+ */
+function toggleFullscreen() {
+  isFullscreen.value = !isFullscreen.value
+  updateFullscreenButtonText()
+  // Why: FullCalendar needs to recalculate its dimensions after the
+  // container changes from inline to fixed positioning
+  nextTick(() => getApi()?.updateSize())
+}
+
+function updateFullscreenButtonText() {
+  const container = calendarRef.value?.$el as HTMLElement | undefined
+  if (!container) return
+  const btn = container.querySelector('.fc-fullscreen-button') as HTMLElement | null
+  if (btn) {
+    btn.textContent = isFullscreen.value ? 'Luk fuldskærm' : 'Fuldskærm'
+  }
 }
 
 /**
@@ -235,7 +319,7 @@ function handleEventDidMount(info: { event: { end: Date | null; title: string };
  * How: Queries the DOM for yearGrid and yearStack buttons and toggles
  *      their display style based on whether the current view is multiMonthYear.
  */
-function handleDatesSet(info: { view: { type: string } }) {
+function handleDatesSet(info: { view: { type: string; currentStart: Date } }) {
   const container = calendarRef.value?.$el as HTMLElement | undefined
   if (!container) return
 
@@ -249,6 +333,10 @@ function handleDatesSet(info: { view: { type: string } }) {
   if (yearStackBtn) {
     yearStackBtn.style.display = isYearView ? 'inline-block' : 'none'
   }
+
+  // Why: Keep the inline DatePicker in sync when the user navigates
+  // FullCalendar via prev/next buttons or view changes
+  syncNavigatorDate(info)
 }
 
 // Why: Reactive options object ensures FullCalendar re-renders when
@@ -259,7 +347,7 @@ const calendarOptions = reactive<CalendarOptions>({
   firstDay: 1,
   initialView: 'dayGridMonth',
   headerToolbar: {
-    left: 'prev,next today',
+    left: 'prev,next today fullscreen',
     center: 'title',
     right: 'yearGrid,yearStack multiMonthYear,dayGridMonth,timeGridWeek,timeGridDay,listMonth'
   },
@@ -292,6 +380,10 @@ const calendarOptions = reactive<CalendarOptions>({
         api.setOption('multiMonthMaxColumns' as keyof CalendarOptions, 1)
         api.changeView('multiMonthYear')
       }
+    },
+    fullscreen: {
+      text: 'Fuldskærm',
+      click: toggleFullscreen
     }
   },
   weekNumbers: true,
@@ -310,8 +402,8 @@ const calendarOptions = reactive<CalendarOptions>({
     {
       events: (
         fetchInfo: { start: Date; end: Date; startStr: string; endStr: string; timeZone: string },
-        successCb: (events: unknown[]) => void,
-        failureCb: (error: unknown) => void
+        successCb: (eventInputs: EventInput[]) => void,
+        failureCb: (error: Error) => void
       ) => {
         events.fetchEvents(fetchInfo, successCb, failureCb)
       }
@@ -355,3 +447,50 @@ async function handleDelete(id: string | number) {
   }
 }
 </script>
+
+<style scoped>
+.calendar-layout {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.calendar-sidebar {
+  flex-shrink: 0;
+}
+
+.calendar-main {
+  flex: 1;
+  min-width: 0;
+}
+
+@keyframes slide-from-right {
+  0% { transform: translateX(12px); opacity: 0.1; }
+  100% { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes slide-from-left {
+  0% { transform: translateX(-12px); opacity: 0.1; }
+  100% { transform: translateX(0); opacity: 1; }
+}
+
+.nudge-left {
+  animation: slide-from-right 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.nudge-right {
+  animation: slide-from-left 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.calendar-expanded {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  z-index: 9999 !important;
+  background: white !important;
+  padding: 1.5rem !important;
+  overflow: auto !important;
+  width: 100% !important;
+}
+</style>

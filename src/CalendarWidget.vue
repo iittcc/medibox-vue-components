@@ -1,5 +1,5 @@
 <template>
-  <div class="calendar-container" style="font-size: 12px; margin: 0">
+  <div class="medical-calculator-container" style="font-size: 12px; margin: 0">
     <FullCalendar :options="calendarOptions" ref="calendarRef" />
     <EventModal
       v-model:visible="modalVisible"
@@ -162,7 +162,7 @@ async function handleDelete(id: string | number) {
 </script>
 
 <style scoped>
-.calendar-container :deep(.fc-list) {
+.medical-calculator-container :deep(.fc-list) {
   border-style: none !important;
 }
 </style>

@@ -4,10 +4,11 @@
     @update:visible="emit('update:visible', $event)"
     modal
     header="Begivenhed"
-    :style="{ width: '36rem' }"
+    :style="{ width: '48rem' }"
     :closable="true"
+    appendTo="self"
   >
-    <div class="calendar-container">
+    <div class="medical-calculator-container">
       <!-- View mode -->
       <template v-if="currentMode === 'view'">
         <div class="flex flex-col gap-4">
@@ -32,10 +33,7 @@
             <div class="text-sm font-medium text-surface-500 dark:text-surface-400">
               Beskrivelse
             </div>
-            <div
-              class="text-surface-700 dark:text-surface-0 mt-1 prose dark:prose-invert max-w-none"
-              v-html="form.description"
-            />
+            <Editor v-model="form.description" editorStyle="height: 320px" />
           </div>
 
           <div v-if="recurrenceDescription" class="mt-2">
@@ -73,7 +71,7 @@
                 v-model="form.startDate"
                 dateFormat="dd/mm/yy"
                 :firstDayOfWeek="1"
-                showIcon
+                showIcon fluid iconDisplay="input"
                 class="w-40"
               />
               <DatePicker
@@ -81,8 +79,8 @@
                 v-model="form.startTime"
                 timeOnly
                 :stepMinute="15"
-                showIcon
                 class="w-32"
+                
               />
               <span class="text-sm text-surface-600 dark:text-surface-300">til</span>
               <DatePicker
@@ -90,14 +88,13 @@
                 v-model="form.endTime"
                 timeOnly
                 :stepMinute="15"
-                showIcon
                 class="w-32"
               />
               <DatePicker
                 v-model="form.endDate"
                 dateFormat="dd/mm/yy"
                 :firstDayOfWeek="1"
-                showIcon
+                showIcon fluid iconDisplay="input"
                 class="w-40"
               />
             </div>
@@ -114,7 +111,7 @@
           <!-- Sted -->
           <div class="flex flex-col gap-1">
             <label class="text-sm font-medium text-surface-700 dark:text-surface-200"> Sted </label>
-            <InputText v-model="form.location" placeholder="Tilf\u00f8j sted" fluid />
+            <InputText v-model="form.location" placeholder="Tilføj sted" fluid />
           </div>
 
           <!-- Beskrivelse -->
@@ -122,7 +119,9 @@
             <label class="text-sm font-medium text-surface-700 dark:text-surface-200">
               Beskrivelse
             </label>
-            <Editor v-model="form.description" editorStyle="height: 120px" />
+            <div class="flex flex-col gap-1">
+              <TextArea  v-model="form.description" autoResize ></TextArea>
+          </div>
           </div>
 
           <!-- Gentag begivenhed -->
@@ -169,8 +168,9 @@
 
       <!-- Create mode footer -->
       <template v-else>
-        <Button label="Opret" @click="onSave()" />
         <SecondaryButton label="Annuller" @click="close()" />
+        <Button label="Opret" @click="onSave()" />
+        
       </template>
     </template>
   </Dialog>
@@ -182,11 +182,11 @@ import Dialog from '@/volt/Dialog.vue'
 import InputText from '@/volt/InputText.vue'
 import Button from '@/volt/Button.vue'
 import DangerButton from '@/volt/DangerButton.vue'
-import SecondaryButton from '@/volt/SecondaryButton.vue'
+import SecondaryButton from '@/volt/SecondaryButton.vue';
 import ToggleButton from '@/volt/ToggleButton.vue'
 import RecurrenceForm from '@/components/calendar/RecurrenceForm.vue'
-import Editor from 'primevue/editor'
-import DatePicker from 'primevue/datepicker'
+import TextArea from '@/volt/Textarea.vue'
+import DatePicker from '@/volt/DatePicker.vue'
 import { parseRRule, describeRRule, buildRRule } from '@/composables/useRecurrence'
 import type { RRuleConfig } from '@/composables/useRecurrence'
 import type { CalendarEventData } from '@/composables/useCalendarEvents'
@@ -267,7 +267,16 @@ function createEmptyForm(): FormState {
  * @returns Tuple of [dateValue, timeValue]
  */
 function parseIsoToDateAndTime(iso: string): [Date, Date] {
-  const d = new Date(iso)
+  // Why: Date-only strings ("YYYY-MM-DD") are parsed as UTC midnight by the
+  // Date constructor, which shifts to the previous day in positive UTC offsets
+  // (e.g. CET). Parse as local date to keep the intended calendar date.
+  let d: Date
+  if (/^\d{4}-\d{2}-\d{2}$/.test(iso)) {
+    const [year, month, day] = iso.split('-').map(Number)
+    d = new Date(year, month - 1, day)
+  } else {
+    d = new Date(iso)
+  }
   const timeDate = new Date()
   timeDate.setHours(d.getHours(), d.getMinutes(), 0, 0)
   return [d, timeDate]
@@ -408,8 +417,14 @@ watch(
 function combineDateTimeToIso(date: Date, time: Date | null, zeroed: boolean): string {
   const result = new Date(date)
   if (zeroed) {
-    result.setHours(0, 0, 0, 0)
-  } else if (time) {
+    // Why: For all-day events, return a date-only string ("YYYY-MM-DD") to avoid
+    // toISOString() converting local midnight to UTC and shifting the date backward
+    const y = result.getFullYear()
+    const m = String(result.getMonth() + 1).padStart(2, '0')
+    const d = String(result.getDate()).padStart(2, '0')
+    return `${y}-${m}-${d}`
+  }
+  if (time) {
     result.setHours(time.getHours(), time.getMinutes(), 0, 0)
   }
   return result.toISOString()

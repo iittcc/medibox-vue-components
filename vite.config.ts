@@ -53,6 +53,13 @@ export default defineConfig({
     alias: {
        '@': path.resolve(__dirname, './src')
     }
-}
-  
+  },
+  server: {
+    proxy: {
+      '/index.php': {
+        target: 'http://localhost:1010',
+        changeOrigin: true
+      }
+    }
+  }
 });
