@@ -2,7 +2,7 @@
 import { createApp } from 'vue';               // Icons           // PrimeFlex
 import 'material-design-icons-iconfont/dist/material-design-icons.css';
 import './assets/orange.css';
-import App from './WestleyCroupScore.vue';
+import App from './components/calculators/WestleyCroupCalculator.vue'
 import PrimeVue from 'primevue/config';
 
 const app = createApp(App);

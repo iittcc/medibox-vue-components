@@ -71,9 +71,12 @@
     "src/calendarWidget.vue",
     "src/components/calendar/EventModal.vue",
     "src/components/calendar/RecurrenceForm.vue",
-
+    "src/composables/useCalculatorForm.ts",
+    "src/scoring/epds.ts",
+    "src/scoring/types.ts",
     "src/tailwind.ts",
-
-
+    "src/components/calculators/CalculatorPrintLayout.vue",
+    "src/components/calculators/EpdsCalculator.vue",
+    "src/components/calculators/EpdsCalculatorPrint.vue"
   ]
 }

@@ -22,7 +22,7 @@
       <div class="print-patient-info">
         <div class="print-patient-row">
           <span>Navn: <strong>{{ patientName || '—' }}</strong></span>
-          <span>CPR: <strong>{{ patientCpr || '—' }}</strong></span>
+          <span v-if="showCpr">CPR: <strong>{{ patientCpr || '—' }}</strong></span>
           <span>Dato: <strong>{{ printDate }}</strong></span>
           <span>Alder: <strong>{{ patientAge }}</strong></span>
           <span>Køn: <strong>{{ patientGender }}</strong></span>
@@ -55,13 +55,16 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   calculatorName: string
   patientName: string
   patientCpr: string
   patientAge: number
   patientGender: string
-}>()
+  showCpr?: boolean
+}>(), {
+  showCpr: false
+})
 
 const logoUrl = '/public/MediBOX_logo.png'
 

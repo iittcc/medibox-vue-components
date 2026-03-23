@@ -1,0 +1,9 @@
+[
+  { "description": "Best response (full consciousness)", "answers": [4, 5, 6], "expectedScore": 15, "expectedSeverity": "normal", "expectedInterpretation": "Fuld bevidsthed" },
+  { "description": "Worst response (deep coma)", "answers": [1, 1, 1], "expectedScore": 3, "expectedSeverity": "severe", "expectedInterpretation": "Svær bevidsthedssvækkelse (Coma)" },
+  { "description": "Boundary: score 14 (mild)", "answers": [4, 4, 6], "expectedScore": 14, "expectedSeverity": "mild", "expectedInterpretation": "Lettere bevidsthedssvækkelse" },
+  { "description": "Boundary: score 13 (mild)", "answers": [3, 4, 6], "expectedScore": 13, "expectedSeverity": "mild", "expectedInterpretation": "Lettere bevidsthedssvækkelse" },
+  { "description": "Boundary: score 12 (moderate)", "answers": [3, 3, 6], "expectedScore": 12, "expectedSeverity": "moderate", "expectedInterpretation": "Middelsvær bevidsthedssvækkelse" },
+  { "description": "Boundary: score 9 (moderate)", "answers": [2, 2, 5], "expectedScore": 9, "expectedSeverity": "moderate", "expectedInterpretation": "Middelsvær bevidsthedssvækkelse" },
+  { "description": "Boundary: score 8 (severe)", "answers": [2, 2, 4], "expectedScore": 8, "expectedSeverity": "severe", "expectedInterpretation": "Svær bevidsthedssvækkelse (Coma)" }
+]

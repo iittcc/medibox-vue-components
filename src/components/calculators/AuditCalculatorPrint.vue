@@ -1,44 +1,35 @@
 <template>
-  <!--
-    What: A4 print view for the EPDS calculator.
-    How: Renders scored EPDS results in the shared CalculatorPrintLayout.
-    Displays score result with emphasis, all 10 questions with selected answers,
-    and clinical threshold reference.
-
-    Design spec: 18pt bold score, 10pt questions, grayscale-safe emphasis.
-  -->
   <CalculatorPrintLayout
     :calculatorName="config.name"
     :patientName="patient.name"
     :patientCpr="patient.cpr"
     :patientAge="patient.age"
     :patientGender="patient.gender"
-    :showCpr="true"
   >
     <template #score-result>
-      <div v-if="result" class="epds-print-score">
-        <div class="epds-score-value">
+      <div v-if="result" class="audit-print-score">
+        <div class="audit-score-value">
           {{ config.shortName }} Score: {{ result.score }}
         </div>
-        <div class="epds-score-interpretation">
+        <div class="audit-score-interpretation">
           {{ result.interpretation }}
         </div>
-        <div class="epds-score-legend">
-          <span>● ≤ 9: Ikke tegn til alvorlig depression</span>
-          <span>● ≥ 10: Behandlingskrævende depression kan foreligge</span>
+        <div class="audit-score-legend">
+          <span>● &lt; 8: Ikke tegn på alkoholafhængighed</span>
+          <span>● ≥ 8: Tegn på alkoholafhængighed</span>
         </div>
       </div>
     </template>
 
     <template #questions>
-      <div v-if="result" class="epds-print-questions">
+      <div v-if="result" class="audit-print-questions">
         <div
           v-for="qr in result.questionResults"
           :key="qr.questionNumber"
-          class="epds-print-question"
+          class="audit-print-question"
         >
-          <div class="epds-question-text">{{ qr.questionText }}</div>
-          <div class="epds-answer-text">► {{ qr.answerText }} ({{ qr.score }})</div>
+          <div class="audit-question-text">{{ qr.questionText }}</div>
+          <div class="audit-answer-text">► {{ qr.answerText }} ({{ qr.score }})</div>
         </div>
       </div>
     </template>
@@ -57,10 +48,7 @@ defineProps<{
 </script>
 
 <style>
-/* ─── EPDS Score Result Box ──────────────────────────────── */
-/* Why: Compact sizing to fit all 10 questions + score on one A4 page */
-
-.epds-print-score {
+.audit-print-score {
   border: 1.5pt solid #333;
   padding: 8pt 12pt;
   margin-bottom: 8pt;
@@ -68,7 +56,7 @@ defineProps<{
   page-break-inside: avoid;
 }
 
-.epds-score-value {
+.audit-score-value {
   font-family: system-ui, -apple-system, sans-serif;
   font-size: 16pt;
   font-weight: 700;
@@ -76,14 +64,14 @@ defineProps<{
   margin-bottom: 2pt;
 }
 
-.epds-score-interpretation {
+.audit-score-interpretation {
   font-size: 10pt;
   font-weight: 600;
   color: #333;
   margin-bottom: 5pt;
 }
 
-.epds-score-legend {
+.audit-score-legend {
   display: flex;
   justify-content: center;
   gap: 16pt;
@@ -93,30 +81,28 @@ defineProps<{
   border-top: 1px solid #ddd;
 }
 
-/* ─── EPDS Question List ─────────────────────────────────── */
-
-.epds-print-questions {
+.audit-print-questions {
   margin-top: 6pt;
 }
 
-.epds-print-question {
+.audit-print-question {
   margin-bottom: 1pt;
   padding: 2.5pt 0;
   border-bottom: 1px solid #eee;
   page-break-inside: avoid;
 }
 
-.epds-print-question:last-child {
+.audit-print-question:last-child {
   border-bottom: none;
 }
 
-.epds-question-text {
+.audit-question-text {
   font-size: 8.5pt;
   color: #333;
   margin-bottom: 0;
 }
 
-.epds-answer-text {
+.audit-answer-text {
   font-size: 8.5pt;
   padding-left: 12pt;
   color: #1a1a1a;

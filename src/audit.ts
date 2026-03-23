@@ -2,7 +2,7 @@
 import { createApp } from 'vue';               // Icons           // PrimeFlex
 import 'material-design-icons-iconfont/dist/material-design-icons.css';
 import './assets/teal.css';
-import App from './Audit.vue';
+import App from './components/calculators/AuditCalculator.vue'
 import PrimeVue from 'primevue/config';
 
 const app = createApp(App);

@@ -1,0 +1,8 @@
+[
+  { "description": "All minimum", "answers": [0, 0, 0, 0, 0], "expectedScore": 0, "expectedSeverity": "normal", "expectedInterpretation": "Mild pseudocroup ≤ 2" },
+  { "description": "All maximum", "answers": [5, 5, 5, 2, 3], "expectedScore": 20, "expectedSeverity": "severe", "expectedInterpretation": "Svær pseudocroup ≥ 8" },
+  { "description": "Boundary: score 2 (mild)", "answers": [0, 0, 0, 1, 1], "expectedScore": 2, "expectedSeverity": "normal", "expectedInterpretation": "Mild pseudocroup ≤ 2" },
+  { "description": "Boundary: score 3 (moderate)", "answers": [0, 0, 0, 1, 2], "expectedScore": 3, "expectedSeverity": "moderate", "expectedInterpretation": "Moderat pseudocroup 3-7" },
+  { "description": "Boundary: score 7 (moderate)", "answers": [0, 4, 0, 1, 2], "expectedScore": 7, "expectedSeverity": "moderate", "expectedInterpretation": "Moderat pseudocroup 3-7" },
+  { "description": "Boundary: score 8 (severe)", "answers": [5, 0, 0, 1, 2], "expectedScore": 8, "expectedSeverity": "severe", "expectedInterpretation": "Svær pseudocroup ≥ 8" }
+]

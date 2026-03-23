@@ -1,0 +1,9 @@
+[
+  { "description": "All zeros (asymptomatisk)", "answers": [0, 0, 0, 0, 0, 0, 0], "expectedScore": 0, "expectedSeverity": "normal", "expectedInterpretation": "Asymptomatisk" },
+  { "description": "Score 1 (mild)", "answers": [1, 0, 0, 0, 0, 0, 0], "expectedScore": 1, "expectedSeverity": "mild", "expectedInterpretation": "Symptomatisk, mild" },
+  { "description": "Score 7 (mild boundary)", "answers": [1, 1, 1, 1, 1, 1, 1], "expectedScore": 7, "expectedSeverity": "mild", "expectedInterpretation": "Symptomatisk, mild" },
+  { "description": "Score 8 (moderate)", "answers": [2, 1, 1, 1, 1, 1, 1], "expectedScore": 8, "expectedSeverity": "moderate", "expectedInterpretation": "Symptomatisk, moderat" },
+  { "description": "Score 19 (moderate boundary)", "answers": [3, 3, 3, 3, 3, 3, 1], "expectedScore": 19, "expectedSeverity": "moderate", "expectedInterpretation": "Symptomatisk, moderat" },
+  { "description": "Score 20 (severe)", "answers": [3, 3, 3, 3, 3, 3, 2], "expectedScore": 20, "expectedSeverity": "severe", "expectedInterpretation": "Symptomatisk, alvorlig" },
+  { "description": "All max (35)", "answers": [5, 5, 5, 5, 5, 5, 5], "expectedScore": 35, "expectedSeverity": "severe", "expectedInterpretation": "Symptomatisk, alvorlig" }
+]

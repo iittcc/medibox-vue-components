@@ -9,12 +9,8 @@
  * (single source of truth for clinical content).
  */
 
-import type {
-  CalculatorConfig,
-  Question,
-  ScoreResult,
-  QuestionResult
-} from './types'
+import type { CalculatorConfig, Question, ScoreResult } from './types'
+import { calculateSimpleSum } from './utils'
 
 // Why: The EPDS clinical threshold is >= 10 for screening cutoff (Danish guidelines).
 // The previous code used > 10 which was inconsistent with the display text and clinical standards.
@@ -186,37 +182,11 @@ export const epdsConfig: CalculatorConfig = {
 
 /**
  * What: Pure scoring function for the EPDS calculator.
- * How: Sums all question answers and applies the clinical threshold
- * to determine the interpretation and severity.
+ * How: Delegates to the shared calculateSimpleSum utility with EPDS thresholds.
  *
  * @param questions - Array of questions with user-selected answers
  * @returns ScoreResult with total score, interpretation, severity, and per-question results
  */
 export function calculateEpds(questions: Question[]): ScoreResult {
-  const questionResults: QuestionResult[] = questions.map((q, index) => {
-    const score = q.answer ?? 0
-    const selectedOption = q.options.find(opt => opt.value === score)
-
-    return {
-      questionNumber: `${index + 1}`,
-      questionText: q.text,
-      answerText: selectedOption?.text ?? '',
-      score
-    }
-  })
-
-  const totalScore = questionResults.reduce((sum, r) => sum + r.score, 0)
-
-  // Why: Using >= for threshold comparison per Danish clinical guidelines.
-  // Score of exactly 10 should trigger clinical concern.
-  const threshold = epdsConfig.thresholds.find(
-    t => totalScore >= t.minScore && totalScore <= t.maxScore
-  )
-
-  return {
-    score: totalScore,
-    interpretation: threshold?.interpretation ?? '',
-    severity: threshold?.severity ?? 'normal',
-    questionResults
-  }
+  return calculateSimpleSum(questions, epdsConfig.thresholds)
 }
