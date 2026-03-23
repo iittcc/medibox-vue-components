@@ -4,7 +4,7 @@ import vue from '@vitejs/plugin-vue';
 import {PrimeVueResolver} from '@primevue/auto-import-resolver';
 import Components from 'unplugin-vue-components/vite';
 import tailwindcss from '@tailwindcss/vite';
-import path from 'node:path';
+import path, { resolve } from 'node:path';
 
 export default defineConfig({
   base: './',
@@ -34,7 +34,9 @@ export default defineConfig({
       gcs: './src/gcs.ts',
       ipss: './src/ipss.ts',
       passwordReset: './src/passwordReset.ts',
-      medicinBoern: './src/medicinBoern.ts'
+      medicinBoern: './src/medicinBoern.ts',
+      calendarFull: resolve(__dirname, 'src/calendarFull.ts'),
+      calendarWidget: resolve(__dirname, 'src/calendarWidget.ts')
     },
     output: {
       entryFileNames: '[name].js',
@@ -51,6 +53,13 @@ export default defineConfig({
     alias: {
        '@': path.resolve(__dirname, './src')
     }
-}
-  
+  },
+  server: {
+    proxy: {
+      '/index.php': {
+        target: 'http://localhost:1010',
+        changeOrigin: true
+      }
+    }
+  }
 });

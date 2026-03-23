@@ -1,9 +1,11 @@
 # Learning: Vue 3 Property Binding with Undefined Variables
 
 ## Issue Encountered
+
 **Problem**: Vue components using `:prop="variableName"` syntax where `variableName` is not defined, causing Vue warnings and test failures.
 
-**Manifestation**: 
+**Manifestation**:
+
 ```vue
 <!-- PROBLEMATIC CODE -->
 <NumberSliderInput
@@ -13,22 +15,26 @@
 ```
 
 **Error Messages**:
+
 ```
 [Vue warn]: Property "custom" was accessed during render but is not defined on instance.
 ```
 
 ## Root Cause Analysis
+
 - **Template binding confusion**: Developer intended to pass a string literal but used property binding syntax
 - **Missing variable declaration**: The variable `custom` was never declared in the component's setup
 - **Vue 3 reactivity system**: Vue 3's proxy-based reactivity detects undefined property access more strictly than Vue 2
 
 ## Impact on Development
+
 - **Test failures**: All component tests failed due to Vue warnings
 - **Runtime errors**: Component couldn't render properly
 - **Debug time**: Significant time spent tracking down seemingly simple issue
 - **CI/CD pipeline**: Blocked deployment due to test failures
 
 ## Solution Applied
+
 ```vue
 <!-- SOLUTION 1: Use string literal -->
 <NumberSliderInput
@@ -51,7 +57,9 @@ const custom = 'custom'  // Define the variable
 ## Prevention Strategies
 
 ### 1. ESLint Rules
+
 Add Vue-specific ESLint rules to catch undefined variables:
+
 ```json
 {
   "rules": {
@@ -62,7 +70,9 @@ Add Vue-specific ESLint rules to catch undefined variables:
 ```
 
 ### 2. TypeScript Strict Mode
+
 Enable strict TypeScript checking:
+
 ```json
 {
   "compilerOptions": {
@@ -74,23 +84,28 @@ Enable strict TypeScript checking:
 ```
 
 ### 3. Template Syntax Guidelines
+
 **DO:**
+
 - Use string literals for static values: `prop="value"`
 - Use v-bind only for reactive data: `:prop="reactiveVariable"`
 - Declare all template variables in setup()
 
 **DON'T:**
+
 - Use `:prop="undefinedVariable"`
 - Mix string literals with property binding syntax
 - Assume variables exist without declaration
 
 ### 4. Code Review Checklist
+
 - [ ] All `:prop="variable"` bindings have corresponding variable declarations
 - [ ] Static strings use literal syntax `prop="value"`
 - [ ] Component props are properly typed
 - [ ] Template variables are declared in setup()
 
 ## Testing Considerations
+
 ```typescript
 // Test to catch undefined variable issues
 it('renders without Vue warnings', () => {
@@ -103,9 +118,11 @@ it('renders without Vue warnings', () => {
 ## Related Patterns
 
 ### Vue 2 vs Vue 3 Differences
+
 Vue 2 was more permissive with undefined variables, while Vue 3's reactivity system is stricter.
 
 ### Common Anti-patterns
+
 ```vue
 <!-- ANTI-PATTERN: Undefined binding -->
 :class="undefinedVariable"
@@ -119,9 +136,11 @@ class="static-class"
 ```
 
 ## References
+
 - [Vue 3 Template Syntax Guide](https://vuejs.org/guide/essentials/template-syntax.html)
 - [Vue 3 Reactivity in Depth](https://vuejs.org/guide/extras/reactivity-in-depth.html)
 - [ESLint Plugin Vue Rules](https://eslint.vuejs.org/rules/)
 
 ## Keywords
+
 `vue3`, `template-binding`, `undefined-variables`, `property-binding`, `reactivity`, `eslint`

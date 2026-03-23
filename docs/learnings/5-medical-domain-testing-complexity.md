@@ -1,9 +1,11 @@
 # Learning: Medical Domain Testing Complexity
 
 ## Issue Encountered
+
 **Problem**: Balancing comprehensive medical logic testing with maintainable test code, especially around clinical thresholds, risk calculations, and patient safety scenarios in a medical calculator application.
 
 **Manifestation**:
+
 ```typescript
 // COMPLEX MEDICAL LOGIC TESTING CHALLENGES
 it('validates cardiovascular risk assessment', () => {
@@ -16,6 +18,7 @@ it('validates cardiovascular risk assessment', () => {
 ```
 
 **Specific Issues**:
+
 - Clinical threshold boundaries vary by age group
 - Multiple risk factors interact non-linearly
 - Medical accuracy requirements vs test complexity
@@ -23,6 +26,7 @@ it('validates cardiovascular risk assessment', () => {
 - Patient safety considerations in edge cases
 
 ## Root Cause Analysis
+
 - **Domain complexity**: Medical calculations involve multiple interacting variables
 - **Regulatory requirements**: Medical software requires higher testing standards
 - **Clinical accuracy**: Small errors can have serious patient safety implications
@@ -30,6 +34,7 @@ it('validates cardiovascular risk assessment', () => {
 - **Multi-dimensional thresholds**: Risk categories change based on age, gender, and other factors
 
 ## Impact on Development
+
 - **Test complexity explosion**: Single feature required 76 different test cases
 - **Maintenance burden**: Changes to medical guidelines require extensive test updates
 - **False confidence**: Passing tests don't guarantee clinical accuracy
@@ -39,6 +44,7 @@ it('validates cardiovascular risk assessment', () => {
 ## Solution Applied
 
 ### 1. Structured Medical Testing Framework
+
 ```typescript
 // Medical domain test structure
 describe('Score2 Medical Calculator', () => {
@@ -61,6 +67,7 @@ describe('Score2 Medical Calculator', () => {
 ```
 
 ### 2. Clinical Threshold Testing Pattern
+
 ```typescript
 // Pattern for age-specific medical thresholds
 const clinicalThresholds = {
@@ -90,6 +97,7 @@ Object.entries(clinicalThresholds).forEach(([ageGroup, thresholds]) => {
 ```
 
 ### 3. Medical Scenario Testing
+
 ```typescript
 // Test realistic patient scenarios
 const patientScenarios = {
@@ -127,6 +135,7 @@ Object.entries(patientScenarios).forEach(([scenarioName, scenario]) => {
 ```
 
 ### 4. Risk Factor Interaction Testing
+
 ```typescript
 // Test how multiple risk factors interact
 it('validates risk factor interactions', () => {
@@ -159,6 +168,7 @@ it('validates risk factor interactions', () => {
 ```
 
 ### 5. Treatment Goal Validation
+
 ```typescript
 // Test clinical treatment recommendations
 it('validates treatment goal recommendations', () => {
@@ -186,6 +196,7 @@ it('validates treatment goal recommendations', () => {
 ## Prevention Strategies
 
 ### 1. Medical Domain Test Architecture
+
 ```typescript
 // tests/medical/
 // ├── patient-safety/     # Critical safety tests
@@ -205,6 +216,7 @@ describe('UI Integration (Component Tests)', () => {
 ```
 
 ### 2. Medical Test Data Management
+
 ```typescript
 // medical-test-data.ts
 export const clinicalGuidelines = {
@@ -234,6 +246,7 @@ export const patientTestCases = [
 ```
 
 ### 3. Clinical Validation Framework
+
 ```typescript
 // Validate against medical literature
 const validateAgainstGuidelines = (component: any) => {
@@ -252,6 +265,7 @@ const validateAgainstGuidelines = (component: any) => {
 ```
 
 ### 4. Patient Safety Testing
+
 ```typescript
 // Critical safety tests that must never fail
 describe('Patient Safety (Critical)', () => {
@@ -286,6 +300,7 @@ describe('Patient Safety (Critical)', () => {
 ```
 
 ### 5. Regulatory Compliance Testing
+
 ```typescript
 // Tests for medical device regulations
 describe('Regulatory Compliance', () => {
@@ -321,6 +336,7 @@ describe('Regulatory Compliance', () => {
 ## Advanced Medical Testing Patterns
 
 ### 1. Statistical Validation
+
 ```typescript
 // Validate calculations across large datasets
 it('validates risk distribution across patient population', () => {
@@ -342,6 +358,7 @@ it('validates risk distribution across patient population', () => {
 ```
 
 ### 2. Cross-Validation Testing
+
 ```typescript
 // Test consistency across different calculation paths
 it('produces consistent results via different paths', () => {
@@ -368,6 +385,7 @@ it('produces consistent results via different paths', () => {
 ```
 
 ### 3. Performance Testing for Medical Calculations
+
 ```typescript
 // Ensure calculations complete in reasonable time
 it('calculates risk within performance requirements', () => {
@@ -387,18 +405,21 @@ it('calculates risk within performance requirements', () => {
 ## Domain Knowledge Requirements
 
 ### 1. Medical Terminology
+
 - Understand cardiovascular risk factors
 - Know clinical threshold definitions
 - Understand treatment goal rationale
 - Recognize contraindications and warnings
 
 ### 2. Regulatory Context
+
 - Medical device software requirements
 - Clinical validation standards
 - Documentation requirements
 - Risk management processes
 
 ### 3. User Safety
+
 - Fail-safe design principles
 - Error handling for clinical scenarios
 - User interface safety considerations
@@ -407,6 +428,7 @@ it('calculates risk within performance requirements', () => {
 ## Common Medical Testing Anti-Patterns
 
 ### 1. Oversimplified Medical Logic
+
 ```typescript
 // ANTI-PATTERN: Trivial medical tests
 expect(higherBP).toIncrease(risk)
@@ -416,6 +438,7 @@ expect(riskIncrease).toBeGreaterThan(clinicallySignificantThreshold)
 ```
 
 ### 2. Ignoring Medical Guidelines
+
 ```typescript
 // ANTI-PATTERN: Arbitrary thresholds
 expect(risk > 10).toBe(true)
@@ -425,6 +448,7 @@ expect(risk).toBeGreaterThan(ESC_SCORE2_HIGH_RISK_THRESHOLD)
 ```
 
 ### 3. Testing Without Clinical Context
+
 ```typescript
 // ANTI-PATTERN: Mathematical testing only
 expect(calculation(a, b, c)).toBe(expectedValue)
@@ -434,10 +458,12 @@ expect(patientRiskAssessment(healthyPatient)).toBe('Lav-moderat risiko')
 ```
 
 ## References
+
 - [European Society of Cardiology SCORE2 Guidelines](https://www.escardio.org/Guidelines)
 - [Medical Device Software Development Standards](https://www.iso.org/standard/54928.html)
 - [Clinical Decision Support Testing](https://www.hl7.org/fhir/clinicalreasoning-module.html)
 - [Patient Safety in Medical Software](https://www.fda.gov/medical-devices/software-medical-device-samd)
 
 ## Keywords
+
 `medical-testing`, `clinical-validation`, `patient-safety`, `cardiovascular-risk`, `SCORE2`, `medical-guidelines`

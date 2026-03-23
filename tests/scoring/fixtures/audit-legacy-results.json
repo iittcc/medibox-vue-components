@@ -1,0 +1,37 @@
+[
+  {
+    "description": "All minimum scores",
+    "answers": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    "expectedScore": 0,
+    "expectedSeverity": "normal",
+    "expectedInterpretation": "Ikke tegn på alkoholafhængighed (AUDIT Score < 8)"
+  },
+  {
+    "description": "All maximum scores",
+    "answers": [4, 4, 4, 4, 4, 4, 4, 4, 4, 4],
+    "expectedScore": 40,
+    "expectedSeverity": "severe",
+    "expectedInterpretation": "Tegn på alkoholafhængighed (AUDIT Score ≥ 8)"
+  },
+  {
+    "description": "At threshold boundary - score exactly 8",
+    "answers": [2, 2, 2, 2, 0, 0, 0, 0, 0, 0],
+    "expectedScore": 8,
+    "expectedSeverity": "severe",
+    "expectedInterpretation": "Tegn på alkoholafhængighed (AUDIT Score ≥ 8)"
+  },
+  {
+    "description": "Just below threshold - score 7",
+    "answers": [2, 2, 2, 1, 0, 0, 0, 0, 0, 0],
+    "expectedScore": 7,
+    "expectedSeverity": "normal",
+    "expectedInterpretation": "Ikke tegn på alkoholafhængighed (AUDIT Score < 8)"
+  },
+  {
+    "description": "Moderate drinking pattern",
+    "answers": [2, 1, 1, 0, 0, 0, 1, 0, 0, 0],
+    "expectedScore": 5,
+    "expectedSeverity": "normal",
+    "expectedInterpretation": "Ikke tegn på alkoholafhængighed (AUDIT Score < 8)"
+  }
+]

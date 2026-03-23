@@ -1,0 +1,41 @@
+.medical-calculator-container {
+  --fc-border-color: #e2e8f0;
+  --fc-button-bg-color: #3b82f6;
+  --fc-button-border-color: #3b82f6;
+  --fc-button-hover-bg-color: #2563eb;
+  --fc-button-hover-border-color: #2563eb;
+  --fc-button-active-bg-color: #1d4ed8;
+  --fc-button-active-border-color: #1d4ed8;
+  --fc-today-bg-color: #eff6ff;
+  --fc-event-bg-color: #3b82f6;
+  --fc-event-border-color: #2563eb;
+  --fc-event-text-color: #fff;
+  font-size: 1em;
+}
+
+.medical-calculator-container .fc-day-sat,
+.medical-calculator-container .fc-day-sun {
+  background-color: #f8fafc;
+}
+
+.medical-calculator-container .past-event.fc-event {
+  opacity: 0.7;
+}
+
+.medical-calculator-container .fc-multimonth .fc-daygrid-week-number {
+  font-size: 0.8em;
+  opacity: 1;
+}
+
+.medical-calculator-container .fc-daygrid-day-frame {
+  min-height: 60px;
+}
+
+.medical-calculator-container .fc-daygrid-day-top {
+  padding: 2px 4px;
+}
+
+.medical-calculator-container .fc-yearGrid-button,
+.medical-calculator-container .fc-yearStack-button {
+  display: none;
+}

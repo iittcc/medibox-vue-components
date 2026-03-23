@@ -37,3 +37,4 @@ playwright-report/**/*
 playwright-report/results.xml
 playwright-report/results.json
 playwright-report/index.html
+.osgrep

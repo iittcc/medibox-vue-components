@@ -1,0 +1,8 @@
+[
+  { "description": "All minimum (1s)", "answers": [1, 1, 1], "expectedScore": 3, "expectedSeverity": "normal", "expectedInterpretation": "Mild graviditetskvalme (PUQE ≤ 6)" },
+  { "description": "All maximum (5s)", "answers": [5, 5, 5], "expectedScore": 15, "expectedSeverity": "severe", "expectedInterpretation": "Svær graviditetskvalme (Hyperemesis Gravidarum) (PUQE ≥ 13)" },
+  { "description": "Boundary: score 6 (mild)", "answers": [2, 2, 2], "expectedScore": 6, "expectedSeverity": "normal", "expectedInterpretation": "Mild graviditetskvalme (PUQE ≤ 6)" },
+  { "description": "Boundary: score 7 (moderate)", "answers": [3, 2, 2], "expectedScore": 7, "expectedSeverity": "moderate", "expectedInterpretation": "Moderat graviditetskvalme (PUQE 7-12)" },
+  { "description": "Boundary: score 12 (moderate)", "answers": [4, 4, 4], "expectedScore": 12, "expectedSeverity": "moderate", "expectedInterpretation": "Moderat graviditetskvalme (PUQE 7-12)" },
+  { "description": "Boundary: score 13 (severe)", "answers": [5, 4, 4], "expectedScore": 13, "expectedSeverity": "severe", "expectedInterpretation": "Svær graviditetskvalme (Hyperemesis Gravidarum) (PUQE ≥ 13)" }
+]

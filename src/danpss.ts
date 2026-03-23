@@ -4,7 +4,7 @@ import 'material-design-icons-iconfont/dist/material-design-icons.css';
 import './assets/teal.css';
 import './assets/zinc.css';
 
-import App from './Danpss.vue';
+import App from './components/calculators/DanpssCalculator.vue'
 import PrimeVue from 'primevue/config';
 import ToastService from 'primevue/toastservice';
 import Chart from 'chart.js/auto';

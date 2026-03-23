@@ -1,4 +1,5 @@
 # Vue Component Testing: Lessons Learned
+
 ## A Time-Saving Methodology Guide
 
 > **Key Insight**: Reading the actual component code first saves 2-3 hours of debugging and rewriting tests based on wrong assumptions.
@@ -6,11 +7,13 @@
 ## Executive Summary
 
 ### Time Investment Analysis
+
 - **Initial Approach**: 3+ hours writing tests based on assumptions → All tests failed
 - **Fixed Approach**: 1 hour reading component + 1 hour writing accurate tests → 22/22 tests passing
 - **Time Saved**: 2+ hours per component when following this methodology
 
 ### Critical Success Factors
+
 1. **Component-First Analysis**: Always examine the real implementation before writing tests
 2. **Complete Dependency Mapping**: Mock ALL dependencies upfront to prevent cascade failures
 3. **Real Property Testing**: Use actual property names and data types from the component
@@ -31,6 +34,7 @@ const selectedPraeparat = ref<number>(0)                // Number, NOT string!
 ```
 
 **❌ MISTAKE: Writing tests based on assumptions**
+
 ```typescript
 // This was WRONG - component doesn't start empty
 expect(component.selectedIndholdsstof).toBe('')  // FAILS!
@@ -38,6 +42,7 @@ expect(component.weight).toBe(15)                // Property doesn't exist!
 ```
 
 **✅ CORRECT: Reading actual component state**
+
 ```typescript
 // This works - based on real component defaults
 expect(component.selectedIndholdsstof).toBe('amoxicillin')  // ✅
@@ -58,6 +63,7 @@ import SecondaryButton from '@/volt/SecondaryButton.vue' // ← Must mock
 ```
 
 **❌ MISTAKE: Partial mocking leads to cascade failures**
+
 ```typescript
 // Missing NumberSliderInput mock → ALL tests fail
 vi.mock('@/volt/Select.vue', () => ({ ... }))
@@ -86,6 +92,7 @@ watch([dosering, vaegt, fordeltPaaVal], () => {
 ### Framework-Specific Configuration
 
 **PrimeVue Context Setup (CRITICAL)**
+
 ```typescript
 // tests/setup.ts - MUST include this for PrimeVue components
 config.global.mocks = {
@@ -103,6 +110,7 @@ config.global.mocks = {
 ```
 
 **❌ FAILURE: Missing PrimeVue context**
+
 ```
 Error: Cannot read properties of undefined (reading 'config')
 ```
@@ -138,6 +146,7 @@ vi.mock('@/components/NumberSliderInput.vue', () => ({
 ### Progressive Test Building Approach
 
 **1. Start with Basic Rendering**
+
 ```typescript
 test('renders the component with title', () => {
   expect(wrapper.find('[data-testid="surface-card"]').exists()).toBe(true)
@@ -146,6 +155,7 @@ test('renders the component with title', () => {
 ```
 
 **2. Add Component Structure Tests**
+
 ```typescript
 test('displays all medicine selection fields', () => {
   const selects = wrapper.findAll('[data-testid="select"]')
@@ -154,6 +164,7 @@ test('displays all medicine selection fields', () => {
 ```
 
 **3. Test Real Property Values**
+
 ```typescript
 test('initial state has correct default values', () => {
   const component = wrapper.vm as any
@@ -165,6 +176,7 @@ test('initial state has correct default values', () => {
 ```
 
 **4. Test Real Behavior Patterns**
+
 ```typescript
 test('performs automatic calculations on input changes', async () => {
   // Test the ACTUAL watcher-based calculation system
@@ -179,12 +191,14 @@ test('performs automatic calculations on input changes', async () => {
 ### Real vs Mocked Behavior Testing
 
 **❌ WRONG: Testing non-existent methods**
+
 ```typescript
 // Component doesn't have this method!
 expect(component.calculationResult).toBeDefined()
 ```
 
 **✅ CORRECT: Testing actual reactive properties**
+
 ```typescript
 // Component has these reactive properties
 expect(component.antalPrDogn).toBe(2)
@@ -199,6 +213,7 @@ expect(component.warning).toContain('7 kg')
 **Problem**: Mocked components often fail to properly emit events or trigger parent component methods
 
 **❌ MISTAKE: Expecting mock events to work like real components**
+
 ```typescript
 // This often fails - mock button clicks don't trigger component methods
 const resetButton = wrapper.find('[data-testid="secondary-button"]')
@@ -207,6 +222,7 @@ expect(component.resetQuestions).toHaveBeenCalled() // ❌ Often fails
 ```
 
 **✅ SOLUTION: Test component methods directly**
+
 ```typescript
 // Test the actual functionality instead of simulating UI events
 component.resetQuestions()
@@ -219,12 +235,14 @@ expect(component.totalScore).toBe(0) // ✅ Verifiable behavior
 **Problem**: DOM attributes on mocked components don't behave like real components
 
 **❌ MISTAKE: Expecting consistent attribute behavior**
+
 ```typescript
 // Mock templates don't handle complex attribute expressions reliably
 expect(copyDialog.attributes('disabled')).toBe('true') // ❌ Unreliable
 ```
 
 **✅ SOLUTION: Test underlying state instead**
+
 ```typescript
 // Test the state that drives the attribute
 expect(component.resultsSection).toBe(null) // ✅ Reliable
@@ -236,6 +254,7 @@ expect(component.resultsSection1).toEqual([]) // ✅ Verifiable
 **Problem**: Setting up method spies after component mounting may miss method calls
 
 **❌ MISTAKE: Late spy setup**
+
 ```typescript
 test('method is called', () => {
   const component = wrapper.vm
@@ -246,6 +265,7 @@ test('method is called', () => {
 ```
 
 **✅ SOLUTION: Test results instead of method calls**
+
 ```typescript
 test('method works correctly', () => {
   const component = wrapper.vm
@@ -258,11 +278,13 @@ test('method works correctly', () => {
 ### When to Pivot from Event Testing
 
 **Recognition Patterns**:
+
 - Mock event handlers repeatedly fail despite correct setup
 - Complex attribute testing becomes unreliable
 - Time spent debugging mock behavior exceeds test value
 
 **Pivot Strategy**:
+
 1. **Identify core behavior**: What should the method actually do?
 2. **Test state changes**: Verify the component state changes correctly
 3. **Test business logic**: Focus on calculation, validation, data transformation
@@ -273,18 +295,21 @@ test('method works correctly', () => {
 ### Specific Error Messages and Solutions
 
 **Error: "Cannot read properties of undefined (reading 'config')"**
+
 ```typescript
 // CAUSE: Missing PrimeVue context
 // FIX: Add $primevue mock to tests/setup.ts (see above)
 ```
 
 **Error: Component mounting failures**
+
 ```typescript
 // CAUSE: Missing component dependency mocks
 // FIX: Mock ALL imported components before running tests
 ```
 
 **Error: Property access errors**
+
 ```typescript
 // CAUSE: Wrong property names
 // FIX: Use exact property names from component
@@ -295,6 +320,7 @@ expect(component.weight).toBe(16)   // ❌ Doesn't exist
 ### Time-Wasting Anti-Patterns
 
 **1. Assumption-Based Testing**
+
 ```typescript
 // ❌ DON'T assume what the component should do
 test('initial state has empty selections', () => {
@@ -308,6 +334,7 @@ test('initial state has correct default values', () => {
 ```
 
 **2. Partial Dependency Mocking**
+
 ```typescript
 // ❌ DON'T mock only some dependencies
 vi.mock('@/volt/Select.vue', () => ({ ... }))
@@ -321,6 +348,7 @@ vi.mock('@/components/NumberSliderInput.vue', () => ({ ... }))
 ```
 
 **3. Generic Property Naming**
+
 ```typescript
 // ❌ DON'T use English names when component uses Danish
 component.weight = 20     // Property doesn't exist
@@ -332,6 +360,7 @@ component.dosering = 50   // Real property
 ```
 
 **4. Mock Event Debugging Time Sink**
+
 ```typescript
 // ❌ DON'T spend hours debugging why button clicks don't work
 test('button triggers method', async () => {
@@ -349,6 +378,7 @@ test('reset method works correctly', () => {
 ```
 
 **5. Over-Engineering Mock Templates**
+
 ```typescript
 // ❌ DON'T try to perfectly replicate complex component behavior
 vi.mock('@/components/CopyDialog.vue', () => ({
@@ -369,6 +399,7 @@ vi.mock('@/components/CopyDialog.vue', () => ({
 ```
 
 **6. Late Method Spy Setup**
+
 ```typescript
 // ❌ DON'T set up spies after component mounting
 test('method gets called', () => {
@@ -394,12 +425,14 @@ test('submit calculates results', () => {
 **Critical Importance**: Medical calculators have specific score thresholds that determine clinical decisions
 
 **❌ MISTAKE: Testing arbitrary values**
+
 ```typescript
 // Testing random scores without clinical significance
 expect(component.totalScore).toBeGreaterThan(5)  // ❌ Meaningless
 ```
 
 **✅ CORRECT: Test exact clinical boundaries**
+
 ```typescript
 // AUDIT: Score ≥ 8 indicates alcohol dependency
 test('determines low risk correctly', () => {
@@ -422,6 +455,7 @@ test('determines high risk correctly', () => {
 **Standard Pattern**: Patient Info → Questions → Validation → Calculation → Results
 
 **Test Structure Template**:
+
 ```typescript
 describe('Medical Calculator Component', () => {
   describe('Patient Information', () => {
@@ -451,6 +485,7 @@ describe('Medical Calculator Component', () => {
 **Problem**: Don't assume English property names in international medical applications
 
 **❌ MISTAKE: English assumptions**
+
 ```typescript
 // Assuming English property names
 expect(component.weight).toBe(16)    // ❌ Property doesn't exist
@@ -459,6 +494,7 @@ expect(component.frequency).toBe(3)  // ❌ Property doesn't exist
 ```
 
 **✅ CORRECT: Use actual property names from component**
+
 ```typescript
 // Danish medical calculator properties
 expect(component.vaegt).toBe(16)     // ✅ "weight" in Danish
@@ -469,6 +505,7 @@ expect(component.hyppighed).toBe(3)  // ✅ "frequency" in Danish
 ### Medical Content Validation
 
 **Question Text Accuracy**:
+
 ```typescript
 test('questions have correct medical terminology', () => {
   const firstQuestion = component.questionsSection1[0]
@@ -481,6 +518,7 @@ test('questions have correct medical terminology', () => {
 ```
 
 **Option Value Accuracy**:
+
 ```typescript
 test('scoring options match medical standards', () => {
   // AUDIT uses specific scoring (0,2,4 for yes/no questions)
@@ -493,6 +531,7 @@ test('scoring options match medical standards', () => {
 ### Results and Recommendations Testing
 
 **Clinical Advice Accuracy**:
+
 ```typescript
 test('provides correct clinical guidance', () => {
   component.totalScore = 8
@@ -506,6 +545,7 @@ test('provides correct clinical guidance', () => {
 ```
 
 **Data Export for Clinical Use**:
+
 ```typescript
 test('generates clinically useful data export', () => {
   // Set patient and scoring data
@@ -531,6 +571,7 @@ test('generates clinically useful data export', () => {
 **Problem**: Complex components with multiple test categories can become overwhelming without proper tracking
 
 **✅ SOLUTION: Use TodoWrite for systematic testing**
+
 ```typescript
 // Create clear test categories and track progress
 TodoWrite([
@@ -543,6 +584,7 @@ TodoWrite([
 ```
 
 **Benefits**:
+
 - Clear visibility into testing progress
 - Ensures comprehensive coverage without missing areas
 - Helps prioritize critical business logic tests
@@ -553,6 +595,7 @@ TodoWrite([
 **Recognition Pattern**: When mocking becomes extensive, focus shifts to business logic
 
 **❌ TIME SINK: Over-testing UI interactions with mocks**
+
 ```typescript
 // Spending hours trying to make button clicks work through mocks
 test('submit button triggers calculation', async () => {
@@ -563,6 +606,7 @@ test('submit button triggers calculation', async () => {
 ```
 
 **✅ VALUE FOCUS: Test critical business logic directly**
+
 ```typescript
 // Test the actual calculation logic that matters
 test('calculates correct AUDIT score for risk scenarios', () => {
@@ -582,6 +626,7 @@ test('calculates correct AUDIT score for risk scenarios', () => {
 ### Mock Simplification Strategies
 
 **When Mocks Become Problematic**:
+
 - Event handlers consistently fail
 - Complex attribute expressions don't work
 - Time spent debugging mocks exceeds test value
@@ -589,6 +634,7 @@ test('calculates correct AUDIT score for risk scenarios', () => {
 **Simplification Approach**:
 
 **1. Minimal Mock Templates**
+
 ```typescript
 // ✅ Simple, reliable mock
 vi.mock('@/components/ComplexComponent.vue', () => ({
@@ -601,6 +647,7 @@ vi.mock('@/components/ComplexComponent.vue', () => ({
 ```
 
 **2. State-Based Testing**
+
 ```typescript
 // Instead of testing UI interactions, test state changes
 test('component state updates correctly', () => {
@@ -612,6 +659,7 @@ test('component state updates correctly', () => {
 ```
 
 **3. Method-Direct Testing**
+
 ```typescript
 // Test methods directly when UI simulation fails
 test('validation method works correctly', () => {
@@ -660,6 +708,7 @@ describe('Medical Calculator Component', () => {
 ```
 
 **Priority Guidelines**:
+
 - **Critical**: Calculation logic and clinical thresholds
 - **Important**: Form validation and data integrity  
 - **Standard**: Rendering and results display
@@ -670,6 +719,7 @@ describe('Medical Calculator Component', () => {
 **15-Minute Rule**: If mock-based test takes >15 minutes to debug, pivot strategy
 
 **Pivot Decision Tree**:
+
 ```
 Mock test failing? 
 ├─ Yes → Is this testing core business logic?
@@ -681,6 +731,7 @@ Mock test failing?
 ```
 
 **Recovery Examples**:
+
 ```typescript
 // FROM: Complex mock interaction testing
 test('copy dialog works when results exist', async () => {
@@ -700,6 +751,7 @@ test('copy functionality has correct availability', () => {
 ### What Went Wrong Initially
 
 **Problem 1: Wrong Property Names**
+
 ```typescript
 // Used these (WRONG):
 selectedIndholdsstof: ''                    // Empty string
@@ -715,6 +767,7 @@ selectedPraeparat: 0                        // Number index
 ```
 
 **Problem 2: Missing Component Context**
+
 ```typescript
 // Tests failed with: "Cannot read properties of undefined (reading 'config')"
 // CAUSE: PrimeVue components need $primevue.config context
@@ -722,6 +775,7 @@ selectedPraeparat: 0                        // Number index
 ```
 
 **Problem 3: Incomplete Dependency Mocking**
+
 ```typescript
 // Missing mocks for:
 - NumberSliderInput.vue
@@ -733,6 +787,7 @@ selectedPraeparat: 0                        // Number index
 ### What Fixed It Quickly
 
 **Solution 1: Component-First Analysis**
+
 ```typescript
 // Read MedicinBoernScore.vue FIRST
 // Identified real property names and default values
@@ -740,6 +795,7 @@ selectedPraeparat: 0                        // Number index
 ```
 
 **Solution 2: Complete Dependency Analysis**
+
 ```typescript
 // Mapped ALL imports from component:
 import Select from '@/volt/Select.vue'
@@ -750,6 +806,7 @@ import CopyDialog from './CopyDialog.vue'
 ```
 
 **Solution 3: Real Behavior Testing**
+
 ```typescript
 // Tested actual watcher-based calculations:
 watch([dosering, vaegt, fordeltPaaVal, antalDage], () => {
@@ -762,6 +819,7 @@ watch([dosering, vaegt, fordeltPaaVal, antalDage], () => {
 ## ✅ Quick Reference Checklist
 
 ### Pre-Implementation Analysis
+
 - [ ] Read actual component code completely
 - [ ] Inventory all properties with real names and types
 - [ ] Map all imported dependencies
@@ -769,12 +827,14 @@ watch([dosering, vaegt, fordeltPaaVal, antalDage], () => {
 - [ ] Check for framework-specific context requirements
 
 ### Test Setup Verification
+
 - [ ] All component dependencies mocked
 - [ ] Framework context properly configured ($primevue, etc.)
 - [ ] TypeScript path aliases working
 - [ ] Test environment can mount component without errors
 
 ### Test Writing Steps
+
 - [ ] Start with basic rendering test
 - [ ] Use actual property names from component
 - [ ] Test real initialization values (not assumptions)
@@ -783,12 +843,14 @@ watch([dosering, vaegt, fordeltPaaVal, antalDage], () => {
 - [ ] Verify error conditions with actual warning messages
 
 ### Mock Limitation Checkpoints
+
 - [ ] Mock event handlers failing after 15 minutes? → Switch to direct method testing
 - [ ] Complex attribute testing unreliable? → Test underlying state instead
 - [ ] Method spies not capturing calls? → Test state changes rather than method calls
 - [ ] Over-engineering mock templates? → Simplify mocks and focus on behavior testing
 
 ### Medical Domain Considerations
+
 - [ ] Test exact clinical thresholds (boundary values)
 - [ ] Verify medical terminology accuracy in questions and results
 - [ ] Use actual property names (don't assume English in international apps)
@@ -796,12 +858,14 @@ watch([dosering, vaegt, fordeltPaaVal, antalDage], () => {
 - [ ] Validate clinical recommendations and guidance text
 
 ### Test Structure Optimization
+
 - [ ] Use TodoWrite for complex components with multiple test categories
 - [ ] Prioritize: Critical (calculation) → Important (validation) → Standard (rendering)
 - [ ] Apply 15-minute rule: Pivot strategy if mock debugging exceeds time value
 - [ ] Focus on core business logic over UI interactions when mocking is extensive
 
 ### Common Error Diagnostics
+
 - **"Cannot read properties of undefined (reading 'config')"** → Add PrimeVue context mock
 - **Component mounting failures** → Mock missing dependencies
 - **Property undefined errors** → Use correct property names from component

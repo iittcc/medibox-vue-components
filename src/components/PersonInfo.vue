@@ -1,9 +1,45 @@
 <template>
-    <div class="flex flex-col md:flex-row md:gap-7 gap-5 w-full justify-start">
-        
+    <!-- Layout with CPR: 2-row grid -->
+    <div v-if="showCpr" class="grid grid-cols-[auto_1fr] md:grid-cols-[auto_1fr_auto_1fr] gap-x-3 gap-y-4 w-full items-center">
+        <!-- Row 1: Navn + CPR -->
+        <label for="personName" class="inline-flex items-center gap-1 whitespace-nowrap"><i class="pi pi-user"></i> Navn:</label>
+        <InputText class="w-full" v-model="localName" placeholder="Indtast navn" @input="updateName" id="personName"/>
+
+        <label for="personCpr" class="inline-flex items-center gap-1 whitespace-nowrap"><i class="pi pi-id-card"></i> CPR:</label>
+        <InputText class="w-full" v-model="localCpr" placeholder="Indtast CPR" @input="updateCpr" id="personCpr"/>
+
+        <!-- Row 2: Køn + Alder -->
+        <span :style="{display: genderdisplay}" class="inline-flex items-center gap-1 whitespace-nowrap"><i class="pi pi-venus"></i><i class="pi pi-mars"></i> Køn:</span>
+        <div :style="{display: genderdisplay}">
+            <SelectButton
+                v-model="localGender"
+                :options="currentGenderOptions"
+                aria-labelledby="basic"
+                @update:modelValue="updateGender"
+            />
+        </div>
+
+        <label for="personAge" class="inline-flex items-center gap-1 whitespace-nowrap"><i class="pi pi-clock"></i> Alder:</label>
+        <div class="min-w-0">
+            <NumberSliderInput
+                  v-model="localAge"
+                  :sliderType="props.sliderType"
+                  :min="props.minAge"
+                  :max="props.maxAge"
+                  mode="decimal"
+                  :showButtons="true"
+                  suffix=" År"
+                  @update:modelValue="updateAge"
+                  id="personAge"
+                />
+        </div>
+    </div>
+
+    <!-- Layout without CPR: single-row flex (original) -->
+    <div v-else class="flex flex-col md:flex-row md:gap-7 gap-5 w-full justify-start">
         <div>
             <div class="flex items-center justify-start gap-2">
-            <i class="pi pi-user"></i> Navn: 
+            <i class="pi pi-user"></i> Navn:
             <InputText class="ml-1" v-model="localName" placeholder="Indtast navn" @input="updateName" id="personName"/>
             </div>
         </div>
@@ -13,20 +49,17 @@
                 <SelectButton
                     v-model="localGender"
                     :options="currentGenderOptions"
-                    optionLabel="label"
-                    optionValue="value"
                     aria-labelledby="basic"
                     @update:modelValue="updateGender"
                     class="ml-1"
                 />
             </div>
-        </div>        
-        <div class="flex flex-row gap-3 ">
+        </div>
+        <div class="flex flex-row gap-3">
             <div class="flex mt-2 gap-2"><i class="pi pi-clock mt-1"></i> Alder: </div>
-            
             <NumberSliderInput
                   v-model="localAge"
-                  :sliderType= "props.sliderType"
+                  :sliderType="props.sliderType"
                   :min="props.minAge"
                   :max="props.maxAge"
                   mode="decimal"
@@ -40,55 +73,49 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from "vue";
+import { ref, computed, watch } from "vue";
 import InputText from '@/volt/InputText.vue';
 import SelectButton from '@/volt/SelectButton.vue';
 import NumberSliderInput from './NumberSliderInput.vue';
-import { genderDisplayMap, childGenderDisplayMap, type GenderValue } from '@/utils/genderUtils'
 
 export interface Props {
     name: string,
     age: number,
     minAge: number,
     maxAge: number,
-    gender: GenderValue,
+    gender: string,
     genderdisplay?: string;
     sliderType?: string;
+    showCpr?: boolean;
+    cpr?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
-    sliderType: "prime"
+    sliderType: "prime",
+    showCpr: false,
+    cpr: ''
 });
 
+const genderOptions = ref(["Mand", "Kvinde"]);
+const genderOptionsChild = ref(["Dreng", "Pige"]);
+
 const localName = ref<string>(props.name);
+const localCpr = ref<string>(props.cpr);
 
 const localAge = ref<number>(props.age);
 
-// Display options for SelectButton (Danish labels with English values)
 const currentGenderOptions = computed(() => {
-    if (localAge.value <= 16) {
-        return Object.entries(childGenderDisplayMap).map(([key, label]) => ({
-            label: label,
-            value: key
-        }));
-    } else {
-        return Object.entries(genderDisplayMap).map(([key, label]) => ({
-            label: label,
-            value: key
-        }));
-    }
+    return localAge.value <= 16 ? genderOptionsChild.value : genderOptions.value;
 });
-
-const localGender = ref<GenderValue>(props.gender as GenderValue);
-
-const emit = defineEmits(['update:name', 'update:age', 'update:gender']);
+const localGender = ref<string>(props.gender);
+const emit = defineEmits(['update:name', 'update:age', 'update:gender', 'update:cpr']);
 
 const updateName = (event: Event) => {
     const target = event.target as HTMLInputElement;
     emit('update:name', target.value);
 };
 
-const updateGender = (value: GenderValue) => {
+const updateGender = (value: string) => {
     emit('update:gender', value);
 };
 
@@ -96,6 +123,20 @@ const updateAge = (value: number | number[]) => {
     emit('update:age', Array.isArray(value) ? value[0] : value);
 };
 
+const updateCpr = (event: Event) => {
+    const target = event.target as HTMLInputElement;
+    emit('update:cpr', target.value);
+};
+
+watch(localAge, (newAge) => {
+    if (newAge <= 16 && (localGender.value === "Mand" || localGender.value === "Kvinde")) {
+        localGender.value = (localGender.value === "Mand") ? genderOptionsChild.value[0] : genderOptionsChild.value[1];
+        emit('update:gender', localGender.value);
+    } else if (newAge >= 16 && (localGender.value === "Dreng" || localGender.value === "Pige")) {
+        localGender.value = (localGender.value === "Dreng") ? genderOptions.value[0] : genderOptions.value[1];
+        emit('update:gender', localGender.value);
+    }
+});
 </script>
 <style scoped>
 html {

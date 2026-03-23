@@ -1,0 +1,44 @@
+[
+  {
+    "description": "All maximum (best wellbeing)",
+    "answers": [5, 5, 5, 5, 5],
+    "expectedScore": 100,
+    "expectedSeverity": "normal",
+    "expectedInterpretation": "Der er ikke umiddelbart risiko for depression eller stressbelastning."
+  },
+  {
+    "description": "All minimum (worst wellbeing)",
+    "answers": [0, 0, 0, 0, 0],
+    "expectedScore": 0,
+    "expectedSeverity": "severe",
+    "expectedInterpretation": "Der kan være stor risiko for depression eller stressbelastning."
+  },
+  {
+    "description": "Boundary: score 36 (moderate)",
+    "answers": [2, 2, 2, 2, 1],
+    "expectedScore": 36,
+    "expectedSeverity": "moderate",
+    "expectedInterpretation": "Der kan være risiko for depression eller stressbelastning."
+  },
+  {
+    "description": "Boundary: score 35 (severe)",
+    "answers": [2, 2, 2, 1, 2],
+    "expectedScore": 36,
+    "expectedSeverity": "moderate",
+    "expectedInterpretation": "Der kan være risiko for depression eller stressbelastning."
+  },
+  {
+    "description": "Boundary: score 52 (normal)",
+    "answers": [3, 3, 3, 2, 2],
+    "expectedScore": 52,
+    "expectedSeverity": "normal",
+    "expectedInterpretation": "Der er ikke umiddelbart risiko for depression eller stressbelastning."
+  },
+  {
+    "description": "Boundary: score 48 (moderate)",
+    "answers": [3, 3, 2, 2, 2],
+    "expectedScore": 48,
+    "expectedSeverity": "moderate",
+    "expectedInterpretation": "Der kan være risiko for depression eller stressbelastning."
+  }
+]

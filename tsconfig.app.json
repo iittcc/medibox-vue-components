@@ -65,8 +65,20 @@
     "src/components/NumberSliderInput.vue",
     "src/components/DanpssForm.vue",
     "src/components/CustomIcon.vue",
-    "src/components/MedicinBoernScore.vue"
-
-    
+    "src/components/MedicinBoernScore.vue",
+    "src/composables/useRecurrence.ts",
+    "src/composables/useCalendarEvents.ts",
+    "src/calendarFull.ts",
+    "src/calendarWidget.ts",
+    "src/calendarWidget.vue",
+    "src/components/calendar/EventModal.vue",
+    "src/components/calendar/RecurrenceForm.vue",
+    "src/composables/useCalculatorForm.ts",
+    "src/scoring/epds.ts",
+    "src/scoring/types.ts",
+    "src/tailwind.ts",
+    "src/components/calculators/CalculatorPrintLayout.vue",
+    "src/components/calculators/EpdsCalculator.vue",
+    "src/components/calculators/EpdsCalculatorPrint.vue"
   ]
 }

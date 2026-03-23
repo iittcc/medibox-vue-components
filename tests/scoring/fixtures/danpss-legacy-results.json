@@ -1,0 +1,39 @@
+[
+  {
+    "description": "All zeros (no symptoms)",
+    "answers": [[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[null,null],[null,null],[null,null]],
+    "expectedTotalAB": 0,
+    "expectedSeverity": "normal"
+  },
+  {
+    "description": "All max sections 1-3 (severe)",
+    "answers": [[3,3],[3,3],[3,3],[3,3],[3,3],[3,3],[3,3],[3,3],[3,3],[3,3],[3,3],[3,3],[null,null],[null,null],[null,null]],
+    "expectedTotalAB": 108,
+    "expectedSeverity": "severe"
+  },
+  {
+    "description": "Boundary: totalAB = 7 (mild)",
+    "answers": [[1,3],[1,2],[1,2],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[null,null],[null,null],[null,null]],
+    "expectedTotalAB": 7,
+    "expectedSeverity": "normal"
+  },
+  {
+    "description": "Boundary: totalAB = 8 (moderate)",
+    "answers": [[2,2],[2,2],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[null,null],[null,null],[null,null]],
+    "expectedTotalAB": 8,
+    "expectedSeverity": "moderate"
+  },
+  {
+    "description": "Boundary: totalAB = 20 (severe)",
+    "answers": [[2,2],[2,2],[2,2],[2,2],[2,2],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[null,null],[null,null],[null,null]],
+    "expectedTotalAB": 20,
+    "expectedSeverity": "severe"
+  },
+  {
+    "description": "With sexual function answered",
+    "answers": [[1,1],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[2,2],[1,1],[0,0]],
+    "expectedTotalAB": 1,
+    "expectedSeverity": "normal",
+    "expectedSexualTotalAB": 5
+  }
+]

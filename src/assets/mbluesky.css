@@ -1,0 +1,14 @@
+@import './base.css';
+:root {
+    --p-primary-50: #f0f9ff;
+    --p-primary-100: #ceeafd;
+    --p-primary-200: #a0d5f8;
+    --p-primary-300: #6cbaef;
+    --p-primary-400: #3aa0e4;
+    --p-primary-500: #1d89cf;
+    --p-primary-600: #1871ab;
+    --p-primary-700: #146090;
+    --p-primary-800: #10466a;
+    --p-primary-900: #0d354f;
+    --p-primary-950: #051e2e;
+}

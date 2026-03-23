@@ -18,4 +18,4 @@ app.use(PrimeVue, {
         dateFormat : "dd/mm/yy" 
     }
 });
-app.mount('#app');
+app.mount('#password-reset-app');

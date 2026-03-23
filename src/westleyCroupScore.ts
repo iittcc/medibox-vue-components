@@ -2,7 +2,7 @@
 import { createApp } from 'vue';
 import 'material-design-icons-iconfont/dist/material-design-icons.css';
 import './assets/orange.css';
-import App from './WestleyCroupScore.vue';
+import App from './components/calculators/WestleyCroupCalculator.vue'
 import PrimeVue from 'primevue/config';
 import ToastService from 'primevue/toastservice';
 
