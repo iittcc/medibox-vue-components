@@ -109,6 +109,7 @@ export interface Question {
   text: string;
   description?: string;
   optionsType?: string;
+  answer: number | null;
 }
 
 const props = defineProps({
@@ -150,16 +151,18 @@ const emit = defineEmits<{
   'update:answer': [value: number | null]
 }>()
 
-// Use framework answer as the single source of truth
+// Why: Support both patterns — direct question.answer binding (new calculators)
+// and frameworkAnswer prop (legacy framework integration). Direct binding takes
+// precedence when frameworkAnswer is not provided.
 const currentAnswer = computed({
-  get: () => props.frameworkAnswer,
+  get: () => props.frameworkAnswer ?? props.question.answer,
   set: (value: number | null) => {
-
+    props.question.answer = value
     emit('update:answer', value)
   }
 })
 
 const isSelected = (value: number): boolean => {
-  return value === props.frameworkAnswer;
+  return value === currentAnswer.value;
 };
 </script>
