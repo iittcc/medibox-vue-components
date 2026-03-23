@@ -2,7 +2,7 @@
 import { createApp } from 'vue';               // Icons           // PrimeFlex
 import 'material-design-icons-iconfont/dist/material-design-icons.css';
 import './assets/sky.css';
-import App from './EPDS.vue';
+import App from './components/calculators/EpdsCalculator.vue';
 import PrimeVue from 'primevue/config';
 
 const app = createApp(App);
@@ -15,7 +15,7 @@ app.use(PrimeVue, {
         firstDayOfWeek : 1,
         dayNamesMin : ['Sø','Ma','Ti','On','To','Fr','Lø'],
         dayNames : ['Søndag','Mandag','Tirsdag','Onsdag','Torsdag','Fredag','Lørdag'],
-        dateFormat : "dd/mm/yy" 
+        dateFormat : "dd/mm/yy"
     }
 });
 app.mount('#app');

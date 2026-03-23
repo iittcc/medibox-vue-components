@@ -1,0 +1,58 @@
+[
+  {
+    "description": "All answers 0 — minimum score, no depression",
+    "answers": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    "expectedScore": 0,
+    "expectedSeverity": "normal",
+    "expectedInterpretation": "Ikke tegn til alvorlig depression."
+  },
+  {
+    "description": "All answers 3 — maximum score, severe depression",
+    "answers": [3, 3, 3, 3, 3, 3, 3, 3, 3, 3],
+    "expectedScore": 30,
+    "expectedSeverity": "severe",
+    "expectedInterpretation": "Behandlingskrævende depression kan foreligge."
+  },
+  {
+    "description": "Score exactly 9 — just below threshold, no depression",
+    "answers": [1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
+    "expectedScore": 9,
+    "expectedSeverity": "normal",
+    "expectedInterpretation": "Ikke tegn til alvorlig depression."
+  },
+  {
+    "description": "Score exactly 10 — at threshold, depression (FIXED: was > 10, now >= 10)",
+    "answers": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    "expectedScore": 10,
+    "expectedSeverity": "severe",
+    "expectedInterpretation": "Behandlingskrævende depression kan foreligge."
+  },
+  {
+    "description": "Score exactly 11 — above threshold, depression",
+    "answers": [3, 3, 3, 2, 0, 0, 0, 0, 0, 0],
+    "expectedScore": 11,
+    "expectedSeverity": "severe",
+    "expectedInterpretation": "Behandlingskrævende depression kan foreligge."
+  },
+  {
+    "description": "Mixed scores — typical mild case",
+    "answers": [1, 2, 1, 0, 0, 0, 0, 0, 0, 0],
+    "expectedScore": 4,
+    "expectedSeverity": "normal",
+    "expectedInterpretation": "Ikke tegn til alvorlig depression."
+  },
+  {
+    "description": "High risk pattern — self-harm question scored high",
+    "answers": [0, 0, 0, 0, 0, 0, 0, 0, 0, 3],
+    "expectedScore": 3,
+    "expectedSeverity": "normal",
+    "expectedInterpretation": "Ikke tegn til alvorlig depression."
+  },
+  {
+    "description": "Moderate depression pattern",
+    "answers": [2, 2, 2, 2, 1, 1, 1, 1, 1, 1],
+    "expectedScore": 14,
+    "expectedSeverity": "severe",
+    "expectedInterpretation": "Behandlingskrævende depression kan foreligge."
+  }
+]
