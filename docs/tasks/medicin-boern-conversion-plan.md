@@ -1,9 +1,11 @@
 # Medicin Børn (Pediatric Medicine Dosage) Calculator Conversion Plan
 
 ## Overview
+
 This document outlines the conversion of the jQuery-based pediatric medicine dosage calculator to a modern Vue 3 application with TypeScript.
 
 ## Original Calculator Analysis
+
 - **Location**: `app/templates/medibox/functions/medicin_boern/`
 - **Technology**: jQuery, vanilla JavaScript, HTML tables
 - **Purpose**: Calculate pediatric medicine dosages based on weight and medication type
@@ -11,6 +13,7 @@ This document outlines the conversion of the jQuery-based pediatric medicine dos
 ## Conversion Details
 
 ### Files Created
+
 1. **`src/assets/medicinBoern.ts`**
    - TypeScript interfaces for all data structures
    - Converted medicine data arrays (mainarray, dispenseringsarray, praeparatarray, detaljerarray)
@@ -39,17 +42,19 @@ This document outlines the conversion of the jQuery-based pediatric medicine dos
    - Added medicinBoern entry point
 
 ## Key Improvements
+
 1. **Type Safety**: Full TypeScript implementation with proper interfaces
 2. **Modern UI**: Replaced table layout with responsive grid/flex design
 3. **Component Architecture**: Reusable Vue components following project patterns
 4. **Real-time Updates**: Automatic recalculation on input changes
-5. **Better UX**: 
+5. **Better UX**:
    - Smooth sliders with visual feedback
    - Clear warning messages
    - Copy functionality for results
    - Responsive design for mobile
 
 ## Functionality Preserved
+
 - All 12 medicine types (Amoxicillin, Penicillin, etc.)
 - Dynamic dispensing form selection (tablets/mixture/suppositories)
 - Preparation filtering based on selections
@@ -60,6 +65,7 @@ This document outlines the conversion of the jQuery-based pediatric medicine dos
 - Reset functionality
 
 ## Testing Checklist
+
 - [ ] All medications load correctly
 - [ ] Dispensing forms update based on medication
 - [ ] Preparations filter correctly

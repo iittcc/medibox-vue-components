@@ -1,9 +1,11 @@
 # Learning: Test Expectations vs Actual Component Behavior Mismatch
 
 ## Issue Encountered
+
 **Problem**: Test expectations hardcoded with assumed values that didn't match the actual calculated results from the component's business logic.
 
 **Manifestation**:
+
 ```typescript
 // PROBLEMATIC TEST CODE
 it('calculates risk reduction correctly', () => {
@@ -17,12 +19,14 @@ it('calculates risk reduction correctly', () => {
 ```
 
 **Error Messages**:
+
 ```
 AssertionError: expected 7 to be 10 // Object.is equality
 AssertionError: expected 0.35 to be 0.5 // Object.is equality
 ```
 
 ## Root Cause Analysis
+
 - **Assumption-based testing**: Tests written based on what developers thought the logic should do
 - **Watchers and reactive updates**: Component automatically recalculated values via watchers
 - **Business logic complexity**: Medical calculations more complex than initially understood
@@ -30,6 +34,7 @@ AssertionError: expected 0.35 to be 0.5 // Object.is equality
 - **Mock vs real calculation**: Mocked calculation functions returned different values than real ones
 
 ## Impact on Development
+
 - **High test failure rate**: 14 out of 34 tests initially failed
 - **False assumptions**: Led to questioning whether business logic was correct
 - **Time waste**: Hours spent debugging "failing" tests that were actually working correctly
@@ -38,6 +43,7 @@ AssertionError: expected 0.35 to be 0.5 // Object.is equality
 ## Solution Applied
 
 ### 1. Component-First Analysis Approach
+
 ```typescript
 // BEFORE: Assumption-based testing
 it('calculates metrics', () => {
@@ -61,6 +67,7 @@ it('calculates metrics', () => {
 ```
 
 ### 2. Relationship Testing Over Exact Values
+
 ```typescript
 // BEFORE: Exact value expectations
 expect(component.risk).toBe(15)
@@ -73,6 +80,7 @@ expect(component.targetRisk).toBeLessThan(component.risk)
 ```
 
 ### 3. Understand Component Lifecycle
+
 ```typescript
 // BEFORE: Ignoring reactive updates
 component.age = 75
@@ -85,6 +93,7 @@ expect(component.risk).toBeGreaterThan(previousRisk)
 ```
 
 ### 4. Business Logic Validation
+
 ```typescript
 // BEFORE: Testing arbitrary values
 component.risk = 5
@@ -103,6 +112,7 @@ expect(highRisk[0]).toBe('Høj risiko')
 ## Prevention Strategies
 
 ### 1. Component Analysis Methodology
+
 ```typescript
 // Step 1: Read the actual component implementation
 // Step 2: Understand the business logic and calculations
@@ -120,6 +130,7 @@ const analysisChecklist = [
 ```
 
 ### 2. Dynamic Expectation Patterns
+
 ```typescript
 // Pattern: Test relationships, not exact values
 it('validates calculation relationships', () => {
@@ -144,6 +155,7 @@ it('validates risk reduction calculations', () => {
 ```
 
 ### 3. Test Data Strategy
+
 ```typescript
 // Create test scenarios based on real medical cases
 const testScenarios = {
@@ -165,7 +177,9 @@ const testScenarios = {
 ```
 
 ### 4. Code Review Guidelines
+
 **Before writing tests:**
+
 - [ ] Read the component implementation completely
 - [ ] Understand all calculation methods
 - [ ] Identify reactive dependencies
@@ -173,6 +187,7 @@ const testScenarios = {
 - [ ] Understand business domain logic
 
 **When writing assertions:**
+
 - [ ] Test relationships over exact values
 - [ ] Use ranges for continuous variables
 - [ ] Account for calculation timing
@@ -182,6 +197,7 @@ const testScenarios = {
 ## Testing Anti-Patterns
 
 ### 1. Magic Number Testing
+
 ```typescript
 // ANTI-PATTERN: Magic numbers without context
 expect(component.nnt).toBe(10)
@@ -191,6 +207,7 @@ expect(component.nnt).toBe(1 / component.arr)
 ```
 
 ### 2. Assumption-Based Assertions
+
 ```typescript
 // ANTI-PATTERN: Assuming component behavior
 component.age = 65
@@ -203,6 +220,7 @@ expect(component.risk).toBeGreaterThan(youngerRisk)
 ```
 
 ### 3. Ignoring Component State
+
 ```typescript
 // ANTI-PATTERN: Testing isolated values
 component.risk = 20
@@ -218,6 +236,7 @@ expect(component.arr).toBe(component.risk - component.targetRisk)
 ## Medical Domain Considerations
 
 ### 1. Clinical Threshold Testing
+
 ```typescript
 // Test actual medical guidelines
 const ageGroups = {
@@ -235,6 +254,7 @@ Object.entries(ageGroups).forEach(([group, thresholds]) => {
 ```
 
 ### 2. Boundary Value Testing
+
 ```typescript
 // Test exact medical boundaries
 it('tests clinical threshold boundaries', () => {
@@ -247,6 +267,7 @@ it('tests clinical threshold boundaries', () => {
 ## Tools and Techniques
 
 ### 1. Component Introspection
+
 ```typescript
 // Helper to understand component state
 const debugComponent = (component: any) => {
@@ -258,6 +279,7 @@ const debugComponent = (component: any) => {
 ```
 
 ### 2. Calculation Validation
+
 ```typescript
 // Validate calculations independently
 const validateRiskCalculation = (inputs: any, result: number) => {
@@ -267,10 +289,12 @@ const validateRiskCalculation = (inputs: any, result: number) => {
 ```
 
 ## References
+
 - [Component-First Testing Methodology](../vue-component-testing-lessons-learned.md)
 - [Medical Calculator Testing Guidelines](../medical-domain-testing.md)
 - [Vue 3 Reactivity System](https://vuejs.org/guide/extras/reactivity-in-depth.html)
 - [Clinical Risk Assessment Guidelines](https://www.escardio.org/Guidelines)
 
 ## Keywords
+
 `testing`, `expectations`, `business-logic`, `medical-calculations`, `component-behavior`, `reactivity`

@@ -118,7 +118,7 @@ describe('useCalendarEvents', () => {
         'http://localhost:1010/index.php/callback/Calendar_callback/add_event'
       )
       expect(formData).toBeInstanceOf(FormData)
-      expect(formData.get('c_id')).toBe(String(eventData.calendarId))
+      expect(formData.get('calendar_id')).toBe(String(eventData.calendarId))
       expect(formData.get('g_id')).toBe(String(eventData.groupId))
       expect(formData.get('start')).toBe(eventData.start)
       expect(formData.get('end')).toBe(eventData.end)
