@@ -23,7 +23,6 @@
                 v-for="(question, index) in questions" :key="index"
                 :question="question" :options="question.options" :index="index"
                 :is-unanswered="formSubmitted && isUnanswered(question)"
-                scrollHeight="18rem"
               />
               <div v-if="validationMessage" class="text-red-500 mt-5 font-bold">{{ validationMessage }}</div>
               <div class="flex justify-end text-right mt-5 gap-3">

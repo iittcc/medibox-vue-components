@@ -215,8 +215,4 @@ function toggleDay(day: string, active: boolean) {
   config.value = { ...config.value, days }
 }
 
-function onDateInput(event: Event) {
-  const target = event.target as HTMLInputElement
-  emit('update:untilDate', target.value || null)
-}
 </script>

@@ -32,7 +32,6 @@
                 :options="question.options"
                 :index="index"
                 :is-unanswered="formSubmitted && isUnanswered(question)"
-                scrollHeight="18rem"
               />
 
               <div v-if="validationMessage" class="text-red-500 mt-5 font-bold">

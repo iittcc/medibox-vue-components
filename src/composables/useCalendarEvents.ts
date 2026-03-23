@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 /**
  * What: Composable providing calendar event CRUD operations via axios.
  * How: Returns fetchEvents, saveEvent, and deleteEvent functions that

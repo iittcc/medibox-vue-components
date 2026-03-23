@@ -30,19 +30,20 @@
         </div>
         <div class="md:w-1/2 w-full h-full p-2 flex-initial" >
           <div class="text-left items-center" >
-            <Listbox 
-              v-model="currentAnswer" 
-              :options="options" 
-              optionLabel="text" 
-              optionValue="value" 
-              class="md:ml-3 h-full" 
-              :scrollHeight="scrollHeight"
+            <Listbox
+              v-model="currentAnswer"
+              :options="options"
+              optionLabel="text"
+              optionValue="value"
+              class="md:ml-3 h-full"
+              scrollHeight="none"
               :pt="{
                 root: 'bg-gray-50 border border-gray-200 rounded-lg shadow-sm',
                 list: 'p-2 space-y-1',
                 option: 'px-3 py-2 rounded-md cursor-pointer hover:bg-primary-600 hover:text-white active:bg-primary-600 focus:bg-surface-200 hover:p-selected:bg-primary-600 transition-colors p-selected:bg-primary-500 p-selected:text-white',
                 optionGroup: 'px-3 py-2 font-semibold text-gray-500'
               }"
+              :ptOptions="{ mergeProps: true }"
             >
               <template #option="slotProps">
                 <div class="flex items-center justify-between w-full h-full py-0 my-0" :class="{ 'font-medium': isSelected(slotProps.option.value) }">
@@ -91,6 +92,11 @@
 </template>
 
 <script setup lang="ts">
+// Why: Multiple root elements (v-if/v-else-if branches) cause Vue to attempt
+// fallthrough of attrs like scrollHeight to root <div> elements, but scrollHeight
+// is a readonly DOM property. Disabling inheritance prevents this.
+defineOptions({ inheritAttrs: false })
+
 import { computed } from 'vue';
 import RadioButton from '@/volt/RadioButton.vue';
 import SelectButton from '@/volt/SelectButton.vue';
@@ -137,10 +143,6 @@ const props = defineProps({
     type: String,
     default: 'Default',
   },
-  scrollHeight: {
-    type: String,
-    default: '14rem',
-  },
   frameworkAnswer: {
     type: [Number, String],
     default: null,
@@ -157,6 +159,9 @@ const emit = defineEmits<{
 const currentAnswer = computed({
   get: () => props.frameworkAnswer ?? props.question.answer,
   set: (value: number | null) => {
+    // Why: Direct mutation is intentional — the composable provides reactive
+    // questions where .answer is the shared state between form and print view.
+    // eslint-disable-next-line vue/no-mutating-props
     props.question.answer = value
     emit('update:answer', value)
   }
