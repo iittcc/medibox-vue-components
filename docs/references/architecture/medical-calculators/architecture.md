@@ -129,6 +129,9 @@ src/vue-components/
 | Centor | 5 | Custom sum (age score map), 3 thresholds | sky | Simple | Migrated |
 | Wells DVT | 10 | Sum (incl. -2), 3 thresholds | teal | Simple | Migrated |
 | Wells PE | 7 | Sum (decimal 1.5/3), 3 thresholds | teal | Simple | Migrated |
+| Y-BOCS | 10 (2 tabs) | Sum, 4 thresholds | sky | Simple | New |
+| ASRS V1.1 | 18 (2 tabs) | Positive-count with per-question thresholds | sky | Medium | New |
+| ADHD-RS | 26 (4 tabs) | Sum with domain subscores | sky | Medium | New |
 | Score2 | 3 inputs | Lookup table, Chart.js | teal | Very hard | To migrate |
 | MedicinBoern | Cascading dropdowns | Drug lookup, weight formula | sky | Very hard | To migrate |
 
@@ -434,6 +437,51 @@ Does NOT use `useCalculatorForm` or `calculateSimpleSum`.
 ### LRTI (Boolean Toggles) — Implemented
 
 LRTI models 8 boolean symptoms as standard Questions with `type: 'Toggle'` and binary options `[{text:'Nej', value:0}, {text:'Ja', value:1}]`. The orchestrator renders `ToggleButton` components. Uses the standard `useCalculatorForm` composable unchanged.
+
+### Tabbed Section Calculators (Y-BOCS, ASRS, ADHD-RS) — Implemented
+
+Calculators with many questions use PrimeVue Volt Tabs to group questions into clinical sections. Each section is a tab panel. All use `useCalculatorForm` with standard `Question` types.
+
+**Tab infrastructure:**
+- Volt components: `Tabs`, `TabList`, `Tab`, `TabPanels`, `TabPanel` (from `@/volt/`)
+- `activeTab` ref tracks current tab (string key `"0"`, `"1"`, etc.)
+- Sections defined in scoring file as `SECTIONS` array with `{ title, startIndex }`
+- Component computes `sections` by slicing `questions` per section boundary
+
+**Navigation pattern:**
+- "Næste afsnit" button: disabled until all questions in current section answered, hidden on last tab
+- "Forrige afsnit" button: hidden on first tab
+- "Beregn" button: disabled until ALL questions across all tabs answered
+- Tab clicks synced via `@update:value="activeTab = $event"`
+
+**Default answers:** Tabbed calculators use `answer: null` (no pre-selected option) to enforce explicit user input. The `useCalculatorForm` composable validates `null` as unanswered.
+
+**Passthrough styling:** Tabs and TabPanels use `:pt` and `:ptOptions="{ mergeProps: true }"` to remove default padding/background.
+
+#### Y-BOCS (Simple sum with tabs)
+
+- 10 Listbox questions in 2 tabs (Tvangstanker, Tvangsadfærd), each scored 0-4
+- Uses `calculateSimpleSum` — standard simple-sum pattern
+- 4 thresholds: 0-14 mild, 15-22 mild/moderate, 23-29 moderate/severe, 30-40 severe
+
+#### ASRS V1.1 (Positive-count scoring)
+
+- 18 SelectButton questions in 2 tabs (Afsnit A: 6q, Afsnit B: 12q), scale 0-4
+- **Custom scoring** — does NOT use `calculateSimpleSum`
+- Each question has a per-question "positive threshold" (defined in `ASRS_POSITIVE_THRESHOLDS` array)
+- An answer is "positive" if `answer >= threshold` for that question
+- Score = count of positive Part A answers (not sum of values)
+- Interpretation: ≥4 positive A → recommend ADHD evaluation
+- Helper function `getPositiveB()` computes Part B count for display
+- Thresholds in config use score 0-3 (normal) and 4-6 (severe) to match positive count
+
+#### ADHD-RS (Sum with domain subscores)
+
+- 26 SelectButton questions in 4 tabs, scale 0-3
+- Domains: A=Inattention (1-9), B=Hyperactivity (10-14), C=Impulsivity (15-18), D=Oppositional (19-26)
+- Uses `calculateSimpleSum` for total score thresholds (≤60 normal, 61-69 borderline, ≥70 severe)
+- Helper function `getAdhdrsSubscores()` computes domain subscores (B+C combined as "hyperactivity/impulsivity")
+- Extra text fields: "Udfyldt af" and "Relation til barnet" (captured in print/copy output)
 
 ### Lookup Table (Score2)
 

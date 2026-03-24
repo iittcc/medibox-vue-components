@@ -35,7 +35,7 @@ export function createYbocsQuestions(): Question[] {
         { text: 'Over tre timer og op til otte timer om dagen eller meget ofte', value: 3 },
         { text: 'Over otte timer om dagen eller næsten konstant', value: 4 }
       ],
-      answer: 0
+      answer: null
     },
     {
       type: 'Listbox',
@@ -49,7 +49,7 @@ export function createYbocsQuestions(): Question[] {
         { text: 'Er en betydelig belastning for mit sociale liv eller min arbejdsindsats', value: 3 },
         { text: 'Invaliderende', value: 4 }
       ],
-      answer: 0
+      answer: null
     },
     {
       type: 'Listbox',
@@ -63,7 +63,7 @@ export function createYbocsQuestions(): Question[] {
         { text: 'Meget belastende', value: 3 },
         { text: 'Næsten konstant og invaliderende ubehag', value: 4 }
       ],
-      answer: 0
+      answer: null
     },
     {
       type: 'Listbox',
@@ -77,7 +77,7 @@ export function createYbocsQuestions(): Question[] {
         { text: 'Giver modstræbende efter uden at forsøge at styre dem', value: 3 },
         { text: 'Giver fuldstændig og villigt efter for alle tvangstanker', value: 4 }
       ],
-      answer: 0
+      answer: null
     },
     {
       type: 'Listbox',
@@ -91,7 +91,7 @@ export function createYbocsQuestions(): Question[] {
         { text: 'Kan sjældent stoppe, og kan kun med stort besvær aflede opmærksomheden', value: 3 },
         { text: 'Fuldstændig ufrivillige, kan sjældent ændre tvangstankerne', value: 4 }
       ],
-      answer: 0
+      answer: null
     },
 
     // === Tvangsadfærd (Compulsions) Q6-10 ===
@@ -107,7 +107,7 @@ export function createYbocsQuestions(): Question[] {
         { text: 'Over tre timer og op til otte timer om dagen eller meget hyppige tvangshandlinger', value: 3 },
         { text: 'Over otte timer om dagen eller næsten konstante tvangshandlinger', value: 4 }
       ],
-      answer: 0
+      answer: null
     },
     {
       type: 'Listbox',
@@ -121,7 +121,7 @@ export function createYbocsQuestions(): Question[] {
         { text: 'Er en stor belastning for mit sociale liv eller arbejdsindsats', value: 3 },
         { text: 'Invaliderende', value: 4 }
       ],
-      answer: 0
+      answer: null
     },
     {
       type: 'Listbox',
@@ -135,7 +135,7 @@ export function createYbocsQuestions(): Question[] {
         { text: 'Markant og meget belastende øgning af angst', value: 3 },
         { text: 'Invaliderende angst, hvis tvangshandlingerne på nogen måde ændres', value: 4 }
       ],
-      answer: 0
+      answer: null
     },
     {
       type: 'Listbox',
@@ -149,7 +149,7 @@ export function createYbocsQuestions(): Question[] {
         { text: 'Giver modstræbende efter uden at forsøge at styre dem', value: 3 },
         { text: 'Giver helt og villigt efter for alle tvangshandlinger', value: 4 }
       ],
-      answer: 0
+      answer: null
     },
     {
       type: 'Listbox',
@@ -163,7 +163,7 @@ export function createYbocsQuestions(): Question[] {
         { text: 'Meget stærk trang, bliver nødt til at udføre dem, kan kun udsætte med besvær', value: 3 },
         { text: 'Trangen er helt ufrivillig og overvældende', value: 4 }
       ],
-      answer: 0
+      answer: null
     }
   ]
 }

@@ -52,6 +52,11 @@ export function mountCalculator(component: Component) {
         SurfaceCardItem: {
           template: '<div data-testid="surface-card-item"><slot name="icon" /><slot name="title" /><slot name="content" /></div>'
         },
+        Tabs: { props: ['value'], template: '<div data-testid="tabs"><slot /></div>' },
+        TabList: { template: '<div data-testid="tab-list"><slot /></div>' },
+        Tab: { props: ['value'], template: '<span data-testid="tab"><slot /></span>' },
+        TabPanels: { template: '<div><slot /></div>' },
+        TabPanel: { props: ['value'], template: '<div><slot /></div>' },
         Button: { template: '<button><slot /></button>', props: ['label', 'icon', 'type', 'disabled'] },
         SecondaryButton: { template: '<button><slot /></button>', props: ['label', 'icon', 'severity', 'disabled'] },
         Message: { template: '<div><slot /></div>', props: ['severity'] },
@@ -73,7 +78,9 @@ export function mountCalculator(component: Component) {
         CentorCalculatorPrint: printStub,
         WellsDvtCalculatorPrint: printStub,
         WellsPeCalculatorPrint: printStub,
-        YbocsCalculatorPrint: printStub
+        YbocsCalculatorPrint: printStub,
+        AsrsCalculatorPrint: printStub,
+        AdhdrsCalculatorPrint: printStub
       }
     }
   })

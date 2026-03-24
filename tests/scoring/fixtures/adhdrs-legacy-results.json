@@ -1,0 +1,44 @@
+[
+  {
+    "description": "All zero — score 0 (normal)",
+    "answers": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    "expectedScore": 0,
+    "expectedSeverity": "normal",
+    "expectedInterpretation": "Normal symptombelastning."
+  },
+  {
+    "description": "All max — score 78 (severe)",
+    "answers": [3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3],
+    "expectedScore": 78,
+    "expectedSeverity": "severe",
+    "expectedInterpretation": "Svær symptombelastning."
+  },
+  {
+    "description": "Score 60 — normal (boundary)",
+    "answers": [3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 0, 0, 0, 0, 0, 0],
+    "expectedScore": 60,
+    "expectedSeverity": "normal",
+    "expectedInterpretation": "Normal symptombelastning."
+  },
+  {
+    "description": "Score 61 — borderline",
+    "answers": [3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 1, 0, 0, 0, 0, 0],
+    "expectedScore": 61,
+    "expectedSeverity": "moderate",
+    "expectedInterpretation": "Borderline symptombelastning."
+  },
+  {
+    "description": "Score 69 — still borderline",
+    "answers": [3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 0, 0, 0],
+    "expectedScore": 69,
+    "expectedSeverity": "moderate",
+    "expectedInterpretation": "Borderline symptombelastning."
+  },
+  {
+    "description": "Score 70 — severe",
+    "answers": [3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 1, 0, 0],
+    "expectedScore": 70,
+    "expectedSeverity": "severe",
+    "expectedInterpretation": "Svær symptombelastning."
+  }
+]

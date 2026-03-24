@@ -131,7 +131,7 @@ describe('Y-BOCS Scoring Function', () => {
       const q1 = createYbocsQuestions()
       const q2 = createYbocsQuestions()
       q1[0].answer = 4
-      expect(q2[0].answer).toBe(0)
+      expect(q2[0].answer).toBeNull()
     })
   })
 

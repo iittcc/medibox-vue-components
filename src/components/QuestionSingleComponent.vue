@@ -59,15 +59,13 @@
   </div>
 
   <div v-else-if="question.type === 'SelectButton'">
-      <div :class="['question', { 'border-r-2 border-l-2 border-red-400': isUnanswered }, 'pl-3', 'pt-1', 'w-full', 'grid', 'pb-0', 'flex-col', 'md:flex-row', 'ml-1', 'pr-1', 'mb-0','mt-1', 'rounded-xl']" :style="{ backgroundColor: 'var(' + question.bg + ')' }">
-        <div class="col p-0">
-          <p class="text-lg font-medium">{{ question.text }}</p>
-          <p class="text-base text-gray-500">{{ question.description }}</p>
+      <div :class="['question', { 'border-r-2 border-l-2 border-red-400': isUnanswered }, 'flex', 'flex-col', 'md:flex-row', 'md:items-center', 'gap-2', 'pl-3', 'pr-2', 'py-2', 'ml-1', 'mt-1', 'rounded-xl']" :style="{ backgroundColor: 'var(' + question.bg + ')' }">
+        <div class="flex-1 min-w-0">
+          <p class="text-md font-medium">{{ question.text }}</p>
+          <p v-if="question.description" class="text-sm text-gray-500">{{ question.description }}</p>
         </div>
-        <div class="col-fixed">
-          <div class="text-left items-center">
-            <SelectButton v-model="currentAnswer" :options="options" optionLabel="text" optionValue="value" class="ml-3" />
-          </div>
+        <div class="shrink-0">
+          <SelectButton v-model="currentAnswer" :options="options" optionLabel="text" optionValue="value" />
         </div>
       </div>
     <Divider />

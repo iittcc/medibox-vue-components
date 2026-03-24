@@ -28,6 +28,8 @@ export default defineConfig({
       wellsDvt: './src/wellsDvt.ts',
       wellsPe: './src/wellsPe.ts',
       ybocs: './src/ybocs.ts',
+      asrs: './src/asrs.ts',
+      adhdrs: './src/adhdrs.ts',
       score2: './src/score2.ts',
       danpss: './src/danpss.ts',
       puqe: './src/puqe.ts',

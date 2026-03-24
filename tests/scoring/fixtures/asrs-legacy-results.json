@@ -1,0 +1,51 @@
+[
+  {
+    "description": "All zero — 0 positive A (no ADHD signs)",
+    "answers": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    "expectedScore": 0,
+    "expectedSeverity": "normal",
+    "expectedInterpretation": "Ikke tegn på ADHD (under 4 positive A-spørgsmål)."
+  },
+  {
+    "description": "All max — 6 positive A (recommend evaluation)",
+    "answers": [4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4],
+    "expectedScore": 6,
+    "expectedSeverity": "severe",
+    "expectedInterpretation": "Yderligere udredning for ADHD anbefales (≥4 positive A-spørgsmål)."
+  },
+  {
+    "description": "A1-A3 at threshold (2), A4-A6 below threshold — 3 positive A (no ADHD)",
+    "answers": [2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    "expectedScore": 3,
+    "expectedSeverity": "normal",
+    "expectedInterpretation": "Ikke tegn på ADHD (under 4 positive A-spørgsmål)."
+  },
+  {
+    "description": "A1-A3 at threshold (2) + A4 at threshold (3) — 4 positive A (recommend)",
+    "answers": [2, 2, 2, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    "expectedScore": 4,
+    "expectedSeverity": "severe",
+    "expectedInterpretation": "Yderligere udredning for ADHD anbefales (≥4 positive A-spørgsmål)."
+  },
+  {
+    "description": "A1 just below threshold (1) — not positive",
+    "answers": [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    "expectedScore": 0,
+    "expectedSeverity": "normal",
+    "expectedInterpretation": "Ikke tegn på ADHD (under 4 positive A-spørgsmål)."
+  },
+  {
+    "description": "A4 just below threshold (2) — not positive for A4",
+    "answers": [0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    "expectedScore": 0,
+    "expectedSeverity": "normal",
+    "expectedInterpretation": "Ikke tegn på ADHD (under 4 positive A-spørgsmål)."
+  },
+  {
+    "description": "All Part B maxed but Part A zero — 0 positive A",
+    "answers": [0, 0, 0, 0, 0, 0, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4],
+    "expectedScore": 0,
+    "expectedSeverity": "normal",
+    "expectedInterpretation": "Ikke tegn på ADHD (under 4 positive A-spørgsmål)."
+  }
+]
