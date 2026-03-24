@@ -96,7 +96,7 @@ describe('useCalculatorForm', () => {
   })
 
   describe('reset', () => {
-    it('resets answers to first option values', () => {
+    it('resets answers to their configured initial values', () => {
       const { questions, calculate, reset, hasResults } = useCalculatorForm(testConfig, mockScoring)
       questions.value[0].answer = 1
       calculate()
@@ -104,6 +104,30 @@ describe('useCalculatorForm', () => {
       reset()
       expect(questions.value[0].answer).toBe(0)
       expect(hasResults.value).toBe(false)
+    })
+
+    it('preserves non-first initial answers on reset', () => {
+      const reverseScoredConfig: CalculatorConfig = {
+        ...testConfig,
+        questions: [
+          {
+            type: 'Listbox',
+            text: 'Reverse',
+            options: [
+              { text: 'High', value: 3 },
+              { text: 'Low', value: 0 }
+            ],
+            answer: 0
+          }
+        ]
+      }
+
+      const { questions, reset } = useCalculatorForm(reverseScoredConfig, mockScoring)
+      questions.value[0].answer = 3
+
+      reset()
+
+      expect(questions.value[0].answer).toBe(0)
     })
 
     it('clears validation state', () => {

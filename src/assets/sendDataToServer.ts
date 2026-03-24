@@ -57,7 +57,7 @@ export class NetworkTimeoutError extends Error implements NetworkError {
   isRetryable = true
   
    
-  constructor(message: string, public _attempt: number, public _status?: number, public _statusText?: string) {
+  constructor(message: string, public attempt: number, public status?: number, public statusText?: string) {
     super(message)
     this.name = 'NetworkTimeoutError'
   }
@@ -70,10 +70,10 @@ export class NetworkRequestError extends Error implements NetworkError {
    
   constructor(
     message: string, 
-    public _attempt: number, 
-    public _status?: number, 
-    public _statusText?: string,
-    public _isRetryable: boolean = true
+    public attempt: number, 
+    public status?: number, 
+    public statusText?: string,
+    public isRetryable: boolean = true
   ) {
     super(message)
     this.name = 'NetworkRequestError'

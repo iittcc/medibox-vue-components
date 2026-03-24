@@ -82,6 +82,8 @@ export interface ErrorBoundaryConfig {
   showToast?: boolean
 }
 
+const registeredErrorBoundaryCleanups = new Set<() => void>()
+
 class ErrorBoundaryManager {
   private errors = ref<ErrorInfo[]>([])
   private retryCount = ref<Map<string, number>>(new Map())
@@ -382,19 +384,17 @@ export function withErrorBoundary(app: App, config?: ErrorBoundaryConfig) {
   window.addEventListener('unhandledrejection', handleUnhandledRejection)
 
   // Store cleanup function on the app instance for later use
-  ;(app as any).__errorBoundaryCleanup = () => {
+  const cleanup = () => {
     window.removeEventListener('unhandledrejection', handleUnhandledRejection)
   }
+  registeredErrorBoundaryCleanups.add(cleanup)
+  ;(app as any).__errorBoundaryCleanup = cleanup
 
   return app
 }
 
 // Cleanup function for removing global event listeners
 export const cleanupErrorBoundary = () => {
-  const apps = document.querySelectorAll('[data-v-app]') as NodeListOf<any>
-  apps.forEach(app => {
-    if (app.__errorBoundaryCleanup) {
-      app.__errorBoundaryCleanup()
-    }
-  })
+  registeredErrorBoundaryCleanups.forEach(cleanup => cleanup())
+  registeredErrorBoundaryCleanups.clear()
 }

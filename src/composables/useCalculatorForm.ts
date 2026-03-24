@@ -37,6 +37,7 @@ export function useCalculatorForm(
       answer: q.answer
     }))
   )
+  const initialAnswers = questions.value.map(question => question.answer)
 
   const patient = ref<PatientInfo>({
     name: '',
@@ -82,8 +83,8 @@ export function useCalculatorForm(
    * clears results and validation state.
    */
   function reset(): void {
-    questions.value.forEach(q => {
-      q.answer = q.options[0]?.value ?? null
+    questions.value.forEach((q, index) => {
+      q.answer = initialAnswers[index] ?? null
     })
     result.value = null
     formSubmitted.value = false

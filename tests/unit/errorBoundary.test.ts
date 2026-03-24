@@ -472,24 +472,17 @@ describe('withErrorBoundary', () => {
 
 describe('cleanupErrorBoundary', () => {
   it('should clean up global event listeners', () => {
-    // Mock app elements
-    const mockApp = {
-      __errorBoundaryCleanup: vi.fn()
-    }
-    
-    vi.spyOn(document, 'querySelectorAll').mockReturnValue([mockApp] as any)
+    const removeEventListenerSpy = vi.spyOn(window, 'removeEventListener')
+    const app = createApp({ template: '<div>Test App</div>' })
+
+    withErrorBoundary(app)
 
     cleanupErrorBoundary()
 
-    expect(mockApp.__errorBoundaryCleanup).toHaveBeenCalled()
+    expect(removeEventListenerSpy).toHaveBeenCalledWith('unhandledrejection', expect.any(Function))
   })
 
-  it('should handle apps without cleanup function', () => {
-    const mockApp = {}
-    
-    vi.spyOn(document, 'querySelectorAll').mockReturnValue([mockApp] as any)
-
-    // Should not throw error
+  it('should be safe to call when no handlers are registered', () => {
     expect(() => cleanupErrorBoundary()).not.toThrow()
   })
 })
