@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect } from 'vitest'
 import { nextTick } from 'vue'
 import AsrsCalculator from '@/components/calculators/AsrsCalculator.vue'
 import { mountCalculator } from './calculator-test-helper'
