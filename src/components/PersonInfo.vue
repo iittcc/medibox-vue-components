@@ -28,23 +28,23 @@
     </div>
 
     <!-- Layout without CPR: single-row flex (original) -->
-    <div v-else class="flex flex-col md:flex-row md:gap-7 gap-5 w-full">
-        <div class="md:w-1/3">
+    <div v-else class="flex flex-col xl:flex-row xl:gap-7 gap-5 w-full">
+        <div class="xl:w-1/3">
             <div class="flex items-center justify-items-start gap-2">
-                <i class="pi pi-user"></i> Navn:
-                <InputText class="ml-1" v-model="localName" placeholder="Indtast navn" @input="updateName"
+                <span class="max-w-17"><i class="pi pi-user"></i> Navn:</span>
+                <InputText class="ml-1 max-w-48" v-model="localName" placeholder="Indtast navn" @input="updateName"
                     id="personName" />
             </div>
         </div>
-        <div :style="{ display: genderdisplay }" class="md:w-1/3 flex md:justify-items-center">
+        <div :style="{ display: genderdisplay }" class="xl:grow flex xl:justify-items-center">
             <div class="flex items-center justify-start gap-2">
-                <i class="pi pi-venus"></i><i class="pi pi-mars"></i> Køn:
+                <span class="max-w-17"><i class="pi pi-venus"></i><i class="pi pi-mars"></i> Køn:</span>
                 <SelectButton v-model="localGender" :options="currentGenderOptions" aria-labelledby="basic"
-                    @update:modelValue="updateGender" class="ml-1 w-48" />
+                    @update:modelValue="updateGender" class="ml-1 max-w-36" />
             </div>
         </div>
-        <div class="md:w-1/3 flex flex-row gap-3 md:justify-items-end">
-            <div class="flex mt-2 gap-2 justify-start"><i class="pi pi-clock mt-1"></i> Alder: </div>
+        <div class="xl:w-1/3 flex flex-row gap-3 xl:justify-items-end">
+            <div class="flex mt-2 gap-2 justify-start max-w-17"><i class="pi pi-clock mt-1"></i> Alder: </div>
             <NumberSliderInput v-model="localAge" :sliderType="props.sliderType" :min="props.minAge" :max="props.maxAge"
                 mode="decimal" :showButtons="true" suffix=" År" @update:modelValue="updateAge" id="personAge" />
         </div>

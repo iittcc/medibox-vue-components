@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-wrap w-56 gap-2">
+  <div class="flex flex-wrap w-48 gap-2">
     <div>
       <InputNumber
         :modelValue="modelValue"
