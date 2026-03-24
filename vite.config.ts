@@ -27,6 +27,7 @@ export default defineConfig({
       chadsvasc: './src/chadsvasc.ts',
       wellsDvt: './src/wellsDvt.ts',
       wellsPe: './src/wellsPe.ts',
+      ybocs: './src/ybocs.ts',
       score2: './src/score2.ts',
       danpss: './src/danpss.ts',
       puqe: './src/puqe.ts',

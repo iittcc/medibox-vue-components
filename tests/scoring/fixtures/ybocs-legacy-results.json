@@ -1,0 +1,72 @@
+[
+  {
+    "description": "All zero — score 0 (insignificant)",
+    "answers": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    "expectedScore": 0,
+    "expectedSeverity": "normal",
+    "expectedInterpretation": "Ubetydelig til mild OCD."
+  },
+  {
+    "description": "All max — score 40 (severe to disabling)",
+    "answers": [4, 4, 4, 4, 4, 4, 4, 4, 4, 4],
+    "expectedScore": 40,
+    "expectedSeverity": "severe",
+    "expectedInterpretation": "Svær til invaliderende OCD."
+  },
+  {
+    "description": "At normal/mild boundary — score 14 (still normal)",
+    "answers": [2, 2, 2, 2, 2, 1, 1, 1, 1, 0],
+    "expectedScore": 14,
+    "expectedSeverity": "normal",
+    "expectedInterpretation": "Ubetydelig til mild OCD."
+  },
+  {
+    "description": "At mild threshold — score 15 (mild to moderate)",
+    "answers": [2, 2, 2, 2, 2, 1, 1, 1, 1, 1],
+    "expectedScore": 15,
+    "expectedSeverity": "mild",
+    "expectedInterpretation": "Mild til moderat OCD."
+  },
+  {
+    "description": "At mild/moderate boundary — score 22 (still mild)",
+    "answers": [3, 3, 3, 3, 2, 2, 2, 2, 1, 1],
+    "expectedScore": 22,
+    "expectedSeverity": "mild",
+    "expectedInterpretation": "Mild til moderat OCD."
+  },
+  {
+    "description": "At moderate threshold — score 23 (moderate to severe)",
+    "answers": [3, 3, 3, 3, 2, 2, 2, 2, 2, 1],
+    "expectedScore": 23,
+    "expectedSeverity": "moderate",
+    "expectedInterpretation": "Moderat til svær OCD."
+  },
+  {
+    "description": "At moderate/severe boundary — score 29 (still moderate)",
+    "answers": [3, 3, 3, 3, 3, 3, 3, 3, 3, 2],
+    "expectedScore": 29,
+    "expectedSeverity": "moderate",
+    "expectedInterpretation": "Moderat til svær OCD."
+  },
+  {
+    "description": "At severe threshold — score 30 (severe to disabling)",
+    "answers": [3, 3, 3, 3, 3, 3, 3, 3, 3, 3],
+    "expectedScore": 30,
+    "expectedSeverity": "severe",
+    "expectedInterpretation": "Svær til invaliderende OCD."
+  },
+  {
+    "description": "Only obsessions maxed — score 20 (mild to moderate)",
+    "answers": [4, 4, 4, 4, 4, 0, 0, 0, 0, 0],
+    "expectedScore": 20,
+    "expectedSeverity": "mild",
+    "expectedInterpretation": "Mild til moderat OCD."
+  },
+  {
+    "description": "Only compulsions maxed — score 20 (mild to moderate)",
+    "answers": [0, 0, 0, 0, 0, 4, 4, 4, 4, 4],
+    "expectedScore": 20,
+    "expectedSeverity": "mild",
+    "expectedInterpretation": "Mild til moderat OCD."
+  }
+]
