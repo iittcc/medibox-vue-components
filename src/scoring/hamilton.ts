@@ -188,7 +188,7 @@ export function createHamiltonQuestions(): Question[] {
       text: '17. Vægttab',
       options: [
         { text: 'Under 2 kg', value: 1 },
-        { text: '2: 2 kg eller mere', value: 2 }
+        { text: '2 kg eller mere', value: 2 }
       ],
       answer: null
     }

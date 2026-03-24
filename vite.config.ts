@@ -23,6 +23,7 @@ export default defineConfig({
   build: {
     rollupOptions: {
     input: {
+      bmi: './src/bmi.ts',
       centor: './src/centor.ts',
       chadsvasc: './src/chadsvasc.ts',
       wellsDvt: './src/wellsDvt.ts',

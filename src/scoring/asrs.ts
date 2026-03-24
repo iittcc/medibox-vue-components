@@ -196,7 +196,7 @@ export const asrsConfig: CalculatorConfig = {
  */
 export function calculateAsrs(questions: Question[]): ScoreResult {
   let positiveA = 0
-  let positiveB = 0
+  let _positiveB = 0
 
   const questionResults: QuestionResult[] = questions.map((q, index) => {
     const score = q.answer ?? 0
@@ -204,7 +204,7 @@ export function calculateAsrs(questions: Question[]): ScoreResult {
     const isPositive = score >= ASRS_POSITIVE_THRESHOLDS[index]
 
     if (ASRS_GROUPS[index] === 'a' && isPositive) positiveA++
-    if (ASRS_GROUPS[index] === 'b' && isPositive) positiveB++
+    if (ASRS_GROUPS[index] === 'b' && isPositive) _positiveB++
 
     return {
       questionNumber: `${index + 1}`,

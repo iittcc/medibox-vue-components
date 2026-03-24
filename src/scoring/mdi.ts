@@ -45,7 +45,7 @@ export function createMdiQuestions(): Question[] {
  * What: Group assignments — B = core symptoms, C = associated symptoms.
  * Items 8a/8b and 10a/10b are paired; group applies to the pair.
  */
-const MDI_GROUPS: ('b' | 'c' | 'pair8' | 'pair10')[] = [
+const _MDI_GROUPS: ('b' | 'c' | 'pair8' | 'pair10')[] = [
   'b', 'b', 'b',       // items 1-3 (core)
   'c', 'c', 'c', 'c',  // items 4-7 (associated)
   'pair8', 'pair8',     // items 8a, 8b (associated pair)

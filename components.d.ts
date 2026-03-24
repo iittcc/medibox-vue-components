@@ -14,6 +14,8 @@ declare module 'vue' {
     AsrsCalculatorPrint: typeof import('./src/components/calculators/AsrsCalculatorPrint.vue')['default']
     AuditCalculator: typeof import('./src/components/calculators/AuditCalculator.vue')['default']
     AuditCalculatorPrint: typeof import('./src/components/calculators/AuditCalculatorPrint.vue')['default']
+    BmiCalculator: typeof import('./src/components/calculators/BmiCalculator.vue')['default']
+    BmiCalculatorPrint: typeof import('./src/components/calculators/BmiCalculatorPrint.vue')['default']
     CalculatorPrintLayout: typeof import('./src/components/calculators/CalculatorPrintLayout.vue')['default']
     CentorCalculator: typeof import('./src/components/calculators/CentorCalculator.vue')['default']
     CentorCalculatorPrint: typeof import('./src/components/calculators/CentorCalculatorPrint.vue')['default']
