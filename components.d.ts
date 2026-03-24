@@ -8,6 +8,10 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    AdhdrsCalculator: typeof import('./src/components/calculators/AdhdrsCalculator.vue')['default']
+    AdhdrsCalculatorPrint: typeof import('./src/components/calculators/AdhdrsCalculatorPrint.vue')['default']
+    AsrsCalculator: typeof import('./src/components/calculators/AsrsCalculator.vue')['default']
+    AsrsCalculatorPrint: typeof import('./src/components/calculators/AsrsCalculatorPrint.vue')['default']
     AuditCalculator: typeof import('./src/components/calculators/AuditCalculator.vue')['default']
     AuditCalculatorPrint: typeof import('./src/components/calculators/AuditCalculatorPrint.vue')['default']
     CalculatorPrintLayout: typeof import('./src/components/calculators/CalculatorPrintLayout.vue')['default']
