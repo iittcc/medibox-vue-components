@@ -55,5 +55,7 @@ declare module 'vue' {
     WestleyCroupCalculatorPrint: typeof import('./src/components/calculators/WestleyCroupCalculatorPrint.vue')['default']
     Who5Calculator: typeof import('./src/components/calculators/Who5Calculator.vue')['default']
     Who5CalculatorPrint: typeof import('./src/components/calculators/Who5CalculatorPrint.vue')['default']
+    YbocsCalculator: typeof import('./src/components/calculators/YbocsCalculator.vue')['default']
+    YbocsCalculatorPrint: typeof import('./src/components/calculators/YbocsCalculatorPrint.vue')['default']
   }
 }
