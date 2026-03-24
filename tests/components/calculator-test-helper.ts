@@ -68,7 +68,8 @@ export function mountCalculator(component: Component) {
         IpssCalculatorPrint: printStub,
         LrtiCalculatorPrint: printStub,
         EpdsCalculatorPrint: printStub,
-        DanpssCalculatorPrint: printStub
+        DanpssCalculatorPrint: printStub,
+        ChadsvascCalculatorPrint: printStub
       }
     }
   })

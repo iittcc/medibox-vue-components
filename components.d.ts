@@ -11,6 +11,8 @@ declare module 'vue' {
     AuditCalculator: typeof import('./src/components/calculators/AuditCalculator.vue')['default']
     AuditCalculatorPrint: typeof import('./src/components/calculators/AuditCalculatorPrint.vue')['default']
     CalculatorPrintLayout: typeof import('./src/components/calculators/CalculatorPrintLayout.vue')['default']
+    ChadsvascCalculator: typeof import('./src/components/calculators/ChadsvascCalculator.vue')['default']
+    ChadsvascCalculatorPrint: typeof import('./src/components/calculators/ChadsvascCalculatorPrint.vue')['default']
     CopyDialog: typeof import('./src/components/CopyDialog.vue')['default']
     CustomIcon: typeof import('./src/components/CustomIcon.vue')['default']
     CustomSlider: typeof import('./src/components/CustomSlider.vue')['default']

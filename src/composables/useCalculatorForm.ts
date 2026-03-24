@@ -8,7 +8,7 @@
  * clinical content and state — preventing content drift between views.
  */
 
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import type {
   Question,
   ScoreResult,
@@ -51,6 +51,15 @@ export function useCalculatorForm(
   const validationMessage = ref('')
 
   const hasResults = computed(() => result.value !== null)
+
+  // Why: When a user changes any input after calculating, the displayed result
+  // becomes stale and potentially misleading. Clear it so they must recalculate.
+  watch(questions, () => {
+    if (result.value !== null) {
+      result.value = null
+      formSubmitted.value = false
+    }
+  }, { deep: true })
 
   /**
    * What: Validates that all questions have been answered.

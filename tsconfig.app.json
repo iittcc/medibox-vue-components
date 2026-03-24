@@ -75,6 +75,9 @@
     "src/components/calculators/WestleyCroupCalculator.vue",
     "src/components/calculators/WestleyCroupCalculatorPrint.vue",
     "src/components/calculators/Who5Calculator.vue",
-    "src/components/calculators/Who5CalculatorPrint.vue"
+    "src/components/calculators/Who5CalculatorPrint.vue",
+    "src/chadsvasc.ts",
+    "src/components/calculators/ChadsvascCalculator.vue",
+    "src/components/calculators/ChadsvascCalculatorPrint.vue"
   ]
 }

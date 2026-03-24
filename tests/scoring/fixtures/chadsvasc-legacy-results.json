@@ -1,0 +1,58 @@
+[
+  {
+    "description": "All no — score 0 (no treatment)",
+    "answers": [0, 0, 0, 0, 0, 0],
+    "expectedScore": 0,
+    "expectedSeverity": "normal",
+    "expectedInterpretation": "Ingen antitrombotisk behandling."
+  },
+  {
+    "description": "Single +1 factor (hypertension) — score 1 (consider treatment)",
+    "answers": [0, 1, 0, 0, 0, 0],
+    "expectedScore": 1,
+    "expectedSeverity": "moderate",
+    "expectedInterpretation": "AK-behandling bør overvejes (DOAK eller VKA)."
+  },
+  {
+    "description": "At threshold boundary — score 2 (start treatment)",
+    "answers": [1, 1, 0, 0, 0, 0],
+    "expectedScore": 2,
+    "expectedSeverity": "severe",
+    "expectedInterpretation": "AK-behandling anbefales (DOAK eller VKA)."
+  },
+  {
+    "description": "All max — score 8",
+    "answers": [1, 1, 2, 1, 2, 1],
+    "expectedScore": 8,
+    "expectedSeverity": "severe",
+    "expectedInterpretation": "AK-behandling anbefales (DOAK eller VKA)."
+  },
+  {
+    "description": "Age 65-74 only — score 1",
+    "answers": [0, 0, 1, 0, 0, 0],
+    "expectedScore": 1,
+    "expectedSeverity": "moderate",
+    "expectedInterpretation": "AK-behandling bør overvejes (DOAK eller VKA)."
+  },
+  {
+    "description": "Age ≥75 only — score 2 (triggers treatment)",
+    "answers": [0, 0, 2, 0, 0, 0],
+    "expectedScore": 2,
+    "expectedSeverity": "severe",
+    "expectedInterpretation": "AK-behandling anbefales (DOAK eller VKA)."
+  },
+  {
+    "description": "Stroke/TIA only — score 2 (triggers treatment)",
+    "answers": [0, 0, 0, 0, 2, 0],
+    "expectedScore": 2,
+    "expectedSeverity": "severe",
+    "expectedInterpretation": "AK-behandling anbefales (DOAK eller VKA)."
+  },
+  {
+    "description": "Realistic pattern — HF + age 65-74 + diabetes",
+    "answers": [1, 0, 1, 1, 0, 0],
+    "expectedScore": 3,
+    "expectedSeverity": "severe",
+    "expectedInterpretation": "AK-behandling anbefales (DOAK eller VKA)."
+  }
+]
