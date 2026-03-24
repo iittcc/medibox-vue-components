@@ -132,6 +132,10 @@ src/vue-components/
 | Y-BOCS | 10 (2 tabs) | Sum, 4 thresholds | sky | Simple | New |
 | ASRS V1.1 | 18 (2 tabs) | Positive-count with per-question thresholds | sky | Medium | New |
 | ADHD-RS | 26 (4 tabs) | Sum with domain subscores | sky | Medium | New |
+| GDS-15 | 15 | Sum (reverse-scored binary), 3 thresholds | sky | Simple | New |
+| MDI | 12 (2 tabs) | Custom sum (paired max) + ICD-10 diagnostic | sky | Medium | New |
+| Hamilton | 17 | Sum, HAM-17/HAM-6 toggle, varying scales | sky | Medium | New |
+| ICD-10 Depression | 13 (3 tabs) | Diagnostic checklist (A+B+C group logic) | sky | Medium | New |
 | Score2 | 3 inputs | Lookup table, Chart.js | teal | Very hard | To migrate |
 | MedicinBoern | Cascading dropdowns | Drug lookup, weight formula | sky | Very hard | To migrate |
 
@@ -438,25 +442,25 @@ Does NOT use `useCalculatorForm` or `calculateSimpleSum`.
 
 LRTI models 8 boolean symptoms as standard Questions with `type: 'Toggle'` and binary options `[{text:'Nej', value:0}, {text:'Ja', value:1}]`. The orchestrator renders `ToggleButton` components. Uses the standard `useCalculatorForm` composable unchanged.
 
-### Tabbed Section Calculators (Y-BOCS, ASRS, ADHD-RS) — Implemented
+### Tabbed Section Calculators — Implemented
 
-Calculators with many questions use PrimeVue Volt Tabs to group questions into clinical sections. Each section is a tab panel. All use `useCalculatorForm` with standard `Question` types.
+Calculators with many questions use the `QuestionTabs` shared component (`src/components/QuestionTabs.vue`) to group questions into clinical section tabs. All use `useCalculatorForm` with standard `Question` types.
 
-**Tab infrastructure:**
-- Volt components: `Tabs`, `TabList`, `Tab`, `TabPanels`, `TabPanel` (from `@/volt/`)
-- `activeTab` ref tracks current tab (string key `"0"`, `"1"`, etc.)
+**QuestionTabs component** encapsulates Tabs/TabList/Tab/TabPanels/TabPanel with passthrough styling:
+- Props: `activeTab`, `sections`, `name`, `formSubmitted`, `isUnanswered`
+- Emits: `update:activeTab`
+- Named slots: `before-{key}` for per-tab content above questions (e.g., section descriptions)
 - Sections defined in scoring file as `SECTIONS` array with `{ title, startIndex }`
-- Component computes `sections` by slicing `questions` per section boundary
 
 **Navigation pattern:**
 - "Næste afsnit" button: disabled until all questions in current section answered, hidden on last tab
 - "Forrige afsnit" button: hidden on first tab
 - "Beregn" button: disabled until ALL questions across all tabs answered
-- Tab clicks synced via `@update:value="activeTab = $event"`
+- Reset returns to first tab (`activeTab = '0'`)
 
-**Default answers:** Tabbed calculators use `answer: null` (no pre-selected option) to enforce explicit user input. The `useCalculatorForm` composable validates `null` as unanswered.
+**Default answers:** Tabbed calculators use `answer: null` (no pre-selected option) to enforce explicit user input.
 
-**Passthrough styling:** Tabs and TabPanels use `:pt` and `:ptOptions="{ mergeProps: true }"` to remove default padding/background.
+**Used by:** Y-BOCS, ASRS, ADHD-RS, MDI, ICD-10 Depression.
 
 #### Y-BOCS (Simple sum with tabs)
 
@@ -482,6 +486,40 @@ Calculators with many questions use PrimeVue Volt Tabs to group questions into c
 - Uses `calculateSimpleSum` for total score thresholds (≤60 normal, 61-69 borderline, ≥70 severe)
 - Helper function `getAdhdrsSubscores()` computes domain subscores (B+C combined as "hyperactivity/impulsivity")
 - Extra text fields: "Udfyldt af" and "Relation til barnet" (captured in print/copy output)
+
+#### GDS-15 (Simple binary with reverse scoring)
+
+- 15 SelectButton questions (Nej/Ja), no tabs needed
+- Reverse-scored: some items score Ja=0/Nej=1, others Ja=1/Nej=0
+- Nej always first in option order regardless of score value
+- Uses `calculateSimpleSum` — 3 thresholds (0-4 normal, 5-7 possible, ≥8 probable)
+
+#### MDI (Dual scoring with paired sub-items)
+
+- 12 Listbox questions in 2 tabs (Kernesymptomer B, Ledsagesymptomer C), scale 0-5
+- Items 8a/8b and 10a/10b are paired: scoring uses `Math.max(a, b)` for each pair
+- **Custom scoring** `calculateMdi()` — does NOT use `calculateSimpleSum`
+- Dual output: sum rating (4 thresholds) + ICD-10 diagnostic via `getMdiIcd10()` helper
+- ICD-10 counts B items ≥4 and C items ≥3, then applies diagnostic rules
+
+#### Hamilton (Mode toggle, varying scales)
+
+- 17 SelectButton questions with varying option counts (2-5 options per item)
+- HAM-17/HAM-6 mode toggle via SelectButton — HAM-6 shows only 6 items (indices 0,1,6,7,9,12)
+- No `value: 0` options — unanswered items score as 0 per clinical instruction
+- Score range badges (`0–N`) rendered inline with question titles
+- Custom card layout (not QuestionSingleComponent) for badge support
+- Two sets of thresholds depending on mode
+- CSS skeleton placeholder in HTML mount point (pre-Vue loading state)
+- Print view filters questions to match selected mode
+
+#### ICD-10 Depression (Diagnostic checklist)
+
+- 13 SelectButton questions (Nej/Ja) in 3 tabs (A: General, B: Core, C: Associated)
+- **Custom scoring** `calculateDepressionIcd10()` — boolean diagnostic logic, not sum
+- Classification: 3A+2B+2C=Let, 3A+2B+4C=Moderat, 3A+3B+5C=Svær
+- Interpretation includes group counts and treatment recommendation
+- Helper `getIcd10GroupCounts()` for display
 
 ### Lookup Table (Score2)
 
