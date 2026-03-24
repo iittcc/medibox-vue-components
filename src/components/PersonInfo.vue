@@ -104,6 +104,15 @@ const localCpr = ref<string>(props.cpr);
 
 const localAge = ref<number>(props.age);
 
+// Why: When a parent component programmatically updates the age prop
+// (e.g., age SelectButton → patient age sync in ChadsvascCalculator/CentorCalculator),
+// localAge must stay in sync. Without this watcher, the UI shows stale values.
+watch(() => props.age, (newAge) => {
+    if (newAge !== localAge.value) {
+        localAge.value = newAge
+    }
+})
+
 const currentGenderOptions = computed(() => {
     return localAge.value <= 16 ? genderOptionsChild.value : genderOptions.value;
 });

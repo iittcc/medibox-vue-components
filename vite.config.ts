@@ -23,6 +23,7 @@ export default defineConfig({
   build: {
     rollupOptions: {
     input: {
+      centor: './src/centor.ts',
       chadsvasc: './src/chadsvasc.ts',
       score2: './src/score2.ts',
       danpss: './src/danpss.ts',

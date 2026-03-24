@@ -126,6 +126,7 @@ src/vue-components/
 | IPSS | 7 | Sum, 4 thresholds | orange | Simple | Migrated |
 | LRTI | 8 | Boolean toggles | orange | Medium | Migrated |
 | DANPSS | 15 (4 sections) | Dual A/B (A×B product), 4 sections | teal | Hard | Migrated |
+| Centor | 5 | Custom sum (age score map), 3 thresholds | sky | Simple | Migrated |
 | Score2 | 3 inputs | Lookup table, Chart.js | teal | Very hard | To migrate |
 | MedicinBoern | Cascading dropdowns | Drug lookup, weight formula | sky | Very hard | To migrate |
 

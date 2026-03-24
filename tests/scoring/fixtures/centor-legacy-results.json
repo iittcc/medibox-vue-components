@@ -1,0 +1,86 @@
+[
+  {
+    "description": "All no, age 15-44 — score 0 (low probability)",
+    "answers": [0, 0, 0, 0, 2],
+    "expectedScore": 0,
+    "expectedSeverity": "normal",
+    "expectedInterpretation": "Lav sandsynlighed for GAS. Ingen test nødvendig. Symptomatisk behandling."
+  },
+  {
+    "description": "All no, age under 3 — score -1 (low probability)",
+    "answers": [0, 0, 0, 0, 0],
+    "expectedScore": -1,
+    "expectedSeverity": "normal",
+    "expectedInterpretation": "Lav sandsynlighed for GAS. Ingen test nødvendig. Symptomatisk behandling."
+  },
+  {
+    "description": "All no, age over 45 — score -1 (low probability)",
+    "answers": [0, 0, 0, 0, 3],
+    "expectedScore": -1,
+    "expectedSeverity": "normal",
+    "expectedInterpretation": "Lav sandsynlighed for GAS. Ingen test nødvendig. Symptomatisk behandling."
+  },
+  {
+    "description": "All yes, age 3-14 — score 5 (max, high probability)",
+    "answers": [1, 1, 1, 1, 1],
+    "expectedScore": 5,
+    "expectedSeverity": "severe",
+    "expectedInterpretation": "Høj sandsynlighed for GAS. Overvej antibiotikabehandling eller udfør hurtigtest."
+  },
+  {
+    "description": "Fever + tonsils, age 15-44 — score 2 (threshold to moderate)",
+    "answers": [1, 1, 0, 0, 2],
+    "expectedScore": 2,
+    "expectedSeverity": "moderate",
+    "expectedInterpretation": "Moderat sandsynlighed for GAS. Streptokok hurtigtest anbefales."
+  },
+  {
+    "description": "Fever only, age 15-44 — score 1 (just below moderate)",
+    "answers": [1, 0, 0, 0, 2],
+    "expectedScore": 1,
+    "expectedSeverity": "normal",
+    "expectedInterpretation": "Lav sandsynlighed for GAS. Ingen test nødvendig. Symptomatisk behandling."
+  },
+  {
+    "description": "All 4 symptoms yes, age 15-44 — score 4 (threshold to high)",
+    "answers": [1, 1, 1, 1, 2],
+    "expectedScore": 4,
+    "expectedSeverity": "severe",
+    "expectedInterpretation": "Høj sandsynlighed for GAS. Overvej antibiotikabehandling eller udfør hurtigtest."
+  },
+  {
+    "description": "3 symptoms yes, age 15-44 — score 3 (just below high)",
+    "answers": [1, 1, 1, 0, 2],
+    "expectedScore": 3,
+    "expectedSeverity": "moderate",
+    "expectedInterpretation": "Moderat sandsynlighed for GAS. Streptokok hurtigtest anbefales."
+  },
+  {
+    "description": "All 4 symptoms yes, age over 45 — score 3 (age reduces to moderate)",
+    "answers": [1, 1, 1, 1, 3],
+    "expectedScore": 3,
+    "expectedSeverity": "moderate",
+    "expectedInterpretation": "Moderat sandsynlighed for GAS. Streptokok hurtigtest anbefales."
+  },
+  {
+    "description": "All 4 symptoms yes, age under 3 — score 3 (age reduces to moderate)",
+    "answers": [1, 1, 1, 1, 0],
+    "expectedScore": 3,
+    "expectedSeverity": "moderate",
+    "expectedInterpretation": "Moderat sandsynlighed for GAS. Streptokok hurtigtest anbefales."
+  },
+  {
+    "description": "Fever + lymph nodes + no cough, age 3-14 — score 4 (child pushes to high)",
+    "answers": [1, 0, 1, 1, 1],
+    "expectedScore": 4,
+    "expectedSeverity": "severe",
+    "expectedInterpretation": "Høj sandsynlighed for GAS. Overvej antibiotikabehandling eller udfør hurtigtest."
+  },
+  {
+    "description": "Tonsils only, age over 45 — score 0 (single symptom with age penalty)",
+    "answers": [0, 1, 0, 0, 3],
+    "expectedScore": 0,
+    "expectedSeverity": "normal",
+    "expectedInterpretation": "Lav sandsynlighed for GAS. Ingen test nødvendig. Symptomatisk behandling."
+  }
+]
