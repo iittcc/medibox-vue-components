@@ -25,6 +25,8 @@ export default defineConfig({
     input: {
       centor: './src/centor.ts',
       chadsvasc: './src/chadsvasc.ts',
+      wellsDvt: './src/wellsDvt.ts',
+      wellsPe: './src/wellsPe.ts',
       score2: './src/score2.ts',
       danpss: './src/danpss.ts',
       puqe: './src/puqe.ts',

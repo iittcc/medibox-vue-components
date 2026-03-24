@@ -86,6 +86,7 @@ export function createWho5Questions(): Question[] {
 // Why: WHO-5 final score = raw sum × 4. Thresholds are on the final 0-100 score.
 export const who5Config: CalculatorConfig = {
   name: 'WHO-5 Trivselsindex',
+  description: '',
   shortName: 'WHO-5',
   defaultAge: 50,
   defaultGender: 'Mand',

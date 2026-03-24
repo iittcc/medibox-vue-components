@@ -75,6 +75,7 @@ export function createLrtiQuestions(): Question[] {
 
 export const lrtiConfig: CalculatorConfig = {
   name: 'LRTI Symptomtjekliste',
+  description: 'Klinisk vurdering af symptomer og funktionsnedsættelse i lækærmen',
   shortName: 'LRTI',
   defaultAge: 6,
   defaultGender: 'Dreng',

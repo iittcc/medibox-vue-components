@@ -53,6 +53,7 @@ export function createGcsQuestions(): Question[] {
 
 export const gcsConfig: CalculatorConfig = {
   name: 'Glasgow Coma Scale',
+  description: 'Klinisk vurdering af bevidsthedsgrad',
   shortName: 'GCS',
   defaultAge: 50,
   defaultGender: 'Mand',

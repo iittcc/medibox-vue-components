@@ -1,73 +1,52 @@
 <template>
     <!-- Layout with CPR: 2-row grid -->
-    <div v-if="showCpr" class="grid grid-cols-[auto_1fr] md:grid-cols-[auto_1fr_auto_1fr] gap-x-3 gap-y-4 w-full items-center">
+    <div v-if="showCpr"
+        class="grid grid-cols-[auto_1fr] md:grid-cols-[auto_1fr_auto_1fr] gap-x-3 gap-y-4 w-full items-center">
         <!-- Row 1: Navn + CPR -->
-        <span for="personName" class="inline-flex items-center gap-1 whitespace-nowrap"><i class="pi pi-user"></i> Navn:</span>
-        <InputText class="w-full" v-model="localName" placeholder="Indtast navn" @input="updateName" id="personName"/>
+        <span for="personName" class="inline-flex items-center gap-1 whitespace-nowrap"><i class="pi pi-user"></i>
+            Navn:</span>
+        <InputText class="w-full" v-model="localName" placeholder="Indtast navn" @input="updateName" id="personName" />
 
-        <span for="personCpr" class="inline-flex items-center gap-1 whitespace-nowrap"><i class="pi pi-id-card"></i> CPR:</span>
-        <InputText class="w-full" v-model="localCpr" placeholder="Indtast CPR" @input="updateCpr" id="personCpr"/>
+        <span for="personCpr" class="inline-flex items-center gap-1 whitespace-nowrap"><i class="pi pi-id-card"></i>
+            CPR:</span>
+        <InputText class="w-full" v-model="localCpr" placeholder="Indtast CPR" @input="updateCpr" id="personCpr" />
 
         <!-- Row 2: Køn + Alder -->
-        <span :style="{display: genderdisplay}" class="inline-flex items-center gap-1 whitespace-nowrap"><i class="pi pi-venus"></i><i class="pi pi-mars"></i> Køn:</span>
-        <div :style="{display: genderdisplay}">
-            <SelectButton
-                v-model="localGender"
-                :options="currentGenderOptions"
-                aria-labelledby="basic"
-                @update:modelValue="updateGender"
-            />
+        <span :style="{ display: genderdisplay }" class="inline-flex items-center gap-1 whitespace-nowrap"><i
+                class="pi pi-venus"></i><i class="pi pi-mars"></i> Køn:</span>
+        <div :style="{ display: genderdisplay }">
+            <SelectButton v-model="localGender" :options="currentGenderOptions" aria-labelledby="basic"
+                @update:modelValue="updateGender" />
         </div>
 
-        <span for="personAge" class="inline-flex items-center gap-1 whitespace-nowrap"><i class="pi pi-clock"></i> Alder:</span>
+        <span for="personAge" class="inline-flex items-center gap-1 whitespace-nowrap"><i class="pi pi-clock"></i>
+            Alder:</span>
         <div class="min-w-0">
-            <NumberSliderInput
-                  v-model="localAge"
-                  :sliderType="props.sliderType"
-                  :min="props.minAge"
-                  :max="props.maxAge"
-                  mode="decimal"
-                  :showButtons="true"
-                  suffix=" År"
-                  @update:modelValue="updateAge"
-                  id="personAge"
-                />
+            <NumberSliderInput v-model="localAge" :sliderType="props.sliderType" :min="props.minAge" :max="props.maxAge"
+                mode="decimal" :showButtons="true" suffix=" År" @update:modelValue="updateAge" id="personAge" />
         </div>
     </div>
 
     <!-- Layout without CPR: single-row flex (original) -->
-    <div v-else class="flex flex-col md:flex-row md:gap-7 gap-5 w-full justify-start">
-        <div>
-            <div class="flex items-center justify-start gap-2">
-            <i class="pi pi-user"></i> Navn:
-            <InputText class="ml-1" v-model="localName" placeholder="Indtast navn" @input="updateName" id="personName"/>
+    <div v-else class="flex flex-col md:flex-row md:gap-7 gap-5 w-full">
+        <div class="md:w-1/3">
+            <div class="flex items-center justify-items-start gap-2">
+                <i class="pi pi-user"></i> Navn:
+                <InputText class="ml-1" v-model="localName" placeholder="Indtast navn" @input="updateName"
+                    id="personName" />
             </div>
         </div>
-        <div :style="{display: genderdisplay}">
+        <div :style="{ display: genderdisplay }" class="md:w-1/3 flex md:justify-items-center">
             <div class="flex items-center justify-start gap-2">
                 <i class="pi pi-venus"></i><i class="pi pi-mars"></i> Køn:
-                <SelectButton
-                    v-model="localGender"
-                    :options="currentGenderOptions"
-                    aria-labelledby="basic"
-                    @update:modelValue="updateGender"
-                    class="ml-1"
-                />
+                <SelectButton v-model="localGender" :options="currentGenderOptions" aria-labelledby="basic"
+                    @update:modelValue="updateGender" class="ml-1 w-48" />
             </div>
         </div>
-        <div class="flex flex-row gap-3">
-            <div class="flex mt-2 gap-2"><i class="pi pi-clock mt-1"></i> Alder: </div>
-            <NumberSliderInput
-                  v-model="localAge"
-                  :sliderType="props.sliderType"
-                  :min="props.minAge"
-                  :max="props.maxAge"
-                  mode="decimal"
-                  :showButtons="true"
-                  suffix=" År"
-                  @update:modelValue="updateAge"
-                  id="personAge"
-                />
+        <div class="md:w-1/3 flex flex-row gap-3 md:justify-items-end">
+            <div class="flex mt-2 gap-2 justify-start"><i class="pi pi-clock mt-1"></i> Alder: </div>
+            <NumberSliderInput v-model="localAge" :sliderType="props.sliderType" :min="props.minAge" :max="props.maxAge"
+                mode="decimal" :showButtons="true" suffix=" År" @update:modelValue="updateAge" id="personAge" />
         </div>
     </div>
 </template>

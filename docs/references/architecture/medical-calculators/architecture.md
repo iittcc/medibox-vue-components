@@ -127,6 +127,8 @@ src/vue-components/
 | LRTI | 8 | Boolean toggles | orange | Medium | Migrated |
 | DANPSS | 15 (4 sections) | Dual A/B (A×B product), 4 sections | teal | Hard | Migrated |
 | Centor | 5 | Custom sum (age score map), 3 thresholds | sky | Simple | Migrated |
+| Wells DVT | 10 | Sum (incl. -2), 3 thresholds | teal | Simple | Migrated |
+| Wells PE | 7 | Sum (decimal 1.5/3), 3 thresholds | teal | Simple | Migrated |
 | Score2 | 3 inputs | Lookup table, Chart.js | teal | Very hard | To migrate |
 | MedicinBoern | Cascading dropdowns | Drug lookup, weight formula | sky | Very hard | To migrate |
 

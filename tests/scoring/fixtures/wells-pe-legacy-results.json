@@ -1,0 +1,65 @@
+[
+  {
+    "description": "All no — score 0 (low probability)",
+    "answers": [0, 0, 0, 0, 0, 0, 0],
+    "expectedScore": 0,
+    "expectedSeverity": "normal",
+    "expectedInterpretation": "Klinisk sandsynlighed for lungeemboli er lav."
+  },
+  {
+    "description": "All yes — max score 12.5 (high)",
+    "answers": [1.5, 1.5, 1, 1, 1.5, 3, 3],
+    "expectedScore": 12.5,
+    "expectedSeverity": "severe",
+    "expectedInterpretation": "Klinisk sandsynlighed for lungeemboli er høj."
+  },
+  {
+    "description": "Single +1.5 factor — score 1.5 (low)",
+    "answers": [1.5, 0, 0, 0, 0, 0, 0],
+    "expectedScore": 1.5,
+    "expectedSeverity": "normal",
+    "expectedInterpretation": "Klinisk sandsynlighed for lungeemboli er lav."
+  },
+  {
+    "description": "At low/moderate boundary — score 2 (moderate)",
+    "answers": [0, 0, 1, 0, 0, 0, 0],
+    "expectedScore": 1,
+    "expectedSeverity": "normal",
+    "expectedInterpretation": "Klinisk sandsynlighed for lungeemboli er lav."
+  },
+  {
+    "description": "Two +1 factors — score 2 (moderate)",
+    "answers": [0, 0, 1, 1, 0, 0, 0],
+    "expectedScore": 2,
+    "expectedSeverity": "moderate",
+    "expectedInterpretation": "Klinisk sandsynlighed for lungeemboli er moderat."
+  },
+  {
+    "description": "At moderate/high boundary — score 6 (high)",
+    "answers": [0, 0, 0, 0, 0, 3, 3],
+    "expectedScore": 6,
+    "expectedSeverity": "severe",
+    "expectedInterpretation": "Klinisk sandsynlighed for lungeemboli er høj."
+  },
+  {
+    "description": "Just below high — score 5.5 (moderate)",
+    "answers": [1.5, 1.5, 1, 1, 0, 0, 0],
+    "expectedScore": 5,
+    "expectedSeverity": "moderate",
+    "expectedInterpretation": "Klinisk sandsynlighed for lungeemboli er moderat."
+  },
+  {
+    "description": "DVT signs alone — score 3 (moderate)",
+    "answers": [0, 0, 0, 0, 0, 3, 0],
+    "expectedScore": 3,
+    "expectedSeverity": "moderate",
+    "expectedInterpretation": "Klinisk sandsynlighed for lungeemboli er moderat."
+  },
+  {
+    "description": "Realistic pattern — previous DVT + tachycardia + DVT signs",
+    "answers": [1.5, 0, 0, 0, 1.5, 3, 0],
+    "expectedScore": 6,
+    "expectedSeverity": "severe",
+    "expectedInterpretation": "Klinisk sandsynlighed for lungeemboli er høj."
+  }
+]

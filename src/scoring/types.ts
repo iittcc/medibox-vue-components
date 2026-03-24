@@ -68,6 +68,7 @@ export interface PatientInfo {
  */
 export interface CalculatorConfig {
   name: string
+  description: string
   shortName: string
   defaultAge: number
   defaultGender: string

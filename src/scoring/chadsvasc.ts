@@ -94,6 +94,7 @@ export function createChadsvascQuestions(): Question[] {
 
 export const chadsvascConfig: CalculatorConfig = {
   name: 'CHA₂DS₂-VA Score',
+  description: '',
   shortName: 'CHA₂DS₂-VA',
   defaultAge: 70,
   defaultGender: 'Mand',

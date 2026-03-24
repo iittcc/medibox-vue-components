@@ -68,6 +68,7 @@ export function createWestleyCroupQuestions(): Question[] {
 
 export const westleyCroupConfig: CalculatorConfig = {
   name: 'Westley Croup Score',
+  description: '',
   shortName: 'Westley Croup',
   defaultAge: 6,
   defaultGender: 'Dreng',

@@ -100,6 +100,7 @@ export function createCentorQuestions(): Question[] {
 
 export const centorConfig: CalculatorConfig = {
   name: 'Modificerede Centor-kriterier',
+  description: 'Klinisk vurdering af sandsynlighed for GAS-faryngitis',
   shortName: 'Centor',
   defaultAge: 25,
   defaultGender: 'Mand',

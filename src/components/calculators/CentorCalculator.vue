@@ -21,14 +21,8 @@
           </template>
         </SurfaceCard>
 
-        <SurfaceCard>
+        <SurfaceCard :title="config.name" :description="config.description">
           <template #content>
-            <div class="mb-4 pl-1">
-              <h2 class="text-xl font-bold text-gray-800">{{ config.name }}</h2>
-              <p class="text-sm text-gray-500 mt-1">
-                Klinisk vurdering af sandsynlighed for GAS-faryngitis
-              </p>
-            </div>
 
             <form @submit.prevent="handleSubmit">
               <!-- Criteria cards -->

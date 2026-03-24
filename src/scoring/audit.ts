@@ -145,6 +145,7 @@ export function createAuditQuestions(): Question[] {
 
 export const auditConfig: CalculatorConfig = {
   name: 'AUDIT Alkoholafhængighedstest',
+  description: 'Klinisk vurdering af sandsynlighed for alkoholafhængighed',
   shortName: 'AUDIT',
   defaultAge: 50,
   defaultGender: 'Mand',

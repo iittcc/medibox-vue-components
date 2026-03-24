@@ -1,0 +1,72 @@
+[
+  {
+    "description": "All no — score 0 (low probability)",
+    "answers": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    "expectedScore": 0,
+    "expectedSeverity": "normal",
+    "expectedInterpretation": "Klinisk sandsynlighed for DVT er lav (3-5%)."
+  },
+  {
+    "description": "All yes (9 positive + 1 negative) — score 7",
+    "answers": [1, 1, 1, 1, 1, 1, 1, 1, 1, -2],
+    "expectedScore": 7,
+    "expectedSeverity": "severe",
+    "expectedInterpretation": "Klinisk sandsynlighed for DVT er høj (50-75%)."
+  },
+  {
+    "description": "Only alternative diagnosis — score -2 (low)",
+    "answers": [0, 0, 0, 0, 0, 0, 0, 0, 0, -2],
+    "expectedScore": -2,
+    "expectedSeverity": "normal",
+    "expectedInterpretation": "Klinisk sandsynlighed for DVT er lav (3-5%)."
+  },
+  {
+    "description": "At low/intermediate boundary — score 1 (intermediate)",
+    "answers": [1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    "expectedScore": 1,
+    "expectedSeverity": "moderate",
+    "expectedInterpretation": "Klinisk sandsynlighed for DVT er intermediær (15-20%)."
+  },
+  {
+    "description": "Just below intermediate — score 0 (low)",
+    "answers": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    "expectedScore": 0,
+    "expectedSeverity": "normal",
+    "expectedInterpretation": "Klinisk sandsynlighed for DVT er lav (3-5%)."
+  },
+  {
+    "description": "At intermediate/high boundary — score 3 (high)",
+    "answers": [1, 1, 1, 0, 0, 0, 0, 0, 0, 0],
+    "expectedScore": 3,
+    "expectedSeverity": "severe",
+    "expectedInterpretation": "Klinisk sandsynlighed for DVT er høj (50-75%)."
+  },
+  {
+    "description": "Just below high — score 2 (intermediate)",
+    "answers": [1, 1, 0, 0, 0, 0, 0, 0, 0, 0],
+    "expectedScore": 2,
+    "expectedSeverity": "moderate",
+    "expectedInterpretation": "Klinisk sandsynlighed for DVT er intermediær (15-20%)."
+  },
+  {
+    "description": "Two positive factors + alternative diagnosis — score 0 (low)",
+    "answers": [1, 1, 0, 0, 0, 0, 0, 0, 0, -2],
+    "expectedScore": 0,
+    "expectedSeverity": "normal",
+    "expectedInterpretation": "Klinisk sandsynlighed for DVT er lav (3-5%)."
+  },
+  {
+    "description": "All 9 positive factors without alt diagnosis — max score 9",
+    "answers": [1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
+    "expectedScore": 9,
+    "expectedSeverity": "severe",
+    "expectedInterpretation": "Klinisk sandsynlighed for DVT er høj (50-75%)."
+  },
+  {
+    "description": "Realistic pattern — cancer + previous DVT + leg swelling",
+    "answers": [0, 0, 1, 1, 0, 1, 0, 0, 0, 0],
+    "expectedScore": 3,
+    "expectedSeverity": "severe",
+    "expectedInterpretation": "Klinisk sandsynlighed for DVT er høj (50-75%)."
+  }
+]

@@ -53,6 +53,7 @@ export function createPuqeQuestions(): Question[] {
 
 export const puqeConfig: CalculatorConfig = {
   name: 'PUQE Scoringsskema',
+  description: '',
   shortName: 'PUQE',
   defaultAge: 28,
   defaultGender: 'Kvinde',

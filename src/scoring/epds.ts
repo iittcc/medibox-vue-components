@@ -157,6 +157,7 @@ export function createEpdsQuestions(): Question[] {
  */
 export const epdsConfig: CalculatorConfig = {
   name: 'Edinburgh Postnatal Depression Scale',
+  description: 'Klinisk vurdering af sandsynlighed for postnatal depression',
   shortName: 'EPDS',
   defaultAge: 35,
   defaultGender: 'Kvinde',

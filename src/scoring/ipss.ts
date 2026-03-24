@@ -119,6 +119,7 @@ export function createIpssQuestions(): Question[] {
 
 export const ipssConfig: CalculatorConfig = {
   name: 'IPSS, International prostata symptom score',
+  description: 'Klinisk vurdering af symptomer og funktionsnedsættelse i prostaten',
   shortName: 'IPSS',
   defaultAge: 50,
   defaultGender: 'Mand',
