@@ -18,24 +18,19 @@
 
         <SurfaceCard :title="config.name" :description="config.description">
           <template #content>
+            <p class="text-xs text-gray-500 mb-4 pl-1 leading-snug">
+              Det er vigtigt også at udspørge de pårørende om depressive symptomer hos patienten, da nogle patienter med depression underrapporterer symptomerne.
+            </p>
+
             <form @submit.prevent="handleSubmit">
-              <QuestionTabs
-                :activeTab="activeTab" @update:activeTab="activeTab = $event"
-                :sections="sections" name="ybocs"
-                :formSubmitted="formSubmitted" :isUnanswered="isUnanswered"
-              >
-                <template v-for="section in sections" :key="section.key" #[`before-${section.key}`]>
-                  <p class="text-xs text-gray-500 mb-3 pl-1 leading-snug">{{ section.description }}</p>
-                </template>
-              </QuestionTabs>
+              <QuestionSingleComponent
+                v-for="(question, index) in questions" :key="index"
+                name="gds15"
+                :question="question" :options="question.options" :index="index"
+                :is-unanswered="formSubmitted && isUnanswered(question)"
+              />
 
               <div v-if="validationMessage" class="text-red-500 mt-5 font-bold">{{ validationMessage }}</div>
-
-              <div class="flex justify-end mt-4 mb-8 gap-3">
-                <SecondaryButton v-if="!isFirstTab" label="Forrige afsnit" icon="pi pi-arrow-left" @click="prevTab" />
-                <SecondaryButton v-if="!isLastTab" label="Næste afsnit" icon="pi pi-arrow-right" iconPos="right" :disabled="!currentSectionComplete" @click="nextTab" />
-              </div>
-
               <div class="flex justify-end text-right mt-5 gap-3">
                 <CopyDialog title="Kopier til Clipboard" icon="pi pi-clipboard" severity="secondary" class="mr-3" :disabled="!hasResults">
                   <template #container>
@@ -48,7 +43,7 @@
                   </template>
                 </CopyDialog>
                 <SecondaryButton label="Print" icon="pi pi-print" severity="secondary" :disabled="!hasResults" @click="handlePrint" />
-                <SecondaryButton label="Reset" icon="pi pi-sync" severity="secondary" @click="handleReset" />
+                <SecondaryButton label="Reset" icon="pi pi-sync" severity="secondary" @click="reset" />
                 <Button type="submit" label="Beregn" class="pr-6 pl-6 rounded-lg" icon="pi pi-calculator" :disabled="!allQuestionsAnswered" />
               </div>
             </form>
@@ -63,7 +58,6 @@
                 <h2>{{ config.shortName }} Score {{ result!.score }} : {{ result!.interpretation }}</h2>
               </Message>
               <br />
-
               <div class="overflow-hidden rounded-lg border border-gray-200 mt-2">
                 <table class="w-full text-sm">
                   <thead>
@@ -85,7 +79,7 @@
         </div>
       </div>
 
-      <YbocsCalculatorPrint :config="config" :patient="patient" :result="result" />
+      <Gds15CalculatorPrint :config="config" :patient="patient" :result="result" />
     </div>
   </div>
 </template>
@@ -95,68 +89,37 @@ import { ref, computed } from 'vue'
 import Button from '@/volt/Button.vue'
 import SecondaryButton from '@/volt/SecondaryButton.vue'
 import Message from '@/volt/Message.vue'
-import QuestionTabs from '../QuestionTabs.vue'
+import QuestionSingleComponent from '../QuestionSingleComponent.vue'
 import CopyDialog from '../CopyDialog.vue'
 import SurfaceCard from '../SurfaceCard.vue'
 import PersonInfo from '../PersonInfo.vue'
-import YbocsCalculatorPrint from './YbocsCalculatorPrint.vue'
+import Gds15CalculatorPrint from './Gds15CalculatorPrint.vue'
 import { useCalculatorForm } from '../../composables/useCalculatorForm'
-import { ybocsConfig, calculateYbocs, YBOCS_SECTIONS } from '../../scoring/ybocs'
+import { gds15Config, calculateGds15 } from '../../scoring/gds15'
 import sendDataToServer from '../../assets/sendDataToServer'
 
-const config = ybocsConfig
-const { questions, patient, result, formSubmitted, validationMessage, hasResults, validate, calculate, reset, isUnanswered } = useCalculatorForm(config, calculateYbocs)
+const config = gds15Config
+const { questions, patient, result, formSubmitted, validationMessage, hasResults, validate, calculate, reset, isUnanswered } = useCalculatorForm(config, calculateGds15)
 const resultsSection = ref<HTMLDivElement | null>(null)
-const activeTab = ref('0')
 const apiUrlServer = import.meta.env.VITE_API_URL
 const apiUrl = apiUrlServer + '/index.php/callback/LogCB/log'
 const keyUrl = apiUrlServer + '/index.php/KeyServer/getPublicKey'
 
-const SECTION_DESCRIPTIONS: Record<number, string> = {
-  0: 'Spørgsmål 1-5 handler om dine tvangstanker. Tvangstanker er uvelkomne forestillinger, billeder eller indskydelser, som trænger sig ind i bevidstheden.',
-  1: 'Spørgsmål 6-10 handler om din tvangsadfærd. Tvangshandlinger er gentagne, bevidste handlinger som nedbringer angst eller ubehag.'
-}
-
-const sections = computed(() => {
-  const secs = YBOCS_SECTIONS
-  return secs.map((sec, i) => {
-    const nextStart = i < secs.length - 1 ? secs[i + 1].startIndex : questions.value.length
-    return {
-      key: String(i),
-      title: sec.title,
-      description: SECTION_DESCRIPTIONS[i] ?? '',
-      startIndex: sec.startIndex,
-      questions: questions.value.slice(sec.startIndex, nextStart)
-    }
-  })
-})
-
 const allQuestionsAnswered = computed(() => questions.value.every(q => q.answer !== null))
-const isFirstTab = computed(() => Number(activeTab.value) === 0)
-const isLastTab = computed(() => Number(activeTab.value) >= sections.value.length - 1)
-const currentSectionComplete = computed(() => {
-  const sec = sections.value[Number(activeTab.value)]
-  return sec ? sec.questions.every(q => q.answer !== null) : false
-})
-function nextTab() { activeTab.value = String(Number(activeTab.value) + 1) }
-function prevTab() { activeTab.value = String(Number(activeTab.value) - 1) }
 
 const scoreTable = [
-  { score: '0-14', interpretation: 'Ubetydelig til mild OCD' },
-  { score: '15-23', interpretation: 'Mild til moderat OCD' },
-  { score: '23-29', interpretation: 'Moderat til svær OCD' },
-  { score: '30-40', interpretation: 'Svær til invaliderende OCD' }
+  { score: '0-4', interpretation: 'Normal scoring' },
+  { score: '5-7', interpretation: 'Mulig depression' },
+  { score: '≥ 8', interpretation: 'Sandsynligvis depression' }
 ]
 
 const resultSeverityDisplay = computed(() => {
   if (!result.value) return 'info'
   if (result.value.severity === 'severe') return 'error'
   if (result.value.severity === 'moderate') return 'warn'
-  if (result.value.severity === 'mild') return 'success'
   return 'success'
 })
 
-function handleReset(): void { reset(); activeTab.value = '0' }
 function handleSubmit(): void {
   formSubmitted.value = true
   if (validate()) {

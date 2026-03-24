@@ -36,6 +36,11 @@ export function mountCalculator(component: Component) {
       stubs: {
         QuestionSingleComponent: questionStub,
         QuestionComponent: questionComponentStub,
+        QuestionTabs: {
+          props: ['activeTab', 'sections', 'name', 'formSubmitted', 'isUnanswered'],
+          emits: ['update:activeTab'],
+          template: '<div data-testid="question-tabs"><div v-for="s in sections" :key="s.key"><div v-for="(q, i) in s.questions" :key="i" data-testid="question"></div></div></div>'
+        },
         PersonInfo: {
           props: ['name', 'age', 'minAge', 'maxAge', 'gender', 'genderdisplay', 'showCpr', 'cpr', 'child'],
           emits: ['update:name', 'update:age', 'update:gender', 'update:cpr'],
@@ -80,7 +85,11 @@ export function mountCalculator(component: Component) {
         WellsPeCalculatorPrint: printStub,
         YbocsCalculatorPrint: printStub,
         AsrsCalculatorPrint: printStub,
-        AdhdrsCalculatorPrint: printStub
+        AdhdrsCalculatorPrint: printStub,
+        Gds15CalculatorPrint: printStub,
+        MdiCalculatorPrint: printStub,
+        HamiltonCalculatorPrint: printStub,
+        DepressionIcd10CalculatorPrint: printStub
       }
     }
   })

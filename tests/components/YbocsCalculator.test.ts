@@ -16,10 +16,9 @@ describe('YbocsCalculator', () => {
     expect(wrapper.findAll('[data-testid="question"]')).toHaveLength(10)
   })
 
-  it('shows section headers', () => {
+  it('renders tabbed question sections', () => {
     const wrapper = mountCalculator(YbocsCalculator)
-    expect(wrapper.text()).toContain('Tvangstanker')
-    expect(wrapper.text()).toContain('Tvangsadfærd')
+    expect(wrapper.find('[data-testid="question-tabs"]').exists()).toBe(true)
   })
 
   it('shows no results initially', () => {

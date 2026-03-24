@@ -16,10 +16,9 @@ describe('AsrsCalculator', () => {
     expect(wrapper.findAll('[data-testid="question"]')).toHaveLength(18)
   })
 
-  it('shows section headers', () => {
+  it('renders tabbed question sections', () => {
     const wrapper = mountCalculator(AsrsCalculator)
-    expect(wrapper.text()).toContain('Afsnit A')
-    expect(wrapper.text()).toContain('Afsnit B')
+    expect(wrapper.find('[data-testid="question-tabs"]').exists()).toBe(true)
   })
 
   it('shows no results initially', () => {

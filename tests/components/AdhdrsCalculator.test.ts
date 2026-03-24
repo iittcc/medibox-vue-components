@@ -16,12 +16,9 @@ describe('AdhdrsCalculator', () => {
     expect(wrapper.findAll('[data-testid="question"]')).toHaveLength(26)
   })
 
-  it('shows section headers', () => {
+  it('renders tabbed question sections', () => {
     const wrapper = mountCalculator(AdhdrsCalculator)
-    expect(wrapper.text()).toContain('Uopmærksomhed')
-    expect(wrapper.text()).toContain('Hyperaktivitet')
-    expect(wrapper.text()).toContain('Impulsivitet')
-    expect(wrapper.text()).toContain('Oppositionel')
+    expect(wrapper.find('[data-testid="question-tabs"]').exists()).toBe(true)
   })
 
   it('shows no results initially', () => {

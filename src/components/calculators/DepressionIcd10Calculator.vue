@@ -21,13 +21,9 @@
             <form @submit.prevent="handleSubmit">
               <QuestionTabs
                 :activeTab="activeTab" @update:activeTab="activeTab = $event"
-                :sections="sections" name="ybocs"
+                :sections="sections" name="icd10"
                 :formSubmitted="formSubmitted" :isUnanswered="isUnanswered"
-              >
-                <template v-for="section in sections" :key="section.key" #[`before-${section.key}`]>
-                  <p class="text-xs text-gray-500 mb-3 pl-1 leading-snug">{{ section.description }}</p>
-                </template>
-              </QuestionTabs>
+              />
 
               <div v-if="validationMessage" class="text-red-500 mt-5 font-bold">{{ validationMessage }}</div>
 
@@ -42,8 +38,8 @@
                     <b>{{ config.name }}</b><br /><br />
                     Navn: {{ patient.name }} <br />Køn: {{ patient.gender }} <br />Alder: {{ patient.age }} år<br /><br />
                     <template v-if="result">
-                      <div v-for="qr in result.questionResults" :key="qr.questionNumber">{{ qr.questionText }}: {{ qr.answerText }} ({{ qr.score }})</div>
-                      <br /><br />{{ config.shortName }} Score {{ result.score }} : {{ result.interpretation }}
+                      <div v-for="qr in result.questionResults" :key="qr.questionNumber">{{ qr.questionText }}: {{ qr.answerText }}</div>
+                      <br /><br />{{ result.interpretation }}
                     </template>
                   </template>
                 </CopyDialog>
@@ -60,23 +56,22 @@
             <template #content>
               <br />
               <Message class="flex justify-center p-3 text-center" :severity="resultSeverityDisplay">
-                <h2>{{ config.shortName }} Score {{ result!.score }} : {{ result!.interpretation }}</h2>
+                <h2>{{ result!.interpretation }}</h2>
               </Message>
               <br />
-
               <div class="overflow-hidden rounded-lg border border-gray-200 mt-2">
                 <table class="w-full text-sm">
                   <thead>
                     <tr class="border-b border-gray-200" :style="{ backgroundColor: 'var(--p-primary-50)' }">
-                      <th class="px-3 py-2 text-left font-semibold text-gray-700">Score</th>
-                      <th class="px-3 py-2 text-left font-semibold text-gray-700">Fortolkning</th>
+                      <th class="px-3 py-2 text-left font-semibold text-gray-700">Kriterier</th>
+                      <th class="px-3 py-2 text-left font-semibold text-gray-700">Sværhedsgrad</th>
+                      <th class="px-3 py-2 text-left font-semibold text-gray-700">Behandling</th>
                     </tr>
                   </thead>
                   <tbody>
-                    <tr v-for="row in scoreTable" :key="row.score" class="border-b border-gray-100 last:border-b-0 text-gray-600">
-                      <td class="px-3 py-1.5">{{ row.score }}</td>
-                      <td class="px-3 py-1.5">{{ row.interpretation }}</td>
-                    </tr>
+                    <tr class="border-b border-gray-100 text-gray-600"><td class="px-3 py-1.5">3A + 2B + 2C</td><td class="px-3 py-1.5">Let depression</td><td class="px-3 py-1.5">Samtaleterapi</td></tr>
+                    <tr class="border-b border-gray-100 text-gray-600"><td class="px-3 py-1.5">3A + 2B + 4C</td><td class="px-3 py-1.5">Moderat depression</td><td class="px-3 py-1.5">Samtaleterapi, evt. medicin</td></tr>
+                    <tr class="text-gray-600"><td class="px-3 py-1.5">3A + 3B + 5C</td><td class="px-3 py-1.5">Svær depression</td><td class="px-3 py-1.5">Medicinsk behandling</td></tr>
                   </tbody>
                 </table>
               </div>
@@ -85,7 +80,7 @@
         </div>
       </div>
 
-      <YbocsCalculatorPrint :config="config" :patient="patient" :result="result" />
+      <DepressionIcd10CalculatorPrint :config="config" :patient="patient" :result="result" />
     </div>
   </div>
 </template>
@@ -99,35 +94,24 @@ import QuestionTabs from '../QuestionTabs.vue'
 import CopyDialog from '../CopyDialog.vue'
 import SurfaceCard from '../SurfaceCard.vue'
 import PersonInfo from '../PersonInfo.vue'
-import YbocsCalculatorPrint from './YbocsCalculatorPrint.vue'
+import DepressionIcd10CalculatorPrint from './DepressionIcd10CalculatorPrint.vue'
 import { useCalculatorForm } from '../../composables/useCalculatorForm'
-import { ybocsConfig, calculateYbocs, YBOCS_SECTIONS } from '../../scoring/ybocs'
+import { depressionIcd10Config, calculateDepressionIcd10, ICD10_SECTIONS } from '../../scoring/depressionIcd10'
 import sendDataToServer from '../../assets/sendDataToServer'
 
-const config = ybocsConfig
-const { questions, patient, result, formSubmitted, validationMessage, hasResults, validate, calculate, reset, isUnanswered } = useCalculatorForm(config, calculateYbocs)
+const config = depressionIcd10Config
+const { questions, patient, result, formSubmitted, validationMessage, hasResults, validate, calculate, reset, isUnanswered } = useCalculatorForm(config, calculateDepressionIcd10)
 const resultsSection = ref<HTMLDivElement | null>(null)
 const activeTab = ref('0')
 const apiUrlServer = import.meta.env.VITE_API_URL
 const apiUrl = apiUrlServer + '/index.php/callback/LogCB/log'
 const keyUrl = apiUrlServer + '/index.php/KeyServer/getPublicKey'
 
-const SECTION_DESCRIPTIONS: Record<number, string> = {
-  0: 'Spørgsmål 1-5 handler om dine tvangstanker. Tvangstanker er uvelkomne forestillinger, billeder eller indskydelser, som trænger sig ind i bevidstheden.',
-  1: 'Spørgsmål 6-10 handler om din tvangsadfærd. Tvangshandlinger er gentagne, bevidste handlinger som nedbringer angst eller ubehag.'
-}
-
 const sections = computed(() => {
-  const secs = YBOCS_SECTIONS
+  const secs = ICD10_SECTIONS
   return secs.map((sec, i) => {
     const nextStart = i < secs.length - 1 ? secs[i + 1].startIndex : questions.value.length
-    return {
-      key: String(i),
-      title: sec.title,
-      description: SECTION_DESCRIPTIONS[i] ?? '',
-      startIndex: sec.startIndex,
-      questions: questions.value.slice(sec.startIndex, nextStart)
-    }
+    return { key: String(i), title: sec.title, startIndex: sec.startIndex, questions: questions.value.slice(sec.startIndex, nextStart) }
   })
 })
 
@@ -140,13 +124,6 @@ const currentSectionComplete = computed(() => {
 })
 function nextTab() { activeTab.value = String(Number(activeTab.value) + 1) }
 function prevTab() { activeTab.value = String(Number(activeTab.value) - 1) }
-
-const scoreTable = [
-  { score: '0-14', interpretation: 'Ubetydelig til mild OCD' },
-  { score: '15-23', interpretation: 'Mild til moderat OCD' },
-  { score: '23-29', interpretation: 'Moderat til svær OCD' },
-  { score: '30-40', interpretation: 'Svær til invaliderende OCD' }
-]
 
 const resultSeverityDisplay = computed(() => {
   if (!result.value) return 'info'

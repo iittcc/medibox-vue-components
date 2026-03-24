@@ -33,31 +33,11 @@
             </p>
 
             <form @submit.prevent="handleSubmit">
-              <Tabs :value="activeTab" @update:value="activeTab = $event"
-              :pt="{
-                root: 'bg-surface-0 dark:bg-surface-900 text-surface-700 dark:text-surface-0 pt-[0.875rem] pb-0 px-[1.125rem] outline-none'
-              }"
-              :ptOptions="{ mergeProps: true }">
-                <TabList >
-                  <Tab v-for="section in sections" :key="section.key" :value="section.key">
-                    {{ section.title }}
-                  </Tab>
-                </TabList>
-                <TabPanels :pt="{
-                root: 'bg-surface-0 dark:bg-surface-900 text-surface-700 dark:text-surface-0 pt-[0.875rem] pb-0 px-[1.125rem] outline-none'
-              }"
-              :ptOptions="{ mergeProps: true }">
-                  <TabPanel v-for="section in sections" :key="section.key" :value="section.key">
-                    <QuestionSingleComponent
-                      v-for="(question, qIdx) in section.questions"
-                      :key="section.startIndex + qIdx"
-                      name="adhdrs"
-                      :question="question" :options="question.options" :index="section.startIndex + qIdx"
-                      :is-unanswered="formSubmitted && isUnanswered(question)"
-                    />
-                  </TabPanel>
-                </TabPanels>
-              </Tabs>
+              <QuestionTabs
+                :activeTab="activeTab" @update:activeTab="activeTab = $event"
+                :sections="sections" name="adhdrs"
+                :formSubmitted="formSubmitted" :isUnanswered="isUnanswered"
+              />
 
               <div v-if="validationMessage" class="text-red-500 mt-5 font-bold">{{ validationMessage }}</div>
 
@@ -86,7 +66,7 @@
                   </template>
                 </CopyDialog>
                 <SecondaryButton label="Print" icon="pi pi-print" severity="secondary" :disabled="!hasResults" @click="handlePrint" />
-                <SecondaryButton label="Reset" icon="pi pi-sync" severity="secondary" @click="reset" />
+                <SecondaryButton label="Reset" icon="pi pi-sync" severity="secondary" @click="handleReset" />
                 <Button type="submit" label="Beregn" class="pr-6 pl-6 rounded-lg" icon="pi pi-calculator" :disabled="!allQuestionsAnswered" />
               </div>
             </form>
@@ -177,12 +157,7 @@ import { ref, computed } from 'vue'
 import Button from '@/volt/Button.vue'
 import SecondaryButton from '@/volt/SecondaryButton.vue'
 import Message from '@/volt/Message.vue'
-import Tabs from '@/volt/Tabs.vue'
-import TabList from '@/volt/TabList.vue'
-import Tab from '@/volt/Tab.vue'
-import TabPanels from '@/volt/TabPanels.vue'
-import TabPanel from '@/volt/TabPanel.vue'
-import QuestionSingleComponent from '../QuestionSingleComponent.vue'
+import QuestionTabs from '../QuestionTabs.vue'
 import CopyDialog from '../CopyDialog.vue'
 import SurfaceCard from '../SurfaceCard.vue'
 import PersonInfo from '../PersonInfo.vue'
@@ -233,6 +208,7 @@ const resultSeverityDisplay = computed(() => {
   return 'success'
 })
 
+function handleReset(): void { reset(); activeTab.value = '0' }
 function handleSubmit(): void {
   formSubmitted.value = true
   if (validate()) {
