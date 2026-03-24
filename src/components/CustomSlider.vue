@@ -17,7 +17,7 @@
       <div v-if="isTooltipVisible" class="tooltip" :style="tooltipStyle">{{ modelValue }}</div>
     </div>
   </template>
-  
+
   <script setup lang="ts">
   import { ref, computed } from 'vue';
 
@@ -80,14 +80,14 @@
     '--value': props.modelValue,
   }));
   </script>
-  
+
   <style scoped>
 
   .slider-container {
     position: relative;
     width: 100%;
   }
-  
+
   .slider {
     width: 100%;
     height: 3px;
@@ -97,29 +97,29 @@
     border-radius: 6px;
     background: linear-gradient(
       to right,
-      var(--color-red-600) 0%,
-      var(--color-red-300) calc((var(--normalMin) - var(--min)) / (var(--max) - var(--min)) * 100%),
-      var(--color-green-600) calc((var(--normalMin) - var(--min)) / (var(--max) - var(--min)) * 100%),
-      var(--color-green-600) calc((var(--normalMax) - var(--min)) / (var(--max) - var(--min)) * 100%),
-      var(--color-red-300) calc((var(--normalMax) - var(--min)) / (var(--max) - var(--min)) * 100%),
-      var(--color-red-600) 100%
+      var(--p-red-600) 0%,
+      var(--p-red-300) calc((var(--normalMin) - var(--min)) / (var(--max) - var(--min)) * 100%),
+      var(--p-green-600) calc((var(--normalMin) - var(--min)) / (var(--max) - var(--min)) * 100%),
+      var(--p-green-600) calc((var(--normalMax) - var(--min)) / (var(--max) - var(--min)) * 100%),
+      var(--p-red-300) calc((var(--normalMax) - var(--min)) / (var(--max) - var(--min)) * 100%),
+      var(--p-red-600) 100%
     );
   }
-  
+
   .slider::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
     height: 20px;
     width: 20px;
     background: #fff;
-    border: 2px solid var(--color-gray-200);
+    border: 2px solid var(--p-gray-200);
     border-radius: 50%;
     transition: background-color 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s, outline-color 0.2s;
     outline-color: transparent;
     cursor: grab;
     box-shadow: 0 0 0 2px var(--p-surface-ground); /* Add this line */
   }
-  
+
   .slider::-moz-range-thumb {
     width: 20px;
     height: 20px;
@@ -134,8 +134,8 @@
   width: 40px;
   transform: translateX(-0%);
   padding: 5px 10px;
-  background:var(--color-gray-100);
-  color: var(--color-gray-700);
+  background:var(--p-gray-100);
+  color: var(--p-gray-700);
   border-radius: 4px;
   font-size: 12px;
   text-align: center;

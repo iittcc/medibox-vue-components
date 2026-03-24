@@ -1,7 +1,7 @@
 <!-- src/components/RiskAssessment.vue -->
 <template>
   <div class="medical-calculator-container">
-    <div class="w-full max-w-[800px] mx-auto px-4">
+    <div class="calculator-interactive-view w-full max-w-[800px] mx-auto px-4">
     <SurfaceCard title="Oplysninger">
       <template #button
         ><CopyDialog
