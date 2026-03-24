@@ -88,9 +88,9 @@ const printTimestamp = computed(() => {
   Setting height:0 + overflow:hidden on all non-print elements eliminates them.
 */
 
-/* Hidden on screen */
+/* Hidden on screen — !important needed to override MediBOX Bootstrap styles */
 .calculator-print-view {
-  display: none;
+  display: none !important;
 }
 
 @media print {

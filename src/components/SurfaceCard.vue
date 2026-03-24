@@ -4,7 +4,7 @@
       <div
         class="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-3 w-full"
       >
-        <div class="text-3xl font-medium mb-1">{{ title }}</div>
+        <div class="text-2xl font-medium mb-1 text-surface-600">{{ title }}</div>
         <div class="inline-flex items-end">
           <div class="text-right">
             <slot name="button"></slot>

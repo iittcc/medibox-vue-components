@@ -23,12 +23,12 @@
   </div>
 
   <div v-else-if="question.type === 'Listbox'">
-      <div :class="['pb-0', { 'border-r-2 border-l-2 border-red-400': isUnanswered }, 'flex', 'pl-0', 'pt-1', 'w-full', 'pb-0', 'flex-col', 'md:flex-row', 'ml-1', 'pr-1', 'mb-0','mt-1', 'rounded-xl', 'justify-between']" :style="{ backgroundColor: 'var(' + question.bg + ')' }">
-        <div class="md:w-1/2 w-full p-0">
-          <p class="text-base font-bold pl-2">{{ question.text }}</p>
-          <p class="text-base text-gray-500 pl-2">{{ question.description }}</p>
+      <div :class="['pb-0', { 'border-r-2 border-l-2 border-red-400': isUnanswered }, 'flex', 'pl-0', 'pt-1', 'w-full', 'pb-0', 'flex-col', 'lg:flex-row', 'ml-1', 'pr-1', 'mb-0','mt-1', 'rounded-xl', 'justify-between']" :style="{ backgroundColor: 'var(' + question.bg + ')' }">
+        <div class="w-full p-0">
+          <p class="text-md font-normal pl-2">{{ question.text }}</p>
+          <p class="text-sm font-normal text-gray-500 pl-2">{{ question.description }}</p>
         </div>
-        <div class="md:w-1/2 w-full h-full p-2 flex-initial" >
+        <div class="md:w-[347px]] w-full h-fit p-2 flex-initial" >
           <div class="text-left items-center" >
             <Listbox
               v-model="currentAnswer"
@@ -38,15 +38,15 @@
               class="md:ml-3 h-full"
               scrollHeight="none"
               :pt="{
-                root: 'bg-gray-50 border border-gray-200 rounded-lg shadow-sm',
-                list: 'p-2 space-y-1',
+                root: 'bg-gray-50 border border-gray-200 rounded-lg shadow-sm ',
+                list: 'p-1 space-y-0 my-0',
                 option: 'px-3 py-2 rounded-md cursor-pointer hover:bg-primary-600 hover:text-white active:bg-primary-600 focus:bg-surface-200 hover:p-selected:bg-primary-600 transition-colors p-selected:bg-primary-500 p-selected:text-white',
                 optionGroup: 'px-3 py-2 font-semibold text-gray-500'
               }"
               :ptOptions="{ mergeProps: true }"
             >
               <template #option="slotProps">
-                <div class="flex items-center justify-between w-full h-full py-0 my-0" :class="{ 'font-medium': isSelected(slotProps.option.value) }">
+                <div class="flex items-center justify-between w-full h-full py-0 my-0" :class="{ 'font-bold': isSelected(slotProps.option.value) }">
                   <span class="">{{ slotProps.option.text }}</span>
                   <span class="text-right">{{ (slotProps.option.value > 0) ? '+ '+slotProps.option.value : (slotProps.option.value < 0) ? '- '+Math.abs(slotProps.option.value) : slotProps.option.value }}</span>
                 </div>

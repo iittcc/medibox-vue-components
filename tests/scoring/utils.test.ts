@@ -91,4 +91,15 @@ describe('calculateSimpleSum', () => {
     expect(result.score).toBe(0)
     expect(result.questionResults).toHaveLength(0)
   })
+
+  it('returns empty answerText when answer does not match any option', () => {
+    const questions: Question[] = [{
+      type: 'Listbox',
+      text: 'Q1',
+      options: [{ text: 'A', value: 0 }, { text: 'B', value: 1 }],
+      answer: 99
+    }]
+    const result = calculateSimpleSum(questions, testThresholds)
+    expect(result.questionResults[0].answerText).toBe('')
+  })
 })

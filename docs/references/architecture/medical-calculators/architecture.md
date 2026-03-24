@@ -41,32 +41,76 @@ Each calculator follows a 4-component architecture that separates clinical conte
 src/vue-components/
   src/
     scoring/
-      types.ts                          # Shared interfaces
+      types.ts                          # Shared interfaces (Question, ScoreResult, etc.)
+      utils.ts                          # calculateSimpleSum() shared utility
       epds.ts                           # EPDS config + scoring (REFERENCE)
-      audit.ts                          # Audit config + scoring
-      ...
+      audit.ts                          # AUDIT config + scoring
+      who5.ts                           # WHO-5 config + scoring (×4 multiplier)
+      puqe.ts                           # PUQE config + scoring (values start at 1)
+      westleyCroupScore.ts              # Westley Croup config + scoring
+      gcs.ts                            # GCS config + scoring (defaults to best response)
+      ipss.ts                           # IPSS config + scoring (7 questions with descriptions)
+      lrti.ts                           # LRTI config + scoring (boolean Toggle questions)
+      danpss.ts                         # DANPSS custom types + A×B product scoring
     composables/
-      useCalculatorForm.ts              # Shared form state composable
+      useCalculatorForm.ts              # Shared form state (simple-sum calculators)
+      useDanpssForm.ts                  # DANPSS-specific dual A/B form state
     components/
       calculators/
-        CalculatorPrintLayout.vue       # Shared A4 print wrapper
+        CalculatorPrintLayout.vue       # Shared A4 print wrapper (showCpr prop)
         EpdsCalculator.vue              # EPDS orchestrator (REFERENCE)
         EpdsCalculatorPrint.vue         # EPDS print view
-        AuditCalculator.vue             # Audit orchestrator
-        AuditCalculatorPrint.vue        # Audit print view
-        ...
+        AuditCalculator.vue             # AUDIT orchestrator
+        AuditCalculatorPrint.vue        # AUDIT print view
+        Who5Calculator.vue              # WHO-5 orchestrator
+        Who5CalculatorPrint.vue         # WHO-5 print view
+        PuqeCalculator.vue              # PUQE orchestrator
+        PuqeCalculatorPrint.vue         # PUQE print view
+        WestleyCroupCalculator.vue      # Westley Croup orchestrator
+        WestleyCroupCalculatorPrint.vue # Westley Croup print view
+        GcsCalculator.vue               # GCS orchestrator
+        GcsCalculatorPrint.vue          # GCS print view
+        IpssCalculator.vue              # IPSS orchestrator
+        IpssCalculatorPrint.vue         # IPSS print view
+        LrtiCalculator.vue              # LRTI orchestrator (ToggleButtons)
+        LrtiCalculatorPrint.vue         # LRTI print view
+        DanpssCalculator.vue            # DANPSS orchestrator (QuestionComponent, charts)
+        DanpssCalculatorPrint.vue       # DANPSS print view (section table)
       PersonInfo.vue                    # Patient info (name, age, gender, CPR)
-      QuestionSingleComponent.vue       # Question renderer
+      QuestionSingleComponent.vue       # Single-answer question renderer
+      QuestionComponent.vue             # Dual A/B question renderer (DANPSS)
       CopyDialog.vue                    # Copy to clipboard
       SurfaceCard.vue                   # Card wrapper
-    epds.ts                             # Entry point
-    audit.ts                            # Entry point
-    ...
+    epds.ts                             # Entry points (one per calculator)
+    audit.ts
+    who-5.ts
+    puqe.ts
+    westleyCroupScore.ts
+    gcs.ts
+    ipss.ts
+    lrti.ts
+    danpss.ts
   tests/
-    scoring/
-      epds-scoring.test.ts              # Parity tests
-      fixtures/
-        epds-legacy-results.json        # Reference data
+    scoring/                            # Parity tests (one per calculator)
+      utils.test.ts                     # Shared utility tests
+      epds-scoring.test.ts
+      audit-scoring.test.ts
+      who5-scoring.test.ts
+      puqe-scoring.test.ts
+      westleyCroupScore-scoring.test.ts
+      gcs-scoring.test.ts
+      ipss-scoring.test.ts
+      lrti-scoring.test.ts
+      danpss-scoring.test.ts
+      fixtures/                         # JSON reference data per calculator
+    components/                         # Component tests (one per calculator)
+      calculator-test-helper.ts         # Shared stubs for mountCalculator()
+      AuditCalculator.test.ts
+      Who5Calculator.test.ts
+      ...
+    unit/                               # Composable tests
+      useCalculatorForm.test.ts
+      useDanpssForm.test.ts
 ```
 
 ## Calculator Inventory
@@ -85,20 +129,10 @@ src/vue-components/
 | Score2 | 3 inputs | Lookup table, Chart.js | teal | Very hard | To migrate |
 | MedicinBoern | Cascading dropdowns | Drug lookup, weight formula | sky | Very hard | To migrate |
 
-### Recommended Migration Order
+### Remaining (not yet migrated)
 
-Migrate by similarity to the reference implementation (EPDS), not by usage frequency:
-
-1. **AUDIT** — closest to EPDS (10 questions, simple sum, same UI pattern)
-2. **WHO-5** — 5 questions, simple sum with ×4 multiplier
-3. **PUQE** — 3 questions, simple sum
-4. **Westley Croup** — 5 questions, simple sum
-5. **GCS** — 3 questions, simple sum but different option ranges per question
-6. **IPSS** — 8 questions, simple sum
-7. **LRTI** — boolean toggles instead of select questions (needs `useCalculatorForm` extension)
-8. **DANPSS** — multi-section with dual A/B scoring (needs composable extension)
-9. **Score2** — lookup table + Chart.js (may keep custom component, just extract scoring)
-10. **MedicinBoern** — cascading dropdowns (may keep custom component, just extract logic)
+- **Score2** — lookup table + Chart.js (needs custom scoring approach, not question-based)
+- **MedicinBoern** — cascading dropdowns for drug dosing (not a scoring calculator)
 
 ---
 
@@ -171,37 +205,23 @@ export const auditConfig: CalculatorConfig = {
 
 **Where to find defaults:** Look at the old component's `PersonInfo` bindings for `defaultAge`, `defaultGender`, `minAge`, `maxAge`.
 
-**1c. Write the pure scoring function:**
+**1c. Write the pure scoring function using the shared utility:**
 
 ```typescript
+import { calculateSimpleSum } from './utils'
+
+// Simple-sum calculators delegate to the shared utility:
 export function calculateAudit(questions: Question[]): ScoreResult {
-  const questionResults: QuestionResult[] = questions.map((q, index) => {
-    const score = q.answer ?? 0
-    const selectedOption = q.options.find(opt => opt.value === score)
-    return {
-      questionNumber: `${index + 1}`,
-      questionText: q.text,
-      answerText: selectedOption?.text ?? '',
-      score
-    }
-  })
+  return calculateSimpleSum(questions, auditConfig.thresholds)
+}
 
-  const totalScore = questionResults.reduce((sum, r) => sum + r.score, 0)
-
-  const threshold = auditConfig.thresholds.find(
-    t => totalScore >= t.minScore && totalScore <= t.maxScore
-  )
-
-  return {
-    score: totalScore,
-    interpretation: threshold?.interpretation ?? '',
-    severity: threshold?.severity ?? 'normal',
-    questionResults
-  }
+// WHO-5 uses the optional score multiplier (raw sum × 4):
+export function calculateWho5(questions: Question[]): ScoreResult {
+  return calculateSimpleSum(questions, who5Config.thresholds, 4)
 }
 ```
 
-**This function is identical for all simple-sum calculators.** Only the config (thresholds) differs.
+**All simple-sum calculators use `calculateSimpleSum()` from `src/scoring/utils.ts`.** Only the config (thresholds) and optional multiplier differ.
 
 ### Step 2: Write Parity Tests
 
@@ -392,17 +412,25 @@ Verify the CSS file exists in `dist/<name>.min.css` and is referenced in `functi
 
 ---
 
-## Handling Complex Calculators
+## Complex Calculator Implementations
 
-### Multi-Section (DANPSS)
+### Multi-Section (DANPSS) — Implemented
 
-DANPSS has 4 sections with dual A/B scoring per question. Extend the approach:
+DANPSS uses a completely separate architecture from simple-sum calculators:
 
-- `CalculatorConfig.questions` becomes a flat array but with section markers
-- Add a `section` field to the `Question` interface or group questions in the scoring function
-- The scoring function computes per-section subtotals + overall total
-- The `ScoreResult` interface may need extension for subscale results (use the `details` field)
-- Optional section 4: handle in `validate()` — skip validation for unanswered optional questions
+- **Custom types** in `src/scoring/danpss.ts`: `DanpssQuestion` (dual answerA/answerB), `DanpssScoreResult` (section subtotals)
+- **Custom composable** `src/composables/useDanpssForm.ts`: handles dual answers, section grouping, optional section 4 validation
+- **Product scoring**: score per question = `answerA × answerB` (not sum)
+- **4 sections**: Tømning (4q), Fyldning (4q), Andre symptomer (4q), Seksualfunktion (3q, optional)
+- **Total** based on sections 1-3 only; section 4 is separate
+- **Thresholds** on totalAB: <8 mild, 8-19 moderate, >19 severe
+- **Print view** includes a section results table with Interval column
+
+Does NOT use `useCalculatorForm` or `calculateSimpleSum`.
+
+### LRTI (Boolean Toggles) — Implemented
+
+LRTI models 8 boolean symptoms as standard Questions with `type: 'Toggle'` and binary options `[{text:'Nej', value:0}, {text:'Ja', value:1}]`. The orchestrator renders `ToggleButton` components. Uses the standard `useCalculatorForm` composable unchanged.
 
 ### Lookup Table (Score2)
 
@@ -472,25 +500,20 @@ This is not a scoring calculator — it's a dosing lookup tool:
 
 ---
 
-## Checklist — Use for Each Calculator Migration
+## Checklist — For Future Calculator Migrations (Score2, MedicinBoern)
 
-- [ ] Read the old `<Name>Score.vue` and understand the scoring logic
-- [ ] Create `src/scoring/<name>.ts` with config + factory + scoring function
+- [ ] Create `src/scoring/<name>.ts` with config + factory + scoring function (use `calculateSimpleSum` if applicable)
 - [ ] Verify threshold values against clinical guidelines
 - [ ] Create `tests/scoring/fixtures/<name>-legacy-results.json` with boundary cases
 - [ ] Create `tests/scoring/<name>-scoring.test.ts` — run and verify all pass
 - [ ] Create `src/components/calculators/<Name>Calculator.vue` (copy from EPDS, adapt)
 - [ ] Create `src/components/calculators/<Name>CalculatorPrint.vue` (copy from EPDS, adapt)
+- [ ] Create `tests/components/<Name>Calculator.test.ts` (use `calculator-test-helper.ts`)
 - [ ] Update `src/<name>.ts` entry point to import new component
-- [ ] Create `src/<name>.html` file for development and add to links in `index.html`
-- [ ] Add files to `src/tsconfig.app.json` and `vite.config.ts`
-- [ ] Run tests: `npx vitest run tests/scoring/<name>-scoring.test.ts`
-- [ ] Run component test in browser: `npm run dev` and open `http://localhost:5173/<name>.html`
-- [ ] Browser test: fill form → calculate → verify score
-- [ ] Run ALL tests: `npx vitest run` (400+ must pass)
+- [ ] Create `src/<name>.html` file for development
+- [ ] Run ALL tests: `cd src/vue-components && npx vitest run` (467+ must pass)
 - [ ] Build: `npm run build` (from `src/vue-components/`)
-- [ ] Deploy: `npx gulp vue` (from project root)
+- [ ] Deploy: `cd ~/localhost/medibox && npx gulp vue`
 - [ ] Verify `functions.php` has correct CSS reference (`<name>.min.css`)
 - [ ] Browser test: fill form → calculate → verify score
 - [ ] Browser test: print → verify one A4 page, logo, no chrome, no ghost pages
-- [ ] Browser test: other calculators still work (no regressions)

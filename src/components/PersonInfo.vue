@@ -2,10 +2,10 @@
     <!-- Layout with CPR: 2-row grid -->
     <div v-if="showCpr" class="grid grid-cols-[auto_1fr] md:grid-cols-[auto_1fr_auto_1fr] gap-x-3 gap-y-4 w-full items-center">
         <!-- Row 1: Navn + CPR -->
-        <label for="personName" class="inline-flex items-center gap-1 whitespace-nowrap"><i class="pi pi-user"></i> Navn:</label>
+        <span for="personName" class="inline-flex items-center gap-1 whitespace-nowrap"><i class="pi pi-user"></i> Navn:</span>
         <InputText class="w-full" v-model="localName" placeholder="Indtast navn" @input="updateName" id="personName"/>
 
-        <label for="personCpr" class="inline-flex items-center gap-1 whitespace-nowrap"><i class="pi pi-id-card"></i> CPR:</label>
+        <span for="personCpr" class="inline-flex items-center gap-1 whitespace-nowrap"><i class="pi pi-id-card"></i> CPR:</span>
         <InputText class="w-full" v-model="localCpr" placeholder="Indtast CPR" @input="updateCpr" id="personCpr"/>
 
         <!-- Row 2: Køn + Alder -->
@@ -19,7 +19,7 @@
             />
         </div>
 
-        <label for="personAge" class="inline-flex items-center gap-1 whitespace-nowrap"><i class="pi pi-clock"></i> Alder:</label>
+        <span for="personAge" class="inline-flex items-center gap-1 whitespace-nowrap"><i class="pi pi-clock"></i> Alder:</span>
         <div class="min-w-0">
             <NumberSliderInput
                   v-model="localAge"

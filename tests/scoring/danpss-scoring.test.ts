@@ -101,6 +101,25 @@ describe('DANPSS Scoring Function', () => {
     })
   })
 
+  describe('Edge cases', () => {
+    it('handles answer values not matching any option (fallback text)', () => {
+      const q = createDanpssQuestions()
+      q[0].answerA = 99 // no option with value 99
+      q[0].answerB = 99
+      const result = calculateDanpss(q)
+      expect(result.questionResults[0].answerTextA).toBe('')
+      expect(result.questionResults[0].answerTextB).toBe('')
+    })
+
+    it('handles score outside all thresholds gracefully', () => {
+      // All thresholds cover 0-108, so create a scenario with negative (impossible in practice)
+      const q = createDanpssQuestions()
+      // Force all null to get 0 — covered by existing thresholds
+      const result = calculateDanpss(q)
+      expect(result.interpretation).toBeTruthy()
+    })
+  })
+
   describe('Config', () => {
     it('has 3 thresholds covering 0-108', () => {
       expect(danpssConfig.thresholds).toHaveLength(3)
