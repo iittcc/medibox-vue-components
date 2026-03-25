@@ -1,0 +1,72 @@
+[
+  {
+    "description": "All minimum scores (0)",
+    "answers": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    "expectedScore": 0,
+    "expectedSeverity": "normal",
+    "expectedInterpretation": "Ingen angsttilstand"
+  },
+  {
+    "description": "All maximum scores (4)",
+    "answers": [4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4],
+    "expectedScore": 56,
+    "expectedSeverity": "severe",
+    "expectedInterpretation": "Svær angsttilstand"
+  },
+  {
+    "description": "At threshold boundary: score 7 (normal)",
+    "answers": [1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0],
+    "expectedScore": 7,
+    "expectedSeverity": "normal",
+    "expectedInterpretation": "Ingen angsttilstand"
+  },
+  {
+    "description": "At threshold boundary: score 8 (questionable)",
+    "answers": [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0],
+    "expectedScore": 8,
+    "expectedSeverity": "mild",
+    "expectedInterpretation": "Tvivlsom angsttilstand"
+  },
+  {
+    "description": "At threshold boundary: score 14 (questionable)",
+    "answers": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    "expectedScore": 14,
+    "expectedSeverity": "mild",
+    "expectedInterpretation": "Tvivlsom angsttilstand"
+  },
+  {
+    "description": "At threshold boundary: score 15 (mild)",
+    "answers": [2, 2, 2, 2, 2, 2, 2, 1, 0, 0, 0, 0, 0, 0],
+    "expectedScore": 15,
+    "expectedSeverity": "moderate",
+    "expectedInterpretation": "Lettere angsttilstand"
+  },
+  {
+    "description": "At threshold boundary: score 19 (mild)",
+    "answers": [2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 0, 0, 0, 0],
+    "expectedScore": 19,
+    "expectedSeverity": "moderate",
+    "expectedInterpretation": "Lettere angsttilstand"
+  },
+  {
+    "description": "At threshold boundary: score 20 (moderate)",
+    "answers": [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0],
+    "expectedScore": 20,
+    "expectedSeverity": "moderate",
+    "expectedInterpretation": "Moderat angsttilstand"
+  },
+  {
+    "description": "At threshold boundary: score 29 (moderate)",
+    "answers": [3, 3, 3, 3, 3, 3, 3, 3, 2, 2, 1, 0, 0, 0],
+    "expectedScore": 29,
+    "expectedSeverity": "moderate",
+    "expectedInterpretation": "Moderat angsttilstand"
+  },
+  {
+    "description": "At threshold boundary: score 30 (severe)",
+    "answers": [3, 3, 3, 3, 3, 3, 3, 3, 2, 2, 1, 1, 0, 0],
+    "expectedScore": 30,
+    "expectedSeverity": "severe",
+    "expectedInterpretation": "Svær angsttilstand"
+  }
+]

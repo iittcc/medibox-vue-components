@@ -1,0 +1,98 @@
+[
+  {
+    "description": "All minimum scores — no positive screenings",
+    "answers": [0,0,0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0, 0,0,0,0, 0,0,0,0,0,0, 0,0,0,0],
+    "expectedPositiveCount": 0,
+    "expectedSubscales": {
+      "symptom": { "score": 0, "positive": false },
+      "helbredsangst": { "score": 0, "positive": false },
+      "angsttilstand": { "score": 0, "positive": false },
+      "depression": { "score": 0, "positive": false },
+      "alkoholproblem": { "score": 0, "positive": false }
+    }
+  },
+  {
+    "description": "All maximum scores — all positive screenings",
+    "answers": [4,4,4,4,4,4,4,4,4,4,4,4, 4,4,4,4,4,4,4, 4,4,4,4, 4,4,4,4,4,4, 1,1,1,1],
+    "expectedPositiveCount": 5,
+    "expectedSubscales": {
+      "symptom": { "score": 48, "positive": true },
+      "helbredsangst": { "score": 28, "positive": true },
+      "angsttilstand": { "score": 16, "positive": true },
+      "depression": { "score": 24, "positive": true },
+      "alkoholproblem": { "score": 4, "positive": true }
+    }
+  },
+  {
+    "description": "Symptom at threshold boundary (score 5, not positive)",
+    "answers": [1,1,1,1,1,0,0,0,0,0,0,0, 0,0,0,0,0,0,0, 0,0,0,0, 0,0,0,0,0,0, 0,0,0,0],
+    "expectedPositiveCount": 0,
+    "expectedSubscales": {
+      "symptom": { "score": 5, "positive": false },
+      "helbredsangst": { "score": 0, "positive": false },
+      "angsttilstand": { "score": 0, "positive": false },
+      "depression": { "score": 0, "positive": false },
+      "alkoholproblem": { "score": 0, "positive": false }
+    }
+  },
+  {
+    "description": "Symptom at threshold boundary (score 6, positive)",
+    "answers": [1,1,1,1,1,1,0,0,0,0,0,0, 0,0,0,0,0,0,0, 0,0,0,0, 0,0,0,0,0,0, 0,0,0,0],
+    "expectedPositiveCount": 1,
+    "expectedSubscales": {
+      "symptom": { "score": 6, "positive": true },
+      "helbredsangst": { "score": 0, "positive": false },
+      "angsttilstand": { "score": 0, "positive": false },
+      "depression": { "score": 0, "positive": false },
+      "alkoholproblem": { "score": 0, "positive": false }
+    }
+  },
+  {
+    "description": "Helbredsangst at threshold (score 2, positive)",
+    "answers": [0,0,0,0,0,0,0,0,0,0,0,0, 1,1,0,0,0,0,0, 0,0,0,0, 0,0,0,0,0,0, 0,0,0,0],
+    "expectedPositiveCount": 1,
+    "expectedSubscales": {
+      "symptom": { "score": 0, "positive": false },
+      "helbredsangst": { "score": 2, "positive": true },
+      "angsttilstand": { "score": 0, "positive": false },
+      "depression": { "score": 0, "positive": false },
+      "alkoholproblem": { "score": 0, "positive": false }
+    }
+  },
+  {
+    "description": "Angsttilstand just below threshold (score 1)",
+    "answers": [0,0,0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0, 1,0,0,0, 0,0,0,0,0,0, 0,0,0,0],
+    "expectedPositiveCount": 0,
+    "expectedSubscales": {
+      "symptom": { "score": 0, "positive": false },
+      "helbredsangst": { "score": 0, "positive": false },
+      "angsttilstand": { "score": 1, "positive": false },
+      "depression": { "score": 0, "positive": false },
+      "alkoholproblem": { "score": 0, "positive": false }
+    }
+  },
+  {
+    "description": "Depression at threshold (score 3, positive)",
+    "answers": [0,0,0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0, 0,0,0,0, 1,1,1,0,0,0, 0,0,0,0],
+    "expectedPositiveCount": 1,
+    "expectedSubscales": {
+      "symptom": { "score": 0, "positive": false },
+      "helbredsangst": { "score": 0, "positive": false },
+      "angsttilstand": { "score": 0, "positive": false },
+      "depression": { "score": 3, "positive": true },
+      "alkoholproblem": { "score": 0, "positive": false }
+    }
+  },
+  {
+    "description": "Alkoholproblem at threshold (score 2, positive)",
+    "answers": [0,0,0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0, 0,0,0,0, 0,0,0,0,0,0, 1,1,0,0],
+    "expectedPositiveCount": 1,
+    "expectedSubscales": {
+      "symptom": { "score": 0, "positive": false },
+      "helbredsangst": { "score": 0, "positive": false },
+      "angsttilstand": { "score": 0, "positive": false },
+      "depression": { "score": 0, "positive": false },
+      "alkoholproblem": { "score": 2, "positive": true }
+    }
+  }
+]

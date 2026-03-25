@@ -23,7 +23,9 @@ export default defineConfig({
   build: {
     rollupOptions: {
     input: {
+      ass: './src/ass.ts',
       bmi: './src/bmi.ts',
+      cmdq: './src/cmdq.ts',
       centor: './src/centor.ts',
       chadsvasc: './src/chadsvasc.ts',
       wellsDvt: './src/wellsDvt.ts',
@@ -44,6 +46,7 @@ export default defineConfig({
       epds: './src/epds.ts',
       lrti: './src/lrti.ts',
       gcs: './src/gcs.ts',
+      hama: './src/hama.ts',
       ipss: './src/ipss.ts',
       passwordReset: './src/passwordReset.ts',
       medicinBoern: './src/medicinBoern.ts',

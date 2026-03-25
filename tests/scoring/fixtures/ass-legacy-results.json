@@ -1,0 +1,79 @@
+[
+  {
+    "description": "All minimum scores — no functional impairment",
+    "answers": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    "expectedTotalScore": 0,
+    "expectedHasFunctionalImpairment": false,
+    "expectedCoreAnxietyScore": 0
+  },
+  {
+    "description": "All maximum scores — full impairment",
+    "answers": [5, 5, 5, 5, 5, 5, 5, 5, 5, 5],
+    "expectedTotalScore": 50,
+    "expectedHasFunctionalImpairment": true,
+    "expectedCoreAnxietyScore": 15,
+    "expectedHighestCategories": ["Alle angstsymptomer scorer ens"],
+    "expectedHighestScore": 5
+  },
+  {
+    "description": "Item 10 at threshold boundary (score 2, not positive)",
+    "answers": [3, 3, 3, 0, 0, 0, 0, 0, 0, 2],
+    "expectedTotalScore": 11,
+    "expectedHasFunctionalImpairment": false,
+    "expectedCoreAnxietyScore": 9
+  },
+  {
+    "description": "Item 10 at threshold boundary (score 3, positive)",
+    "answers": [3, 3, 3, 0, 0, 0, 0, 0, 0, 3],
+    "expectedTotalScore": 12,
+    "expectedHasFunctionalImpairment": true,
+    "expectedCoreAnxietyScore": 9,
+    "expectedHighestCategories": ["Generel angst/GAD", "Undvigeadfærd/agorafobi"],
+    "expectedHighestScore": 3
+  },
+  {
+    "description": "Panic anxiety highest",
+    "answers": [1, 1, 1, 5, 5, 0, 0, 0, 0, 4],
+    "expectedTotalScore": 17,
+    "expectedHasFunctionalImpairment": true,
+    "expectedCoreAnxietyScore": 3,
+    "expectedHighestCategories": ["Panikangst"],
+    "expectedHighestScore": 5
+  },
+  {
+    "description": "OCD highest",
+    "answers": [0, 0, 0, 0, 0, 4, 4, 0, 0, 3],
+    "expectedTotalScore": 11,
+    "expectedHasFunctionalImpairment": true,
+    "expectedCoreAnxietyScore": 0,
+    "expectedHighestCategories": ["OCD"],
+    "expectedHighestScore": 4
+  },
+  {
+    "description": "Social phobia highest",
+    "answers": [1, 1, 0, 0, 0, 0, 0, 5, 0, 3],
+    "expectedTotalScore": 10,
+    "expectedHasFunctionalImpairment": true,
+    "expectedCoreAnxietyScore": 2,
+    "expectedHighestCategories": ["Socialfobi"],
+    "expectedHighestScore": 5
+  },
+  {
+    "description": "PTSD highest",
+    "answers": [0, 0, 0, 0, 0, 0, 0, 0, 5, 4],
+    "expectedTotalScore": 9,
+    "expectedHasFunctionalImpairment": true,
+    "expectedCoreAnxietyScore": 0,
+    "expectedHighestCategories": ["PTSD"],
+    "expectedHighestScore": 5
+  },
+  {
+    "description": "Multiple categories tied for highest",
+    "answers": [3, 0, 0, 3, 0, 0, 0, 0, 0, 3],
+    "expectedTotalScore": 9,
+    "expectedHasFunctionalImpairment": true,
+    "expectedCoreAnxietyScore": 3,
+    "expectedHighestCategories": ["Generel angst/GAD", "Panikangst"],
+    "expectedHighestScore": 3
+  }
+]
