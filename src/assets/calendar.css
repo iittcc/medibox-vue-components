@@ -1,21 +1,21 @@
 .medical-calculator-container {
   --fc-border-color: #e2e8f0;
-  --fc-button-bg-color: #3b82f6;
-  --fc-button-border-color: #3b82f6;
-  --fc-button-hover-bg-color: #2563eb;
-  --fc-button-hover-border-color: #2563eb;
-  --fc-button-active-bg-color: #1d4ed8;
-  --fc-button-active-border-color: #1d4ed8;
-  --fc-today-bg-color: #eff6ff;
-  --fc-event-bg-color: #3b82f6;
-  --fc-event-border-color: #2563eb;
+  --fc-button-bg-color: #1d89cf;
+  --fc-button-border-color:  #1a7ab9;
+  ;
+  --fc-button-hover-bg-color: #1a7ab9;
+  --fc-button-hover-border-color: #1a7ab9;
+  --fc-button-active-bg-color: #1a7ab9;
+  --fc-button-active-border-color: #1a7ab9;
+  --fc-button-corner-radius: 0rem;
+  --fc-today-bg-color: #eff6ff ;
+  --fc-event-bg-color: #1d89cf;
+  --fc-event-border-color: #1a7ab9;
   --fc-event-text-color: #fff;
-  font-size: 1em;
 }
 
-.medical-calculator-container .fc-day-sat,
-.medical-calculator-container .fc-day-sun {
-  background-color: #f8fafc;
+.medical-calculator-container .fc .fc-button {
+  border-radius: 0 !important;
 }
 
 .medical-calculator-container .past-event.fc-event {
@@ -25,6 +25,11 @@
 .medical-calculator-container .fc-multimonth .fc-daygrid-week-number {
   font-size: 0.8em;
   opacity: 1;
+}
+
+.medical-calculator-container .fc-dayGridMonth-view .fc-daygrid-week-number {
+  font-size: 0.7em;
+  opacity: 0.6;
 }
 
 .medical-calculator-container .fc-daygrid-day-frame {
@@ -38,4 +43,29 @@
 .medical-calculator-container .fc-yearGrid-button,
 .medical-calculator-container .fc-yearStack-button {
   display: none;
+}
+
+@media (max-width: 768px) {
+  .medical-calculator-container .fc-fullscreen-button,
+  .medical-calculator-container .fc-yearGrid-button,
+  .medical-calculator-container .fc-yearStack-button,
+  .medical-calculator-container .fc-multiMonthYear-button {
+    display: none !important;
+  }
+
+  .medical-calculator-container .fc-header-toolbar {
+    flex-wrap: wrap !important;
+    gap: 0.5rem;
+  }
+
+  .medical-calculator-container .fc-toolbar-chunk:nth-child(2) {
+    width: 100%;
+    text-align: center;
+    order: -1;
+  }
+
+  /* Remove margin from all elements. */
+  .medical-calculator-container .fc *:not(.fc-header-toolbar) {
+    margin: 0 !important;
+  }
 }

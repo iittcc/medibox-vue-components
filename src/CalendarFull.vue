@@ -34,7 +34,7 @@
  *      Danish locale, and connects to the backend via useCalendarEvents composable.
  */
 
-import { ref, reactive, nextTick } from 'vue'
+import { ref, reactive, nextTick, onMounted, onUnmounted } from 'vue'
 import FullCalendar from '@fullcalendar/vue3'
 import dayGridPlugin from '@fullcalendar/daygrid'
 import timeGridPlugin from '@fullcalendar/timegrid'
@@ -337,11 +337,29 @@ function handleDatesSet(info: { view: { type: string; currentStart: Date } }) {
   // Why: Keep the inline DatePicker in sync when the user navigates
   // FullCalendar via prev/next buttons or view changes
   syncNavigatorDate(info)
+
+  // Why: FullCalendar re-renders toolbar buttons on navigation, resetting
+  // the fullscreen button text to the default. Re-apply the correct label.
+  updateFullscreenButtonText()
 }
+
+const isMobile = ref(window.innerWidth <= 768)
+
+function onResize() {
+  const wasMobile = isMobile.value
+  isMobile.value = window.innerWidth <= 768
+  if (wasMobile !== isMobile.value) {
+    calendarOptions.height = isMobile.value ? 700 : 'auto'
+  }
+}
+
+onMounted(() => window.addEventListener('resize', onResize))
+onUnmounted(() => window.removeEventListener('resize', onResize))
 
 // Why: Reactive options object ensures FullCalendar re-renders when
 // configuration values change (e.g. editable toggled)
 const calendarOptions = reactive<CalendarOptions>({
+  height: isMobile.value ? 700 : 'auto',
   plugins: [dayGridPlugin, timeGridPlugin, listPlugin, interactionPlugin, multiMonthPlugin],
   locale: daLocale,
   firstDay: 1,
@@ -387,6 +405,7 @@ const calendarOptions = reactive<CalendarOptions>({
     }
   },
   weekNumbers: true,
+  weekNumberFormat: { week: 'numeric' },
   editable: props.editable,
   selectable: props.editable,
   selectMirror: props.editable,
@@ -457,6 +476,12 @@ async function handleDelete(id: string | number) {
 
 .calendar-sidebar {
   flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+  .calendar-sidebar {
+    display: none;
+  }
 }
 
 .calendar-main {
