@@ -375,11 +375,11 @@ function handleDatesSet(info: { view: { type: string; currentStart: Date } }) {
   updateFullscreenButtonText()
 }
 
-const isMobile = ref(window.innerWidth <= 768)
+const isMobile = ref(window.innerWidth <= 992)
 
 function onResize() {
   const wasMobile = isMobile.value
-  isMobile.value = window.innerWidth <= 768
+  isMobile.value = window.innerWidth <= 992
   if (wasMobile !== isMobile.value) {
     calendarOptions.height = isMobile.value ? 700 : 800
   }
@@ -508,9 +508,12 @@ async function handleDelete(id: string | number) {
 
 .calendar-sidebar {
   flex-shrink: 0;
+  transform: scale(0.8);
+  transform-origin: top left;
+  margin-right: -40px !important;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 992px) {
   .calendar-sidebar {
     display: none;
   }

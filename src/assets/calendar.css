@@ -72,6 +72,11 @@
     margin: 0px !important;
 }
 
+.medical-calculator-container .fc .fc-button .fc-icon {
+  font-size: 1em !important;
+  vertical-align: middle;
+}
+
 /* Fullscreen modal — above Bootstrap navbar (1030) but below PrimeVue Dialog (1100+) */
 .medical-calculator-container .modal-backdrop {
   position: fixed;
