@@ -103,6 +103,7 @@ module.exports = [
                 clearInterval: "readonly",
                 CustomEvent: "readonly",
                 Event: "readonly",
+                KeyboardEvent: "readonly",
                 MouseEvent: "readonly",
                 HTMLElement: "readonly",
                 HTMLInputElement: "readonly",

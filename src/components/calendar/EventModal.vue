@@ -198,6 +198,7 @@ const props = defineProps<{
   editable: boolean
   calendarId: number
   groupId: number
+  fullscreen?: boolean
 }>()
 
 const emit = defineEmits<{

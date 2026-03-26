@@ -1,7 +1,13 @@
 <template>
-  <div class="medical-calculator-container" ref="containerRef" :class="{ 'calendar-expanded': isFullscreen }">
-    <div class="calendar-layout">
-      <div class="calendar-sidebar">
+  <div class="medical-calculator-container" ref="containerRef">
+    <!-- Fullscreen modal backdrop -->
+    <Transition name="modal">
+      <div v-if="isFullscreen" class="modal-backdrop" @click.self="toggleFullscreen"></div>
+    </Transition>
+
+    <!-- Single calendar container — switches between inline and modal via CSS -->
+    <div :class="isFullscreen ? 'modal-panel' : 'calendar-layout'">
+      <div v-if="!isFullscreen" class="calendar-sidebar">
         <DatePicker
           v-model="navigatorDate"
           inline
@@ -10,10 +16,18 @@
           @update:modelValue="onNavigatorDateChange"
         />
       </div>
-      <div class="calendar-main" ref="calendarMainRef">
+      <div :class="isFullscreen ? 'modal-body' : 'calendar-main'" ref="calendarMainRef">
+        <div v-if="isFullscreen" class="modal-header">
+          <button type="button" @click="toggleFullscreen" class="modal-close" aria-label="Luk fuldskærm">
+            <svg class="modal-close-icon" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
         <FullCalendar :options="calendarOptions" ref="calendarRef" />
       </div>
     </div>
+
     <EventModal
       v-model:visible="modalVisible"
       :event="selectedEvent"
@@ -21,6 +35,7 @@
       :editable="props.editable"
       :calendar-id="props.calendarId"
       :group-id="props.groupId"
+      :fullscreen="isFullscreen"
       @save="handleSave"
       @delete="handleDelete"
     />
@@ -34,7 +49,7 @@
  *      Danish locale, and connects to the backend via useCalendarEvents composable.
  */
 
-import { ref, reactive, nextTick, onMounted, onUnmounted } from 'vue'
+import { ref, reactive, nextTick, watch, onMounted, onUnmounted } from 'vue'
 import FullCalendar from '@fullcalendar/vue3'
 import dayGridPlugin from '@fullcalendar/daygrid'
 import timeGridPlugin from '@fullcalendar/timegrid'
@@ -126,11 +141,28 @@ function syncNavigatorDate(info: { view: { currentStart: Date } }) {
  */
 function toggleFullscreen() {
   isFullscreen.value = !isFullscreen.value
-  updateFullscreenButtonText()
-  // Why: FullCalendar needs to recalculate its dimensions after the
-  // container changes from inline to fixed positioning
-  nextTick(() => getApi()?.updateSize())
+  document.body.style.overflow = isFullscreen.value ? 'hidden' : ''
+  // Why: FullCalendar is conditionally rendered (v-if) so after toggling,
+  // we need to wait for the new instance to mount before updating size
+  nextTick(() => {
+    updateFullscreenButtonText()
+    getApi()?.updateSize()
+  })
 }
+
+function onEscapeKey(e: KeyboardEvent) {
+  if (e.key === 'Escape' && isFullscreen.value) {
+    toggleFullscreen()
+  }
+}
+
+watch(isFullscreen, (val) => {
+  if (val) {
+    document.addEventListener('keydown', onEscapeKey)
+  } else {
+    document.removeEventListener('keydown', onEscapeKey)
+  }
+})
 
 function updateFullscreenButtonText() {
   const container = calendarRef.value?.$el as HTMLElement | undefined
@@ -507,15 +539,83 @@ async function handleDelete(id: string | number) {
   animation: slide-from-left 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
-.calendar-expanded {
-  position: fixed !important;
-  top: 0 !important;
-  left: 0 !important;
-  right: 0 !important;
-  z-index: 9999 !important;
-  background: white !important;
-  padding: 1.5rem !important;
-  overflow: auto !important;
-  width: 100% !important;
+/* Fullscreen modal — above Bootstrap navbar (1030) but below PrimeVue Dialog (1100+) */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1040;
+  background: rgba(107, 114, 128, 0.75);
+}
+
+.modal-panel {
+  position: fixed;
+  inset: 1rem;
+  z-index: 1050;
+  background: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: flex-end;
+  padding: 0.5rem 0.75rem 0;
+  flex-shrink: 0;
+}
+
+.modal-close {
+  color: #9ca3af;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 0.375rem;
+  transition: color 0.15s;
+}
+
+.modal-close:hover {
+  color: #374151;
+}
+
+.modal-close-icon {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.modal-body {
+  flex: 1;
+  overflow: auto;
+  padding: 0 1.5rem 1.5rem;
+}
+
+/* Modal transitions */
+.modal-enter-active {
+  transition: opacity 0.3s ease;
+}
+.modal-enter-active .modal-panel {
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+.modal-leave-active {
+  transition: opacity 0.2s ease;
+}
+.modal-leave-active .modal-panel {
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+.modal-enter-from {
+  opacity: 0;
+}
+.modal-enter-from .modal-panel {
+  opacity: 0;
+  transform: scale(0.95) translateY(1rem);
+}
+.modal-leave-to {
+  opacity: 0;
+}
+.modal-leave-to .modal-panel {
+  opacity: 0;
+  transform: scale(0.95);
 }
 </style>
