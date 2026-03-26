@@ -78,7 +78,7 @@
                   <div class="flex items-center gap-3">
                     <span class="text-sm font-bold">{{ sub.score }}</span>
                     <span v-if="sub.positive" class="text-xs font-bold text-red-600 px-2 py-0.5 bg-red-100 rounded-full">POSITIV</span>
-                    <span v-else class="text-xs text-gray-400">< {{ sub.threshold }}</span>
+                    <span v-else class="text-xs text-gray-400">&lt; {{ sub.threshold }}</span>
                   </div>
                 </div>
               </div>

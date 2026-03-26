@@ -446,7 +446,7 @@ function handleEventDidMount(info: { event: { start: Date | null; end: Date | nu
 
   // Why: PrimeVue Tooltip directive bound programmatically because FullCalendar
   // renders event elements outside Vue's template system.
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   //const dir = Tooltip as any
   //if (dir.mounted) {
   //  dir.mounted(info.el, { value: { value: lines.join('<br>'), escape: false }, modifiers: { top: true } })
@@ -491,9 +491,7 @@ function onResize() {
   const wasMobile = isMobile.value
   isMobile.value = window.innerWidth <= 992
   if (wasMobile !== isMobile.value) {
-    if (isMobile.value) {
-      calendarOptions.height = 700;
-    }
+    calendarOptions.height = isMobile.value ? 700 : 800;
   }
 }
 
@@ -503,7 +501,7 @@ onUnmounted(() => window.removeEventListener('resize', onResize))
 // Why: Reactive options object ensures FullCalendar re-renders when
 // configuration values change (e.g. editable toggled)
 const calendarOptions = reactive<CalendarOptions>({
-  height: isMobile.value ? 700 : undefined,
+  height: isMobile.value ? 700 : 800,
   plugins: [dayGridPlugin, timeGridPlugin, listPlugin, interactionPlugin, multiMonthPlugin],
   locale: daLocale,
   firstDay: 1,

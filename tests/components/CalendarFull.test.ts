@@ -92,8 +92,6 @@ describe('CalendarFull', () => {
 
     it('hides sidebar in fullscreen mode', async () => {
       const wrapper = mountFull()
-      const vm = wrapper.vm as unknown as { isFullscreen: { value: boolean }; toggleFullscreen: () => void }
-
       // Access internal state to toggle fullscreen
       await wrapper.vm.$nextTick()
 
@@ -102,7 +100,7 @@ describe('CalendarFull', () => {
     })
 
     it('locks body scroll when entering fullscreen', async () => {
-      const wrapper = mountFull()
+      mountFull()
       expect(document.body.style.overflow).toBe('')
     })
   })
