@@ -1,17 +1,38 @@
 .medical-calculator-container {
+  /* FullCalendar tokens */
   --fc-border-color: #e2e8f0;
   --fc-button-bg-color: #1d89cf;
-  --fc-button-border-color:  #1a7ab9;
-  ;
+  --fc-button-border-color: #1a7ab9;
   --fc-button-hover-bg-color: #1a7ab9;
   --fc-button-hover-border-color: #1a7ab9;
   --fc-button-active-bg-color: #1a7ab9;
   --fc-button-active-border-color: #1a7ab9;
   --fc-button-corner-radius: 0rem;
-  --fc-today-bg-color: #eff6ff ;
+  --fc-today-bg-color: #eff6ff;
   --fc-event-bg-color: #1d89cf;
   --fc-event-border-color: #1a7ab9;
   --fc-event-text-color: #fff;
+
+  /* PrimeVue Volt tokens — align with MediBOX blue palette */
+  --p-primary-color: #1d89cf;
+  --p-primary-contrast-color: #fff;
+  --p-primary-hover-color: #1a7ab9;
+  --p-primary-active-color: #16689e;
+  --p-content-border-color: #e2e8f0;
+  --p-primary-50: #eff6ff;
+  --p-primary-100: #dbeafe;
+  --p-primary-200: #bfdbfe;
+  --p-primary-300: #93c5fd;
+  --p-primary-400: #60a5fa;
+  --p-primary-500: #1d89cf;
+  --p-primary-600: #1a7ab9;
+  --p-primary-700: #16689e;
+  --p-primary-800: #125584;
+  --p-primary-900: #0e426a;
+  --p-primary-950: #0a2f50;
+  --p-highlight-background: #eff6ff;
+  --p-highlight-color: #16689e;
+  --p-content-border-radius: 0px;
 }
 
 .medical-calculator-container .fc .fc-button {
@@ -45,6 +66,99 @@
   display: none;
 }
 
+  /* Remove margin from table header element that causes layout issues. */
+  .medical-calculator-container .fc *:not(.fc-header-toolbar) {
+    box-sizing: border-box;
+    margin: 0px !important;
+}
+
+/* Fullscreen modal — above Bootstrap navbar (1030) but below PrimeVue Dialog (1100+) */
+.medical-calculator-container .modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1040;
+  background: rgba(107, 114, 128, 0.75);
+}
+
+.medical-calculator-container .modal-panel {
+  position: fixed;
+  inset: 1rem;
+  z-index: 1050;
+  background: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.medical-calculator-container .modal-header {
+  display: flex;
+  justify-content: flex-end;
+  padding: 0.5rem 0.75rem 0;
+  flex-shrink: 0;
+}
+
+.medical-calculator-container .modal-close {
+  color: #9ca3af;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 0.375rem;
+  transition: color 0.15s;
+}
+
+.medical-calculator-container .modal-close:hover {
+  color: #374151;
+}
+
+.medical-calculator-container .modal-close-icon {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.medical-calculator-container .modal-body {
+  flex: 1;
+  overflow: auto;
+  padding: 0 1.5rem 1.5rem;
+}
+
+/* Modal transitions */
+.medical-calculator-container .modal-enter-active {
+  transition: opacity 0.3s ease;
+}
+
+.medical-calculator-container .modal-enter-active .modal-panel {
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.medical-calculator-container .modal-leave-active {
+  transition: opacity 0.2s ease;
+}
+
+.medical-calculator-container .modal-leave-active .modal-panel {
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.medical-calculator-container .modal-enter-from {
+  opacity: 0;
+}
+
+.medical-calculator-container .modal-enter-from .modal-panel {
+  opacity: 0;
+  transform: scale(0.95) translateY(1rem);
+}
+
+.medical-calculator-container .modal-leave-to {
+  opacity: 0;
+}
+
+.medical-calculator-container .modal-leave-to .modal-panel {
+  opacity: 0;
+  transform: scale(0.95);
+}
+
 @media (max-width: 768px) {
   .medical-calculator-container .fc-fullscreen-button,
   .medical-calculator-container .fc-yearGrid-button,
@@ -62,10 +176,5 @@
     width: 100%;
     text-align: center;
     order: -1;
-  }
-
-  /* Remove margin from all elements. */
-  .medical-calculator-container .fc *:not(.fc-header-toolbar) {
-    margin: 0 !important;
   }
 }

@@ -381,7 +381,7 @@ function onResize() {
   const wasMobile = isMobile.value
   isMobile.value = window.innerWidth <= 768
   if (wasMobile !== isMobile.value) {
-    calendarOptions.height = isMobile.value ? 700 : 'auto'
+    calendarOptions.height = isMobile.value ? 700 : 800
   }
 }
 
@@ -391,7 +391,7 @@ onUnmounted(() => window.removeEventListener('resize', onResize))
 // Why: Reactive options object ensures FullCalendar re-renders when
 // configuration values change (e.g. editable toggled)
 const calendarOptions = reactive<CalendarOptions>({
-  height: isMobile.value ? 700 : 'auto',
+  height: isMobile.value ? 700 : 800,
   plugins: [dayGridPlugin, timeGridPlugin, listPlugin, interactionPlugin, multiMonthPlugin],
   locale: daLocale,
   firstDay: 1,
@@ -539,83 +539,5 @@ async function handleDelete(id: string | number) {
   animation: slide-from-left 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
-/* Fullscreen modal — above Bootstrap navbar (1030) but below PrimeVue Dialog (1100+) */
-.modal-backdrop {
-  position: fixed;
-  inset: 0;
-  z-index: 1040;
-  background: rgba(107, 114, 128, 0.75);
-}
-
-.modal-panel {
-  position: fixed;
-  inset: 1rem;
-  z-index: 1050;
-  background: white;
-  border-radius: 0.5rem;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-
-.modal-header {
-  display: flex;
-  justify-content: flex-end;
-  padding: 0.5rem 0.75rem 0;
-  flex-shrink: 0;
-}
-
-.modal-close {
-  color: #9ca3af;
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0.25rem;
-  border-radius: 0.375rem;
-  transition: color 0.15s;
-}
-
-.modal-close:hover {
-  color: #374151;
-}
-
-.modal-close-icon {
-  width: 1.5rem;
-  height: 1.5rem;
-}
-
-.modal-body {
-  flex: 1;
-  overflow: auto;
-  padding: 0 1.5rem 1.5rem;
-}
-
-/* Modal transitions */
-.modal-enter-active {
-  transition: opacity 0.3s ease;
-}
-.modal-enter-active .modal-panel {
-  transition: opacity 0.3s ease, transform 0.3s ease;
-}
-.modal-leave-active {
-  transition: opacity 0.2s ease;
-}
-.modal-leave-active .modal-panel {
-  transition: opacity 0.2s ease, transform 0.2s ease;
-}
-.modal-enter-from {
-  opacity: 0;
-}
-.modal-enter-from .modal-panel {
-  opacity: 0;
-  transform: scale(0.95) translateY(1rem);
-}
-.modal-leave-to {
-  opacity: 0;
-}
-.modal-leave-to .modal-panel {
-  opacity: 0;
-  transform: scale(0.95);
-}
+/* Fullscreen modal styles are in calendar.css (unscoped) */
 </style>

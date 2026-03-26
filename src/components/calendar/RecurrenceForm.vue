@@ -137,7 +137,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed } from 'vue'
 import Select from '@/volt/Select.vue'
 import InputNumber from '@/volt/InputNumber.vue'
 import ToggleButton from '@/volt/ToggleButton.vue'
@@ -155,23 +155,7 @@ const emit = defineEmits<{
   'update:untilDate': [value: string | null]
 }>()
 
-const config = ref<RRuleConfig>({ ...props.modelValue })
-
-watch(
-  () => props.modelValue,
-  (newVal) => {
-    config.value = { ...newVal }
-  },
-  { deep: true }
-)
-
-watch(
-  config,
-  (newVal) => {
-    emit('update:modelValue', { ...newVal })
-  },
-  { deep: true }
-)
+const config = computed(() => props.modelValue)
 
 const frequencyOptions = [
   { label: 'Dagligt', value: 'DAILY' },
@@ -205,14 +189,14 @@ const monthDayOptions = Array.from({ length: 31 }, (_, i) => ({
 }))
 
 function updateField<K extends keyof RRuleConfig>(field: K, value: RRuleConfig[K]) {
-  config.value = { ...config.value, [field]: value }
+  emit('update:modelValue', { ...config.value, [field]: value })
 }
 
 function toggleDay(day: string, active: boolean) {
   const days = active
     ? [...config.value.days, day]
     : config.value.days.filter((d) => d !== day)
-  config.value = { ...config.value, days }
+  emit('update:modelValue', { ...config.value, days })
 }
 
 </script>
