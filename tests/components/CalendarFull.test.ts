@@ -1,20 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { mount } from '@vue/test-utils'
+import { flushPromises, mount } from '@vue/test-utils'
 import PrimeVue from 'primevue/config'
-import { calendarStubs } from './calendar-test-helper'
-
-// Must mock before importing the component
-const mockFetchEvents = vi.fn()
-const mockSaveEvent = vi.fn().mockResolvedValue(1)
-const mockDeleteEvent = vi.fn().mockResolvedValue(true)
-
-vi.mock('@/composables/useCalendarEvents', () => ({
-  useCalendarEvents: vi.fn(() => ({
-    fetchEvents: mockFetchEvents,
-    saveEvent: mockSaveEvent,
-    deleteEvent: mockDeleteEvent
-  }))
-}))
+import { calendarEventServiceSpies, calendarStubs, createTestEvent, fullCalendarApi } from './calendar-test-helper'
 
 vi.mock('@fullcalendar/vue3', () => ({
   default: calendarStubs.FullCalendar
@@ -35,6 +22,7 @@ const defaultProps = {
   editable: true,
   baseUrl: 'http://localhost:1011/'
 }
+const { EventModal: _eventModalStub, ...calendarStubsWithoutEventModal } = calendarStubs
 
 function mountFull(props = defaultProps) {
   return mount(CalendarFull, {
@@ -42,7 +30,7 @@ function mountFull(props = defaultProps) {
     global: {
       plugins: [[PrimeVue, { unstyled: true }]],
       stubs: {
-        ...calendarStubs,
+        ...calendarStubsWithoutEventModal,
         Teleport: { template: '<div><slot /></div>' },
         Transition: { template: '<div><slot /></div>' }
       }
@@ -54,6 +42,7 @@ describe('CalendarFull', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     document.body.style.overflow = ''
+    calendarEventServiceSpies.fetchEvents.mockImplementation(() => {})
   })
 
   // ---------------------------------------------------------------------------
@@ -192,10 +181,28 @@ describe('CalendarFull', () => {
   // Event sources
   // ---------------------------------------------------------------------------
   describe('event sources', () => {
-    it('configures event source from useCalendarEvents', () => {
+    it('starts with an empty events array and loads data explicitly', () => {
       const wrapper = mountFull()
       const fc = wrapper.findComponent({ name: 'FullCalendar' })
-      expect(fc.props('options').eventSources).toHaveLength(1)
+      expect(fc.props('options').events).toEqual([])
+    })
+
+    it('reloads and reapplies mounted events after saving an event', async () => {
+      calendarEventServiceSpies.fetchEvents.mockImplementationOnce((_info, successCb) => {
+        successCb([{ id: '99', title: 'Ny begivenhed', start: '2026-03-26T09:00:00', end: '2026-03-26T10:00:00' }])
+      })
+
+      const wrapper = mountFull()
+      const eventModal = wrapper.findComponent({ name: 'EventModal' })
+
+      await eventModal.vm.$emit('save', createTestEvent())
+      await flushPromises()
+
+      expect(calendarEventServiceSpies.fetchEvents).toHaveBeenCalledTimes(1)
+      expect(fullCalendarApi.removeAllEvents).toHaveBeenCalledTimes(1)
+      expect(fullCalendarApi.addEvent).toHaveBeenCalledWith(
+        expect.objectContaining({ id: '99', title: 'Ny begivenhed' })
+      )
     })
   })
 })

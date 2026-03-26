@@ -24,7 +24,7 @@
 import { ref, reactive } from 'vue'
 import FullCalendar from '@fullcalendar/vue3'
 import listPlugin from '@fullcalendar/list'
-import type { CalendarOptions, EventClickArg } from '@fullcalendar/core'
+import type { CalendarOptions, EventClickArg, EventInput } from '@fullcalendar/core'
 import daLocale from '@fullcalendar/core/locales/da'
 import EventModal from '@/components/calendar/EventModal.vue'
 import { useCalendarEvents } from '@/composables/useCalendarEvents'
@@ -43,13 +43,44 @@ const calendarRef = ref<InstanceType<typeof FullCalendar>>()
 const modalVisible = ref(false)
 const modalMode = ref<'create' | 'edit' | 'view'>('create')
 const selectedEvent = ref<CalendarEventData | null>(null)
-
 /**
  * What: Retrieves the FullCalendar API instance.
  * How: Accesses the ref and calls getApi() on the FullCalendar component.
  */
 function getApi() {
   return calendarRef.value?.getApi()
+}
+
+function applyCalendarEvents(fetchedEvents: EventInput[]) {
+  const api = getApi()
+  if (!api) return
+
+  api.removeAllEvents()
+  for (const calendarEvent of fetchedEvents) {
+    api.addEvent(calendarEvent)
+  }
+}
+
+/**
+ * What: Forces FullCalendar to refresh its event source.
+ * How: Explicitly fetches the current visible range and replaces the mounted
+ *      events through the Calendar API.
+ */
+function refetchCalendar() {
+  const api = getApi()
+  if (!api) return
+
+  events.fetchEvents(
+    {
+      start: api.view.activeStart,
+      end: api.view.activeEnd,
+      startStr: api.view.activeStart.toISOString(),
+      endStr: api.view.activeEnd.toISOString(),
+      timeZone: 'local'
+    },
+    applyCalendarEvents,
+    (error) => { console.error('Failed to fetch calendar events:', error) }
+  )
 }
 
 /**
@@ -139,7 +170,7 @@ const calendarOptions = reactive<CalendarOptions>({
 async function handleSave(data: CalendarEventData) {
   try {
     await events.saveEvent(data)
-    getApi()?.refetchEvents()
+    refetchCalendar()
   } catch (error) {
     console.error('Failed to save event:', error)
   }
@@ -154,7 +185,7 @@ async function handleSave(data: CalendarEventData) {
 async function handleDelete(id: string | number) {
   try {
     await events.deleteEvent(id)
-    getApi()?.refetchEvents()
+    refetchCalendar()
   } catch (error) {
     console.error('Failed to delete event:', error)
   }

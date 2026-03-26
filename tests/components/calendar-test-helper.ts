@@ -8,12 +8,18 @@ import { type Component } from 'vue'
 import PrimeVue from 'primevue/config'
 import type { CalendarEventData } from '@/composables/useCalendarEvents'
 
+export const calendarEventServiceSpies = {
+  fetchEvents: vi.fn(),
+  saveEvent: vi.fn().mockResolvedValue(1),
+  deleteEvent: vi.fn().mockResolvedValue(true)
+}
+
 // Mock useCalendarEvents composable
 vi.mock('@/composables/useCalendarEvents', () => ({
   useCalendarEvents: vi.fn(() => ({
-    fetchEvents: vi.fn(),
-    saveEvent: vi.fn().mockResolvedValue(1),
-    deleteEvent: vi.fn().mockResolvedValue(true)
+    fetchEvents: calendarEventServiceSpies.fetchEvents,
+    saveEvent: calendarEventServiceSpies.saveEvent,
+    deleteEvent: calendarEventServiceSpies.deleteEvent
   }))
 }))
 
@@ -23,17 +29,27 @@ const fullCalendarStub = {
   template: '<div data-testid="fullcalendar"></div>',
   methods: {
     getApi() {
-      return {
-        getDate: () => new Date(),
-        gotoDate: vi.fn(),
-        updateSize: vi.fn(),
-        refetchEvents: vi.fn(),
-        unselect: vi.fn(),
-        changeView: vi.fn(),
-        setOption: vi.fn()
-      }
+      return fullCalendarApi
     }
   }
+}
+
+export const fullCalendarApi = {
+  getDate: vi.fn(() => new Date()),
+  view: {
+    activeStart: new Date('2026-03-01T00:00:00'),
+    activeEnd: new Date('2026-03-31T23:59:59')
+  },
+  gotoDate: vi.fn(),
+  updateSize: vi.fn(),
+  refetchEvents: vi.fn(),
+  unselect: vi.fn(),
+  changeView: vi.fn(),
+  setOption: vi.fn(),
+  removeAllEvents: vi.fn(),
+  addEvent: vi.fn(),
+  removeAllEventSources: vi.fn(),
+  addEventSource: vi.fn()
 }
 
 const dialogStub = {

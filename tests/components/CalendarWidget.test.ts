@@ -1,19 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { mount } from '@vue/test-utils'
+import { flushPromises, mount } from '@vue/test-utils'
 import PrimeVue from 'primevue/config'
-import { calendarStubs } from './calendar-test-helper'
-
-const mockFetchEvents = vi.fn()
-const mockSaveEvent = vi.fn().mockResolvedValue(1)
-const mockDeleteEvent = vi.fn().mockResolvedValue(true)
-
-vi.mock('@/composables/useCalendarEvents', () => ({
-  useCalendarEvents: vi.fn(() => ({
-    fetchEvents: mockFetchEvents,
-    saveEvent: mockSaveEvent,
-    deleteEvent: mockDeleteEvent
-  }))
-}))
+import { calendarEventServiceSpies, calendarStubs, createTestEvent, fullCalendarApi } from './calendar-test-helper'
 
 vi.mock('@fullcalendar/vue3', () => ({
   default: calendarStubs.FullCalendar
@@ -28,13 +16,14 @@ const defaultProps = {
   editable: true,
   baseUrl: 'http://localhost:1011/'
 }
+const { EventModal: _eventModalStub, ...calendarStubsWithoutEventModal } = calendarStubs
 
 function mountWidget(props = defaultProps) {
   return mount(CalendarWidget, {
     props,
     global: {
       plugins: [[PrimeVue, { unstyled: true }]],
-      stubs: calendarStubs
+      stubs: calendarStubsWithoutEventModal
     }
   })
 }
@@ -42,6 +31,7 @@ function mountWidget(props = defaultProps) {
 describe('CalendarWidget', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    calendarEventServiceSpies.fetchEvents.mockImplementation(() => {})
   })
 
   // ---------------------------------------------------------------------------
@@ -93,6 +83,24 @@ describe('CalendarWidget', () => {
       const wrapper = mountWidget({ ...defaultProps, editable: false })
       const fc = wrapper.findComponent({ name: 'FullCalendar' })
       expect(fc.props('options').editable).toBe(false)
+    })
+
+    it('refreshes the mounted event source after saving an event', async () => {
+      calendarEventServiceSpies.fetchEvents.mockImplementationOnce((_info, successCb) => {
+        successCb([{ id: '42', title: 'Widget event', start: '2026-03-26T09:00:00', end: '2026-03-26T10:00:00' }])
+      })
+
+      const wrapper = mountWidget()
+      const eventModal = wrapper.findComponent({ name: 'EventModal' })
+
+      await eventModal.vm.$emit('save', createTestEvent())
+      await flushPromises()
+
+      expect(calendarEventServiceSpies.fetchEvents).toHaveBeenCalledTimes(1)
+      expect(fullCalendarApi.removeAllEvents).toHaveBeenCalledTimes(1)
+      expect(fullCalendarApi.addEvent).toHaveBeenCalledWith(
+        expect.objectContaining({ id: '42', title: 'Widget event' })
+      )
     })
   })
 })

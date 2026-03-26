@@ -147,13 +147,49 @@ describe('useCalendarEvents', () => {
       expect(formDataTrue.get('allDay')).toBe('1')
     })
 
-    it('returns response data', async () => {
+    it('returns response data when backend responds with a numeric id', async () => {
       mockedAxios.post.mockResolvedValue({ data: 99 })
 
       const { saveEvent } = useCalendarEvents(baseUrl, calendarId, groupId)
       const result = await saveEvent(eventData)
 
       expect(result).toBe(99)
+    })
+
+    it('returns eventId when backend responds with success payload', async () => {
+      mockedAxios.post.mockResolvedValue({ data: { status: 'success', eventId: 77 } })
+
+      const { saveEvent } = useCalendarEvents(baseUrl, calendarId, groupId)
+      const result = await saveEvent(eventData)
+
+      expect(result).toBe(77)
+    })
+
+    it('throws when backend responds with a failed save payload', async () => {
+      mockedAxios.post.mockResolvedValue({ data: false })
+
+      const { saveEvent } = useCalendarEvents(baseUrl, calendarId, groupId)
+
+      await expect(saveEvent(eventData)).rejects.toThrow('Begivenheden kunne ikke gemmes.')
+    })
+
+    it('throws backend validation error details from axios errors', async () => {
+      mockedAxios.post.mockRejectedValue({
+        isAxiosError: true,
+        response: {
+          data: {
+            status: 'error',
+            message: 'Begivenheden kunne ikke gemmes.',
+            errors: {
+              start_date: 'Start dato er påkrævet.'
+            }
+          }
+        }
+      })
+
+      const { saveEvent } = useCalendarEvents(baseUrl, calendarId, groupId)
+
+      await expect(saveEvent(eventData)).rejects.toThrow('Start dato er påkrævet.')
     })
   })
 

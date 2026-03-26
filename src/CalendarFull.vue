@@ -1,5 +1,13 @@
 <template>
   <div class="medical-calculator-container" ref="containerRef">
+    <!-- Toast notification -->
+    <Transition name="toast">
+      <div v-if="toastMessage" :class="['calendar-toast', toastIsError ? 'calendar-toast--error' : '']">
+        <span>{{ toastMessage }}</span>
+        <button v-if="toastUndoFn" class="calendar-toast-undo" @click="handleUndo">Fortryd</button>
+      </div>
+    </Transition>
+
     <!-- Fullscreen modal backdrop -->
     <Transition name="modal">
       <div v-if="isFullscreen" class="modal-backdrop" @click.self="toggleFullscreen"></div>
@@ -81,6 +89,28 @@ const navigatorDate = ref<Date>(new Date())
 const modalVisible = ref(false)
 const modalMode = ref<'create' | 'edit' | 'view'>('create')
 const selectedEvent = ref<CalendarEventData | null>(null)
+const toastMessage = ref('')
+const toastIsError = ref(false)
+let toastTimer: ReturnType<typeof setTimeout> | null = null
+let toastUndoFn: (() => void) | null = null
+
+function showToast(message: string, options?: { error?: boolean; undo?: () => void }) {
+  toastMessage.value = message
+  toastIsError.value = options?.error ?? false
+  toastUndoFn = options?.undo ?? null
+  if (toastTimer) clearTimeout(toastTimer)
+  toastTimer = setTimeout(() => { dismissToast() }, 5000)
+}
+
+function dismissToast() {
+  toastMessage.value = ''
+  toastUndoFn = null
+}
+
+function handleUndo() {
+  if (toastUndoFn) toastUndoFn()
+  dismissToast()
+}
 
 /**
  * What: Retrieves the FullCalendar API instance.
@@ -88,6 +118,43 @@ const selectedEvent = ref<CalendarEventData | null>(null)
  */
 function getApi() {
   return calendarRef.value?.getApi()
+}
+
+function applyCalendarEvents(fetchedEvents: EventInput[]) {
+  const api = getApi()
+  if (!api) return
+
+  api.removeAllEvents()
+  for (const calendarEvent of fetchedEvents) {
+    api.addEvent(calendarEvent)
+  }
+}
+
+function loadEvents(start: Date, end: Date) {
+  events.fetchEvents(
+    {
+      start,
+      end,
+      startStr: start.toISOString(),
+      endStr: end.toISOString(),
+      timeZone: 'local'
+    },
+    applyCalendarEvents,
+    (error) => { console.error('Failed to fetch calendar events:', error) }
+  )
+}
+
+/**
+ * What: Forces FullCalendar to re-fetch events from the backend.
+ * How: Loads the active date range explicitly and replaces the mounted events
+ *      through the Calendar API so the UI updates immediately.
+ */
+
+function refetchCalendar() {
+  const api = getApi()
+  if (!api) return
+
+  loadEvents(api.view.activeStart, api.view.activeEnd)
 }
 
 /**
@@ -259,13 +326,11 @@ function handleEventClick(info: EventClickArg) {
  *      updated event times. On cancel, reverts the drag.
  */
 async function handleEventDrop(info: EventDropArg) {
-  if (!window.confirm('Er du sikker på du vil flytte begivenheden?')) {
-    info.revert()
-    return
-  }
-
   const event = info.event
   const ext = event.extendedProps
+  // Why: Capture old position before save so undo can restore it
+  const oldStart = info.oldEvent.startStr
+  const oldEnd = info.oldEvent.endStr || info.oldEvent.startStr
 
   const data: CalendarEventData = {
     id: event.id,
@@ -284,25 +349,27 @@ async function handleEventDrop(info: EventDropArg) {
 
   try {
     await events.saveEvent(data)
-    getApi()?.refetchEvents()
+    refetchCalendar()
+    showToast('Begivenheden er flyttet', {
+      undo: async () => {
+        await events.saveEvent({ ...data, start: oldStart, end: oldEnd })
+        refetchCalendar()
+      }
+    })
   } catch {
     info.revert()
+    showToast('Kunne ikke flytte begivenheden', { error: true })
   }
 }
 
 /**
  * What: Handles event resize (duration change).
- * How: Prompts for confirmation in Danish. On confirm, saves the updated
- *      event times. On cancel, reverts the resize.
+ * How: Saves the updated event times. On failure, reverts the resize.
  */
 async function handleEventResize(info: EventResizeDoneArg) {
-  if (!window.confirm('Er du sikker på du vil ændre begivenheden?')) {
-    info.revert()
-    return
-  }
-
   const event = info.event
   const ext = event.extendedProps
+  const oldEnd = info.oldEvent.endStr || info.oldEvent.startStr
 
   const data: CalendarEventData = {
     id: event.id,
@@ -321,9 +388,16 @@ async function handleEventResize(info: EventResizeDoneArg) {
 
   try {
     await events.saveEvent(data)
-    getApi()?.refetchEvents()
+    refetchCalendar()
+    showToast('Begivenheden er opdateret', {
+      undo: async () => {
+        await events.saveEvent({ ...data, end: oldEnd })
+        refetchCalendar()
+      }
+    })
   } catch {
     info.revert()
+    showToast('Kunne ikke opdatere begivenheden', { error: true })
   }
 }
 
@@ -332,18 +406,51 @@ async function handleEventResize(info: EventResizeDoneArg) {
  * How: Applies 'past-event' CSS class to events that have already ended,
  *      and sets a tooltip with the event title and time.
  */
-function handleEventDidMount(info: { event: { end: Date | null; title: string }; el: HTMLElement }) {
+function handleEventDidMount(info: { event: { start: Date | null; end: Date | null; allDay: boolean; title: string; extendedProps: Record<string, unknown> }; el: HTMLElement }) {
   const now = new Date()
   if (info.event.end && info.event.end < now) {
     info.el.classList.add('past-event')
   }
 
-  // Why: Native title attribute provides a simple tooltip without
-  // requiring a tooltip library
-  const timeStr = info.event.end
-    ? ` (${info.event.end.toLocaleTimeString('da-DK', { hour: '2-digit', minute: '2-digit' })})`
-    : ''
-  info.el.title = `${info.event.title}${timeStr}`
+  const ev = info.event
+  const ext = ev.extendedProps
+  const timeOpts: Intl.DateTimeFormatOptions = { hour: '2-digit', minute: '2-digit' }
+  const dateOpts: Intl.DateTimeFormatOptions = { day: '2-digit', month: '2-digit', year: 'numeric' }
+
+  // Build tooltip lines
+  const lines: string[] = [ev.title]
+
+  // Date/time
+  if (ev.start) {
+    const startDate = ev.start.toLocaleDateString('da-DK', dateOpts)
+    const endDate = ev.end ? ev.end.toLocaleDateString('da-DK', dateOpts) : startDate
+    if (ev.allDay) {
+      lines.push(startDate === endDate ? startDate : `${startDate} — ${endDate}`)
+    } else {
+      const startTime = ev.start.toLocaleTimeString('da-DK', timeOpts)
+      const endTime = ev.end ? ev.end.toLocaleTimeString('da-DK', timeOpts) : ''
+      if (startDate === endDate) {
+        lines.push(`${startDate}  ${startTime} — ${endTime}`)
+      } else {
+        lines.push(`${startDate} ${startTime} — ${endDate} ${endTime}`)
+      }
+    }
+  }
+
+  if (ext.location) lines.push(`Sted: ${ext.location}`)
+  if (ext.description) {
+    const plain = String(ext.description).replace(/<[^>]*>/g, '').trim()
+    if (plain) lines.push(plain.length > 120 ? plain.substring(0, 120) + '...' : plain)
+  }
+  if (ext.rrule) lines.push('Gentages')
+
+  // Why: PrimeVue Tooltip directive bound programmatically because FullCalendar
+  // renders event elements outside Vue's template system.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  //const dir = Tooltip as any
+  //if (dir.mounted) {
+  //  dir.mounted(info.el, { value: { value: lines.join('<br>'), escape: false }, modifiers: { top: true } })
+  //}
 }
 
 /**
@@ -351,7 +458,7 @@ function handleEventDidMount(info: { event: { end: Date | null; title: string };
  * How: Queries the DOM for yearGrid and yearStack buttons and toggles
  *      their display style based on whether the current view is multiMonthYear.
  */
-function handleDatesSet(info: { view: { type: string; currentStart: Date } }) {
+function handleDatesSet(info: { view: { type: string; currentStart: Date; activeStart: Date; activeEnd: Date } }) {
   const container = calendarRef.value?.$el as HTMLElement | undefined
   if (!container) return
 
@@ -373,6 +480,9 @@ function handleDatesSet(info: { view: { type: string; currentStart: Date } }) {
   // Why: FullCalendar re-renders toolbar buttons on navigation, resetting
   // the fullscreen button text to the default. Re-apply the correct label.
   updateFullscreenButtonText()
+
+  loadEvents(info.view.activeStart, info.view.activeEnd)
+
 }
 
 const isMobile = ref(window.innerWidth <= 992)
@@ -381,7 +491,9 @@ function onResize() {
   const wasMobile = isMobile.value
   isMobile.value = window.innerWidth <= 992
   if (wasMobile !== isMobile.value) {
-    calendarOptions.height = isMobile.value ? 700 : 800
+    if (isMobile.value) {
+      calendarOptions.height = 700;
+    }
   }
 }
 
@@ -391,7 +503,7 @@ onUnmounted(() => window.removeEventListener('resize', onResize))
 // Why: Reactive options object ensures FullCalendar re-renders when
 // configuration values change (e.g. editable toggled)
 const calendarOptions = reactive<CalendarOptions>({
-  height: isMobile.value ? 700 : 800,
+  height: isMobile.value ? 700 : undefined,
   plugins: [dayGridPlugin, timeGridPlugin, listPlugin, interactionPlugin, multiMonthPlugin],
   locale: daLocale,
   firstDay: 1,
@@ -449,17 +561,7 @@ const calendarOptions = reactive<CalendarOptions>({
       multiMonthMaxColumns: 3
     }
   },
-  eventSources: [
-    {
-      events: (
-        fetchInfo: { start: Date; end: Date; startStr: string; endStr: string; timeZone: string },
-        successCb: (eventInputs: EventInput[]) => void,
-        failureCb: (error: Error) => void
-      ) => {
-        events.fetchEvents(fetchInfo, successCb, failureCb)
-      }
-    }
-  ],
+  events: [] as EventInput[],
   select: handleSelect,
   eventClick: handleEventClick,
   eventDrop: handleEventDrop,
@@ -477,9 +579,14 @@ const calendarOptions = reactive<CalendarOptions>({
 async function handleSave(data: CalendarEventData) {
   try {
     await events.saveEvent(data)
-    getApi()?.refetchEvents()
+    // Why: Wait for Vue to process the modal close (visible=false) before
+    // refetching, ensuring the FullCalendar ref is stable
+    await nextTick()
+    refetchCalendar()
+    showToast('Begivenheden er gemt')
   } catch (error) {
     console.error('Failed to save event:', error)
+    showToast(error instanceof Error ? error.message : 'Kunne ikke gemme begivenheden', { error: true })
   }
 }
 
@@ -492,9 +599,12 @@ async function handleSave(data: CalendarEventData) {
 async function handleDelete(id: string | number) {
   try {
     await events.deleteEvent(id)
-    getApi()?.refetchEvents()
+    await nextTick()
+    refetchCalendar()
+    showToast('Begivenheden er slettet')
   } catch (error) {
     console.error('Failed to delete event:', error)
+    showToast('Kunne ikke slette begivenheden', { error: true })
   }
 }
 </script>

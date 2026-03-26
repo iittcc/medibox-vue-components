@@ -47,6 +47,55 @@ export interface FetchInfo {
   timeZone: string
 }
 
+interface CalendarSaveSuccessResponse {
+  status: 'success'
+  eventId: number | boolean
+}
+
+interface CalendarSaveErrorResponse {
+  status?: 'error'
+  message?: string
+  errors?: Record<string, string>
+}
+
+function buildCalendarErrorMessage(
+  payload: unknown,
+  fallback: string
+): string {
+  if (payload && typeof payload === 'object') {
+    const response = payload as CalendarSaveErrorResponse
+    if (response.errors && typeof response.errors === 'object') {
+      const firstError = Object.values(response.errors).find(
+        (value) => typeof value === 'string' && value.trim().length > 0
+      )
+      if (firstError) {
+        return firstError
+      }
+    }
+
+    if (typeof response.message === 'string' && response.message.trim()) {
+      return response.message
+    }
+  }
+
+  return fallback
+}
+
+function getAxiosLikeResponseData(error: unknown): unknown {
+  if (
+    error &&
+    typeof error === 'object' &&
+    'response' in error &&
+    error.response &&
+    typeof error.response === 'object' &&
+    'data' in error.response
+  ) {
+    return error.response.data
+  }
+
+  return undefined
+}
+
 /**
  * What: Creates calendar event operations bound to a specific calendar and group.
  * How: Closes over baseUrl, calendarId, and groupId to provide fetchEvents,
@@ -134,14 +183,42 @@ export function useCalendarEvents(
       formData.append('parent_event_id', String(data.parentEventId))
     }
 
-    appendCsrf(formData)
-    const response = await axios.post(
-      `${callbackBase}/add_event`,
-      formData,
-      { timeout: 30000 }
-    )
+    try {
+      appendCsrf(formData)
+      const response = await axios.post(
+        `${callbackBase}/add_event`,
+        formData,
+        { timeout: 30000 }
+      )
 
-    return response.data
+      const responseData = response.data as number | boolean | CalendarSaveSuccessResponse
+      if (typeof responseData === 'number') {
+        return responseData
+      }
+
+      if (responseData === true) {
+        return true
+      }
+
+      if (
+        responseData &&
+        typeof responseData === 'object' &&
+        responseData.status === 'success'
+      ) {
+        return responseData.eventId
+      }
+
+      throw new Error(buildCalendarErrorMessage(response.data, 'Begivenheden kunne ikke gemmes.'))
+    } catch (error) {
+      const responseData = getAxiosLikeResponseData(error)
+      if (axios.isAxiosError(error) || responseData !== undefined) {
+        throw new Error(
+          buildCalendarErrorMessage(responseData, 'Begivenheden kunne ikke gemmes.')
+        )
+      }
+
+      throw error instanceof Error ? error : new Error(String(error))
+    }
   }
 
   /**

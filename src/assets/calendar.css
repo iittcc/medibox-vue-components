@@ -77,6 +77,82 @@
   vertical-align: middle;
 }
 
+/* Toast notification */
+.medical-calculator-container .calendar-toast {
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1060;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: #16a34a;
+  color: #fff;
+  padding: 0.875rem 1.5rem;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  font-weight: 500;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+.medical-calculator-container .calendar-toast--error {
+  background: #dc2626;
+}
+
+.medical-calculator-container .calendar-toast-undo {
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  padding: 0.25rem 0.75rem;
+  border-radius: 0.25rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.medical-calculator-container .calendar-toast-undo:hover {
+  background: rgba(255, 255, 255, 0.35);
+}
+
+.medical-calculator-container .toast-enter-active {
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.medical-calculator-container .toast-leave-active {
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.medical-calculator-container .toast-enter-from,
+.medical-calculator-container .toast-leave-to {
+  opacity: 0;
+  transform: translateX(-50%) translateY(0.5rem);
+}
+
+/* PrimeVue Tooltip for calendar events */
+.p-tooltip {
+  position: absolute;
+  z-index: 1070;
+  max-width: 20rem;
+  padding: 0.5rem 0.75rem;
+  background: #1e293b;
+  color: #fff;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  border-radius: 0.375rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  pointer-events: none;
+}
+
+.p-tooltip-text {
+  white-space: pre-line;
+}
+
+.p-tooltip-arrow {
+  display: none;
+}
+
 /* Fullscreen modal — above Bootstrap navbar (1030) but below PrimeVue Dialog (1100+) */
 .medical-calculator-container .modal-backdrop {
   position: fixed;
