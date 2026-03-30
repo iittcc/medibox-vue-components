@@ -1,16 +1,17 @@
 <template>
   <div id="app">
-    <PasswordResetComponent :visible="true" />
+    <PasswordResetComponent :modalState="modalState" />
   </div>
 </template>
 
 <script setup lang="ts">
-import PasswordResetComponent from "@/components/PasswordResetComponent.vue";
-</script> 
+import PasswordResetComponent from '@/components/PasswordResetComponent.vue'
 
-<style scoped>
-@import "primeflex/primeflex.css";
-html {
-  font-size: 12px;
+declare global {
+  interface Window {
+    passwordResetConfig?: { modalState: number }
+  }
 }
-</style>
+
+const modalState = window.passwordResetConfig?.modalState ?? 1
+</script>

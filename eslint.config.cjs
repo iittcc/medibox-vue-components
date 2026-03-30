@@ -113,6 +113,7 @@ module.exports = [
                 NodeJS: "readonly",
                 PromiseRejectionEvent: "readonly",
                 localStorage: "readonly",
+                URLSearchParams: "readonly",
                 beforeEach: "readonly",
             },
         },
