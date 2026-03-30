@@ -268,6 +268,59 @@ describe('EventModal', () => {
       await nextTick()
       expect(wrapper.text()).toContain('26/03/2026')
     })
+
+    it('emits save with exclusive end date (+1 day) for all-day event (MED-1200)', async () => {
+      // Simulate: CalendarFull passes inclusive end date (March 30) after the MED-1200 fix
+      const wrapper = mountModal({
+        visible: false,
+        mode: 'edit',
+        event: createTestEventWithId({
+          allDay: true,
+          start: '2026-03-30',
+          end: '2026-03-30',
+          title: 'Single Day Event'
+        })
+      })
+      await wrapper.setProps({ visible: true })
+      await nextTick()
+
+      // Click Gem (save)
+      const buttons = wrapper.findAll('[data-testid="button"]')
+      const saveBtn = buttons.find(b => b.attributes('data-label') === 'Gem')
+      await saveBtn!.trigger('click')
+
+      expect(wrapper.emitted('save')).toBeTruthy()
+      const emitted = wrapper.emitted('save')![0][0] as Record<string, unknown>
+      // onSave adds +1 day for exclusive end → March 31
+      expect(emitted.end).toBe('2026-03-31')
+      expect(emitted.start).toBe('2026-03-30')
+      expect(emitted.allDay).toBe(true)
+    })
+
+    it('preserves multi-day all-day event dates on round-trip (MED-1200)', async () => {
+      // 3-day event: March 28-30 inclusive → CalendarFull passes end=March 30
+      const wrapper = mountModal({
+        visible: false,
+        mode: 'edit',
+        event: createTestEventWithId({
+          allDay: true,
+          start: '2026-03-28',
+          end: '2026-03-30',
+          title: 'Multi Day Event'
+        })
+      })
+      await wrapper.setProps({ visible: true })
+      await nextTick()
+
+      const buttons = wrapper.findAll('[data-testid="button"]')
+      const saveBtn = buttons.find(b => b.attributes('data-label') === 'Gem')
+      await saveBtn!.trigger('click')
+
+      const emitted = wrapper.emitted('save')![0][0] as Record<string, unknown>
+      // onSave adds +1 day: March 30 → March 31 (exclusive end for FC)
+      expect(emitted.start).toBe('2026-03-28')
+      expect(emitted.end).toBe('2026-03-31')
+    })
   })
 
   // ---------------------------------------------------------------------------

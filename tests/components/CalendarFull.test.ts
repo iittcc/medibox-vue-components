@@ -203,4 +203,103 @@ describe('CalendarFull', () => {
       )
     })
   })
+
+  // ---------------------------------------------------------------------------
+  // MED-1200: All-day event end date adjustment on event click
+  // ---------------------------------------------------------------------------
+  describe('all-day event end date adjustment (MED-1200)', () => {
+    function createEventClickInfo(overrides: Record<string, unknown> = {}) {
+      return {
+        event: {
+          id: '42',
+          startStr: '2026-03-30',
+          endStr: '2026-03-31',
+          allDay: true,
+          start: new Date(2026, 2, 30),
+          end: new Date(2026, 2, 31),
+          title: 'All Day Event',
+          extendedProps: {
+            location: 'Room A',
+            description: 'Test',
+            rrule: null,
+            until_date: null,
+            parent_event_id: null
+          },
+          ...overrides
+        },
+        el: document.createElement('div'),
+        jsEvent: new MouseEvent('click'),
+        view: {}
+      }
+    }
+
+    it('subtracts one day from all-day event end date (exclusive → inclusive)', async () => {
+      const wrapper = mountFull()
+      const fc = wrapper.findComponent({ name: 'FullCalendar' })
+      const options = fc.props('options')
+
+      // Simulate clicking an all-day event with exclusive end date (March 31)
+      options.eventClick(createEventClickInfo())
+      await flushPromises()
+
+      const eventModal = wrapper.findComponent({ name: 'EventModal' })
+      // End date should be adjusted to inclusive (March 30), not exclusive (March 31)
+      expect(eventModal.props('event').end).toBe('2026-03-30')
+      expect(eventModal.props('event').start).toBe('2026-03-30')
+      expect(eventModal.props('event').allDay).toBe(true)
+    })
+
+    it('does not adjust end date for timed events', async () => {
+      const wrapper = mountFull()
+      const fc = wrapper.findComponent({ name: 'FullCalendar' })
+      const options = fc.props('options')
+
+      options.eventClick(createEventClickInfo({
+        startStr: '2026-03-30T09:00:00',
+        endStr: '2026-03-30T10:00:00',
+        allDay: false,
+        start: new Date(2026, 2, 30, 9, 0),
+        end: new Date(2026, 2, 30, 10, 0)
+      }))
+      await flushPromises()
+
+      const eventModal = wrapper.findComponent({ name: 'EventModal' })
+      expect(eventModal.props('event').end).toBe('2026-03-30T10:00:00')
+    })
+
+    it('handles multi-day all-day event (exclusive end adjusted by one day)', async () => {
+      const wrapper = mountFull()
+      const fc = wrapper.findComponent({ name: 'FullCalendar' })
+      const options = fc.props('options')
+
+      // 3-day event: March 28-30, FC stores end as March 31 (exclusive)
+      options.eventClick(createEventClickInfo({
+        startStr: '2026-03-28',
+        endStr: '2026-03-31',
+        start: new Date(2026, 2, 28),
+        end: new Date(2026, 2, 31)
+      }))
+      await flushPromises()
+
+      const eventModal = wrapper.findComponent({ name: 'EventModal' })
+      expect(eventModal.props('event').start).toBe('2026-03-28')
+      expect(eventModal.props('event').end).toBe('2026-03-30')
+    })
+
+    it('falls back to startStr when endStr is empty for all-day event', async () => {
+      const wrapper = mountFull()
+      const fc = wrapper.findComponent({ name: 'FullCalendar' })
+      const options = fc.props('options')
+
+      options.eventClick(createEventClickInfo({
+        endStr: '',
+        end: null
+      }))
+      await flushPromises()
+
+      const eventModal = wrapper.findComponent({ name: 'EventModal' })
+      // When end is null, should fall back to startStr without adjustment
+      expect(eventModal.props('event').end).toBe('2026-03-30')
+    })
+  })
 })

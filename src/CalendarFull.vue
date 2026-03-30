@@ -302,12 +302,22 @@ function handleEventClick(info: EventClickArg) {
   const event = info.event
   const ext = event.extendedProps
 
+  // Why: FullCalendar uses exclusive end dates for all-day events, so we
+  // subtract one day to get the inclusive end date for the edit form.
+  // Without this, each edit adds an extra day (MED-1200).
+  let endStr = event.endStr || event.startStr
+  if (event.allDay && event.end) {
+    const end = new Date(event.end)
+    end.setDate(end.getDate() - 1)
+    endStr = toDateString(end)
+  }
+
   selectedEvent.value = {
     id: event.id,
     calendarId: props.calendarId,
     groupId: props.groupId,
     start: event.startStr,
-    end: event.endStr || event.startStr,
+    end: endStr,
     allDay: event.allDay,
     title: event.title,
     location: ext.location || '',
