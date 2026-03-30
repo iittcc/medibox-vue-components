@@ -324,6 +324,68 @@ describe('EventModal', () => {
   })
 
   // ---------------------------------------------------------------------------
+  // MED-1205: Editing recurring event must not convert to single event
+  // ---------------------------------------------------------------------------
+  describe('recurring event edit (MED-1205)', () => {
+    it('emits save with null parentEventId when event is recurring', async () => {
+      // Simulate editing a recurring occurrence (ID contains '_', parentEventId set)
+      const wrapper = mountModal({
+        visible: false,
+        mode: 'edit',
+        event: createTestEventWithId({
+          id: '42_20260401',
+          rrule: 'FREQ=WEEKLY;BYDAY=WE',
+          parentEventId: 42,
+          title: 'Weekly Wednesday'
+        })
+      })
+      await wrapper.setProps({ visible: true })
+      await nextTick()
+
+      const buttons = wrapper.findAll('[data-testid="button"]')
+      const saveBtn = buttons.find(b => b.attributes('data-label') === 'Gem')
+      await saveBtn!.trigger('click')
+
+      expect(wrapper.emitted('save')).toBeTruthy()
+      const emitted = wrapper.emitted('save')![0][0] as Record<string, unknown>
+      // parentEventId must be null to prevent backend setting recurrence_exception=1
+      expect(emitted.parentEventId).toBeNull()
+      expect(emitted.rrule).toBeTruthy()
+    })
+
+    it('preserves parentEventId when recurrence is turned off', async () => {
+      // Edge case: user edits a recurring occurrence and disables recurrence
+      const wrapper = mountModal({
+        visible: false,
+        mode: 'edit',
+        event: createTestEventWithId({
+          id: '42_20260401',
+          rrule: 'FREQ=WEEKLY;BYDAY=WE',
+          parentEventId: 42,
+          title: 'Weekly Wednesday'
+        })
+      })
+      await wrapper.setProps({ visible: true })
+      await nextTick()
+
+      // Toggle off recurrence (find the second ToggleButton and click)
+      const vm = wrapper.vm as unknown as { form: { isRecurring: boolean } }
+      vm.form.isRecurring = false
+      await nextTick()
+
+      const buttons = wrapper.findAll('[data-testid="button"]')
+      const saveBtn = buttons.find(b => b.attributes('data-label') === 'Gem')
+      await saveBtn!.trigger('click')
+
+      expect(wrapper.emitted('save')).toBeTruthy()
+      const emitted = wrapper.emitted('save')![0][0] as Record<string, unknown>
+      // When recurrence is off, parentEventId should be preserved for exception handling
+      expect(emitted.parentEventId).toBe(42)
+      expect(emitted.rrule).toBeNull()
+    })
+  })
+
+  // ---------------------------------------------------------------------------
   // Recurrence form
   // ---------------------------------------------------------------------------
   describe('recurrence', () => {

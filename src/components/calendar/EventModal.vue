@@ -453,6 +453,10 @@ function onSave() {
 
   const rrule = form.value.isRecurring ? buildRRule(rruleConfig.value) : null
 
+  // Why: When saving a recurring event (rrule is non-null), sending parentEventId
+  // causes the backend to set recurrence_exception=1, converting the series to a
+  // single event. Set parentEventId to null to update the series instead (MED-1205).
+  // Same pattern as handleEventDrop / handleEventResize (MED-1201).
   const data: CalendarEventData = {
     calendarId: props.calendarId,
     groupId: props.groupId,
@@ -464,7 +468,7 @@ function onSave() {
     description: form.value.description,
     rrule,
     untilDate: form.value.untilDate,
-    parentEventId: form.value.parentEventId
+    parentEventId: rrule ? null : form.value.parentEventId
   }
 
   if (form.value.eventId !== undefined) {
