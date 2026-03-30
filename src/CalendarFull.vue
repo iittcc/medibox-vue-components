@@ -342,6 +342,9 @@ async function handleEventDrop(info: EventDropArg) {
   const oldStart = info.oldEvent.startStr
   const oldEnd = info.oldEvent.endStr || info.oldEvent.startStr
 
+  // Why: Expanded occurrences have composite IDs ("42_20260330") and parent_event_id
+  // set. Sending parent_event_id on drop would mark the parent as a recurrence_exception,
+  // converting it from recurring to single. We send null to move the whole series instead.
   const data: CalendarEventData = {
     id: event.id,
     calendarId: props.calendarId,
@@ -354,7 +357,7 @@ async function handleEventDrop(info: EventDropArg) {
     description: ext.description || '',
     rrule: ext.rrule || null,
     untilDate: ext.until_date || null,
-    parentEventId: ext.parent_event_id || null
+    parentEventId: null
   }
 
   try {
@@ -381,6 +384,8 @@ async function handleEventResize(info: EventResizeDoneArg) {
   const ext = event.extendedProps
   const oldEnd = info.oldEvent.endStr || info.oldEvent.startStr
 
+  // Why: Same as handleEventDrop — don't send parent_event_id to avoid
+  // marking the parent event as a recurrence_exception on resize.
   const data: CalendarEventData = {
     id: event.id,
     calendarId: props.calendarId,
@@ -393,7 +398,7 @@ async function handleEventResize(info: EventResizeDoneArg) {
     description: ext.description || '',
     rrule: ext.rrule || null,
     untilDate: ext.until_date || null,
-    parentEventId: ext.parent_event_id || null
+    parentEventId: null
   }
 
   try {

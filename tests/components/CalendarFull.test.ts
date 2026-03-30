@@ -205,6 +205,139 @@ describe('CalendarFull', () => {
   })
 
   // ---------------------------------------------------------------------------
+  // MED-1201: Moving recurrent event preserves recurrence
+  // ---------------------------------------------------------------------------
+  describe('moving recurrent event preserves recurrence (MED-1201)', () => {
+    function createEventDropInfo(overrides: Record<string, unknown> = {}, extOverrides: Record<string, unknown> = {}) {
+      return {
+        event: {
+          id: '42_20260330140000',
+          startStr: '2026-03-31T14:00:00',
+          endStr: '2026-03-31T15:00:00',
+          allDay: false,
+          title: 'Weekly Meeting',
+          extendedProps: {
+            location: 'Room B',
+            description: 'Recurring event',
+            rrule: 'FREQ=WEEKLY;BYDAY=MO',
+            until_date: '2026-12-31',
+            parent_event_id: 42,
+            ...extOverrides
+          },
+          ...overrides
+        },
+        oldEvent: {
+          startStr: '2026-03-30T14:00:00',
+          endStr: '2026-03-30T15:00:00'
+        },
+        revert: vi.fn(),
+        delta: { days: 1, milliseconds: 0 },
+        el: document.createElement('div'),
+        jsEvent: new MouseEvent('mouseup'),
+        view: {}
+      }
+    }
+
+    function createEventResizeInfo(overrides: Record<string, unknown> = {}, extOverrides: Record<string, unknown> = {}) {
+      return {
+        event: {
+          id: '42_20260330140000',
+          startStr: '2026-03-30T14:00:00',
+          endStr: '2026-03-30T16:00:00',
+          allDay: false,
+          title: 'Weekly Meeting',
+          extendedProps: {
+            location: 'Room B',
+            description: 'Recurring event',
+            rrule: 'FREQ=WEEKLY;BYDAY=MO',
+            until_date: '2026-12-31',
+            parent_event_id: 42,
+            ...extOverrides
+          },
+          ...overrides
+        },
+        oldEvent: {
+          startStr: '2026-03-30T14:00:00',
+          endStr: '2026-03-30T15:00:00'
+        },
+        startDelta: { days: 0, milliseconds: 0 },
+        endDelta: { days: 0, milliseconds: 3600000 },
+        revert: vi.fn(),
+        el: document.createElement('div'),
+        jsEvent: new MouseEvent('mouseup'),
+        view: {}
+      }
+    }
+
+    it('sends parentEventId as null when dropping a recurring occurrence', async () => {
+      const wrapper = mountFull()
+      const fc = wrapper.findComponent({ name: 'FullCalendar' })
+      const options = fc.props('options')
+
+      await options.eventDrop(createEventDropInfo())
+      await flushPromises()
+
+      expect(calendarEventServiceSpies.saveEvent).toHaveBeenCalledWith(
+        expect.objectContaining({
+          rrule: 'FREQ=WEEKLY;BYDAY=MO',
+          parentEventId: null
+        })
+      )
+    })
+
+    it('preserves rrule when dropping a recurring occurrence', async () => {
+      const wrapper = mountFull()
+      const fc = wrapper.findComponent({ name: 'FullCalendar' })
+      const options = fc.props('options')
+
+      await options.eventDrop(createEventDropInfo())
+      await flushPromises()
+
+      expect(calendarEventServiceSpies.saveEvent).toHaveBeenCalledWith(
+        expect.objectContaining({
+          rrule: 'FREQ=WEEKLY;BYDAY=MO',
+          untilDate: '2026-12-31'
+        })
+      )
+    })
+
+    it('sends parentEventId as null when resizing a recurring occurrence', async () => {
+      const wrapper = mountFull()
+      const fc = wrapper.findComponent({ name: 'FullCalendar' })
+      const options = fc.props('options')
+
+      await options.eventResize(createEventResizeInfo())
+      await flushPromises()
+
+      expect(calendarEventServiceSpies.saveEvent).toHaveBeenCalledWith(
+        expect.objectContaining({
+          rrule: 'FREQ=WEEKLY;BYDAY=MO',
+          parentEventId: null
+        })
+      )
+    })
+
+    it('still sends parentEventId as null for non-recurring events on drop', async () => {
+      const wrapper = mountFull()
+      const fc = wrapper.findComponent({ name: 'FullCalendar' })
+      const options = fc.props('options')
+
+      await options.eventDrop(createEventDropInfo(
+        { id: '99' },
+        { rrule: null, until_date: null, parent_event_id: null }
+      ))
+      await flushPromises()
+
+      expect(calendarEventServiceSpies.saveEvent).toHaveBeenCalledWith(
+        expect.objectContaining({
+          rrule: null,
+          parentEventId: null
+        })
+      )
+    })
+  })
+
+  // ---------------------------------------------------------------------------
   // MED-1200: All-day event end date adjustment on event click
   // ---------------------------------------------------------------------------
   describe('all-day event end date adjustment (MED-1200)', () => {
