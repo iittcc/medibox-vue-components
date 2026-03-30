@@ -66,10 +66,23 @@
   display: none;
 }
 
-  /* Remove margin from table header element that causes layout issues. */
-  .medical-calculator-container .fc *:not(.fc-header-toolbar) {
-    box-sizing: border-box;
-    margin: 0px !important;
+/* Why: MediBOX global styles (Bootstrap/PixelAdmin) add unwanted margins to
+   table elements inside FullCalendar. We reset those specifically rather than
+   using a wildcard, because FullCalendar sets inline margin-top on event
+   harnesses to stack multi-day and single-day events without overlap. */
+.medical-calculator-container .fc *:not(.fc-header-toolbar) {
+  box-sizing: border-box;
+}
+
+.medical-calculator-container .fc table,
+.medical-calculator-container .fc thead,
+.medical-calculator-container .fc tbody,
+.medical-calculator-container .fc th,
+.medical-calculator-container .fc td,
+.medical-calculator-container .fc .fc-scrollgrid,
+.medical-calculator-container .fc .fc-scrollgrid-section,
+.medical-calculator-container .fc .fc-scrollgrid-section > td {
+  margin: 0 !important;
 }
 
 .medical-calculator-container .fc .fc-button .fc-icon {
