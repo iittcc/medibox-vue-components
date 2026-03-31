@@ -66,6 +66,23 @@
   display: none;
 }
 
+.medical-calculator-container .fc-selected-date {
+  background-color: #eff6ff !important;
+  box-shadow: inset 0 0 0 2px #1d89cf;
+}
+
+.medical-calculator-container .fc-selected-date-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.75rem;
+  min-height: 1.75rem;
+  padding: 0.125rem 0.5rem;
+  border-radius: 9999px;
+  background-color: #1d89cf;
+  color: #fff !important;
+}
+
 /* Why: MediBOX global styles (Bootstrap/PixelAdmin) add unwanted margins to
    table elements inside FullCalendar. We reset those specifically rather than
    using a wildcard, because FullCalendar sets inline margin-top on event

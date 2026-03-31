@@ -15,13 +15,14 @@
 
     <!-- Single calendar container — switches between inline and modal via CSS -->
     <div :class="isFullscreen ? 'modal-panel' : 'calendar-layout'">
-      <div v-if="!isFullscreen" class="calendar-sidebar">
+      <div v-if="!isFullscreen" class="calendar-sidebar" :class="{ 'no-date-selection': !dateSelected }">
         <DatePicker
           v-model="navigatorDate"
           inline
           showWeek
           :firstDayOfWeek="1"
-          @update:modelValue="onNavigatorDateChange"
+          @date-select="onNavigatorDateSelect"
+          @month-change="onNavigatorMonthChange"
         />
       </div>
       <div :class="isFullscreen ? 'modal-body' : 'calendar-main'" ref="calendarMainRef">
@@ -86,6 +87,8 @@ const calendarRef = ref<InstanceType<typeof FullCalendar>>()
 const calendarMainRef = ref<HTMLElement>()
 const isFullscreen = ref(false)
 const navigatorDate = ref<Date>(new Date())
+const dateSelected = ref(false)
+let navigatorDriven = false
 const modalVisible = ref(false)
 const modalMode = ref<'create' | 'edit' | 'view'>('create')
 const selectedEvent = ref<CalendarEventData | null>(null)
@@ -158,21 +161,115 @@ function refetchCalendar() {
 }
 
 /**
+ * What: Applies the shared selected-day marker inside FullCalendar.
+ * How: Toggles CSS classes on the rendered day/header elements that match the
+ *      currently selected navigatorDate, so both calendars show the same date.
+ */
+function syncSelectedDateMarker() {
+  const container = calendarRef.value?.$el as HTMLElement | undefined
+  if (!container) return
+
+  container.querySelectorAll('.fc-selected-date').forEach((el) => el.classList.remove('fc-selected-date'))
+  container.querySelectorAll('.fc-selected-date-link').forEach((el) => el.classList.remove('fc-selected-date-link'))
+  if (!dateSelected.value) return
+
+  const selectedDate = toDateString(navigatorDate.value)
+  container.querySelectorAll(`[data-date="${selectedDate}"]`).forEach((el) => {
+    el.classList.add('fc-selected-date')
+  })
+
+  const linkSelectors = [
+    `.fc-daygrid-day[data-date="${selectedDate}"] .fc-daygrid-day-number`,
+    `.fc-col-header-cell[data-date="${selectedDate}"] .fc-col-header-cell-cushion`,
+    `.fc-list-day[data-date="${selectedDate}"] .fc-list-day-text`,
+    `.fc-list-day[data-date="${selectedDate}"] .fc-list-day-side-text`
+  ]
+
+  container.querySelectorAll(linkSelectors.join(', ')).forEach((el) => {
+    el.classList.add('fc-selected-date-link')
+  })
+}
+
+/**
  * What: Navigates FullCalendar to the date selected in the inline DatePicker.
  * How: Determines slide direction by comparing old and new dates, applies a
  *      CSS slide animation, then calls gotoDate on the FullCalendar API.
  */
-function onNavigatorDateChange(value: Date | null) {
-  if (!value) return
+function onNavigatorDateSelect(value: Date) {
   const api = getApi()
   if (!api) return
 
-  // Why: Compare against current FullCalendar date to determine slide direction
+  const selectedDate = new Date(value.getFullYear(), value.getMonth(), value.getDate())
+
+  // Why: User explicitly clicked a date — mark it as selected so the
+  // DatePicker highlights it. Arrow-only navigation leaves this false.
+  dateSelected.value = true
+  navigatorDriven = true
+  navigatorDate.value = selectedDate
+  nextTick(() => { syncSelectedDateMarker() })
+
   const currentDate = api.getDate()
-  const goingForward = value.getTime() > currentDate.getTime()
+  const goingForward = selectedDate.getTime() > currentDate.getTime()
 
   nudgeCalendar(goingForward)
-  api.gotoDate(value)
+  api.gotoDate(selectedDate)
+}
+
+/**
+ * What: Selects today's date from the FullCalendar toolbar.
+ * How: Reuses the explicit selected-day flow so the inline DatePicker and
+ *      FullCalendar both mark today instead of only navigating the main view.
+ */
+function handleTodayButtonClick() {
+  const api = getApi()
+  if (!api) return
+
+  const today = new Date()
+  const selectedDate = new Date(today.getFullYear(), today.getMonth(), today.getDate())
+
+  dateSelected.value = true
+  navigatorDriven = true
+  navigatorDate.value = selectedDate
+  nextTick(() => { syncSelectedDateMarker() })
+
+  const currentDate = api.getDate()
+  const goingForward = selectedDate.getTime() > currentDate.getTime()
+
+  nudgeCalendar(goingForward)
+  api.gotoDate(selectedDate)
+}
+
+/**
+ * What: Navigates FullCalendar when the DatePicker month/year arrows are used.
+ * How: Builds a Date from the month-change event payload and calls gotoDate,
+ *      so the main calendar stays in sync even without clicking a specific date.
+ */
+function onNavigatorMonthChange(event: { month: number; year: number }) {
+  const api = getApi()
+  if (!api) return
+
+  // Why: PrimeVue emits month as 1-indexed, but Date constructor expects 0-indexed
+  const targetMonth = event.month - 1
+  const currentStart = api.view.currentStart
+
+  // Why: When syncNavigatorDate updates navigatorDate (v-model), PrimeVue may
+  // re-emit month-change as a side-effect. Skip if already on the target month.
+  if (currentStart.getFullYear() === event.year && currentStart.getMonth() === targetMonth) return
+
+  const newDate = new Date(event.year, targetMonth, 1)
+  const goingForward = newDate.getTime() > currentStart.getTime()
+
+  // Why: Arrow navigation changes the visible month, not the selected day.
+  dateSelected.value = false
+  navigatorDate.value = newDate
+  nextTick(() => { syncSelectedDateMarker() })
+
+  // Why: The DatePicker already shows the correct month from its own arrow click.
+  // Prevent syncNavigatorDate from resetting navigatorDate which would snap the
+  // DatePicker to a different month.
+  navigatorDriven = true
+  nudgeCalendar(goingForward)
+  api.gotoDate(newDate)
 }
 
 /**
@@ -193,12 +290,49 @@ function nudgeCalendar(forward: boolean) {
 }
 
 /**
- * What: Syncs the inline DatePicker when FullCalendar navigates.
- * How: Updates navigatorDate from the datesSet callback so the
- *      DatePicker highlights the current month/date.
+ * What: Checks whether a selected day still belongs to FullCalendar's visible range.
+ * How: Compares the local selected day against FullCalendar's active start/end
+ *      dates, treating activeEnd as exclusive.
  */
-function syncNavigatorDate(info: { view: { currentStart: Date } }) {
+function isSelectedDateInViewRange(activeStart: Date, activeEnd: Date) {
+  const selectedDay = new Date(
+    navigatorDate.value.getFullYear(),
+    navigatorDate.value.getMonth(),
+    navigatorDate.value.getDate()
+  )
+
+  return selectedDay.getTime() >= activeStart.getTime() && selectedDay.getTime() < activeEnd.getTime()
+}
+
+/**
+ * What: Syncs the inline DatePicker when FullCalendar navigates.
+ * How: Preserves an explicit day selection across view switches when the day
+ *      still exists in the visible range, otherwise falls back to the view's
+ *      current start date for passive browsing.
+ */
+function syncNavigatorDate(info: { view: { currentStart: Date; activeStart: Date; activeEnd: Date } }) {
+  // Why: When the DatePicker arrows or a date click triggered this navigation,
+  // the DatePicker already shows the correct month/date. Updating navigatorDate
+  // would fight the DatePicker's internal state.
+  if (navigatorDriven) {
+    navigatorDriven = false
+    nextTick(() => { syncSelectedDateMarker() })
+    return
+  }
+
+  // Why: Switching between Month/Week/Day/Year views re-renders the same date
+  // in a different layout. Keep the explicit selection as long as that date is
+  // still part of the visible range.
+  if (dateSelected.value && isSelectedDateInViewRange(info.view.activeStart, info.view.activeEnd)) {
+    nextTick(() => { syncSelectedDateMarker() })
+    return
+  }
+
+  // Why: FC navigated to a range that no longer contains the selected day, so
+  // treat it as passive browsing and clear the explicit selection marker.
+  dateSelected.value = false
   navigatorDate.value = new Date(info.view.currentStart)
+  nextTick(() => { syncSelectedDateMarker() })
 }
 
 /**
@@ -214,6 +348,7 @@ function toggleFullscreen() {
   nextTick(() => {
     updateFullscreenButtonText()
     getApi()?.updateSize()
+    syncSelectedDateMarker()
   })
 }
 
@@ -522,12 +657,11 @@ const calendarOptions = reactive<CalendarOptions>({
   firstDay: 1,
   initialView: 'dayGridMonth',
   headerToolbar: {
-    left: 'prev,next today fullscreen',
+    left: 'prev,next todayNav fullscreen',
     center: 'title',
     right: 'yearGrid,yearStack multiMonthYear,dayGridMonth,timeGridWeek,timeGridDay,listMonth'
   },
   buttonText: {
-    today: 'I dag',
     year: 'År',
     month: 'Måned',
     week: 'Uge',
@@ -535,6 +669,10 @@ const calendarOptions = reactive<CalendarOptions>({
     list: 'Liste'
   },
   customButtons: {
+    todayNav: {
+      text: 'I dag',
+      click: handleTodayButtonClick
+    },
     yearGrid: {
       text: 'Grid',
       click: () => {
@@ -569,6 +707,19 @@ const calendarOptions = reactive<CalendarOptions>({
   dayMaxEventRows: true,
   nowIndicator: true,
   navLinks: true,
+  navLinkDayClick(date: Date) {
+    // Why: User clicked a specific date in FullCalendar — select it in the
+    // DatePicker and navigate FC to the day view for that date.
+    const selectedDate = new Date(date.getFullYear(), date.getMonth(), date.getDate())
+    dateSelected.value = true
+    navigatorDriven = true
+    navigatorDate.value = selectedDate
+    nextTick(() => { syncSelectedDateMarker() })
+    const api = getApi()
+    if (api) {
+      api.changeView('timeGridDay', selectedDate)
+    }
+  },
   views: {
     multiMonthYear: {
       multiMonthMaxColumns: 3
@@ -634,6 +785,14 @@ async function handleDelete(id: string | number) {
   transform: scale(0.8);
   transform-origin: top left;
   margin-right: -40px !important;
+}
+
+/* Why: When no date is explicitly selected (just navigating with arrows),
+   suppress the DatePicker's selected-day highlight so only clicked dates
+   appear marked. PrimeVue uses data-p-selected for the active day cell. */
+.no-date-selection :deep([data-p-selected="true"]) {
+  background-color: transparent !important;
+  color: inherit !important;
 }
 
 @media (max-width: 992px) {

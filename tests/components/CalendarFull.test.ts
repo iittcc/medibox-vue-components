@@ -41,6 +41,7 @@ function mountFull(props = defaultProps) {
 describe('CalendarFull', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    vi.useRealTimers()
     document.body.style.overflow = ''
     calendarEventServiceSpies.fetchEvents.mockImplementation(() => {})
   })
@@ -159,6 +160,127 @@ describe('CalendarFull', () => {
       const fc = wrapper.findComponent({ name: 'FullCalendar' })
       expect(fc.props('options').customButtons.yearGrid).toBeDefined()
       expect(fc.props('options').customButtons.yearStack).toBeDefined()
+    })
+
+    it('syncs today to the inline DatePicker when clicking the I dag toolbar button', async () => {
+      vi.useFakeTimers()
+      vi.setSystemTime(new Date('2026-03-16T10:30:00'))
+
+      const wrapper = mountFull()
+      const fc = wrapper.findComponent({ name: 'FullCalendar' })
+      const options = fc.props('options')
+
+      options.customButtons.todayNav.click()
+      await flushPromises()
+
+      const selectedDate = wrapper.findComponent({ name: 'DatePicker' }).props('modelValue') as Date
+
+      expect(wrapper.find('.calendar-sidebar').classes()).not.toContain('no-date-selection')
+      expect(selectedDate.getTime()).toBe(new Date(2026, 2, 16).getTime())
+      expect(wrapper.find('.fc-daygrid-day[data-date="2026-03-16"]').classes()).toContain('fc-selected-date')
+      expect(wrapper.find('.fc-daygrid-day[data-date="2026-03-16"] .fc-daygrid-day-number').classes()).toContain('fc-selected-date-link')
+      expect(fullCalendarApi.gotoDate).toHaveBeenCalledWith(new Date(2026, 2, 16))
+    })
+
+    it('marks the inline DatePicker and FullCalendar when a day nav link is clicked', async () => {
+      const wrapper = mountFull()
+      const fc = wrapper.findComponent({ name: 'FullCalendar' })
+      const options = fc.props('options')
+
+      options.navLinkDayClick(new Date('2026-03-15T00:00:00'))
+      await flushPromises()
+
+      const datePicker = wrapper.findComponent({ name: 'DatePicker' })
+      const selectedDate = datePicker.props('modelValue') as Date
+
+      expect(selectedDate.getTime()).toBe(new Date(2026, 2, 15).getTime())
+      expect(wrapper.find('.calendar-sidebar').classes()).not.toContain('no-date-selection')
+      expect(wrapper.find('.fc-daygrid-day[data-date="2026-03-15"]').classes()).toContain('fc-selected-date')
+      expect(wrapper.find('.fc-daygrid-day[data-date="2026-03-15"] .fc-daygrid-day-number').classes()).toContain('fc-selected-date-link')
+      expect(fullCalendarApi.changeView).toHaveBeenCalledWith('timeGridDay', new Date(2026, 2, 15))
+    })
+
+    it('marks the selected day in FullCalendar when the inline DatePicker emits date-select', async () => {
+      const wrapper = mountFull()
+      const datePicker = wrapper.findComponent({ name: 'DatePicker' })
+
+      await datePicker.vm.$emit('date-select', new Date(2026, 2, 16))
+      await flushPromises()
+
+      expect(wrapper.find('.calendar-sidebar').classes()).not.toContain('no-date-selection')
+      expect(wrapper.find('.fc-daygrid-day[data-date="2026-03-16"]').classes()).toContain('fc-selected-date')
+      expect(wrapper.find('.fc-daygrid-day[data-date="2026-03-16"] .fc-daygrid-day-number').classes()).toContain('fc-selected-date-link')
+      expect(fullCalendarApi.gotoDate).toHaveBeenCalledWith(new Date(2026, 2, 16))
+    })
+
+    it('preserves the selected day when switching to another view that still contains it', async () => {
+      const wrapper = mountFull()
+      const datePicker = wrapper.findComponent({ name: 'DatePicker' })
+      const fc = wrapper.findComponent({ name: 'FullCalendar' })
+      const options = fc.props('options')
+
+      await datePicker.vm.$emit('date-select', new Date(2026, 2, 15))
+      await flushPromises()
+
+      options.datesSet({
+        view: {
+          type: 'dayGridMonth',
+          currentStart: new Date(2026, 2, 1),
+          activeStart: new Date(2026, 2, 1),
+          activeEnd: new Date(2026, 3, 1)
+        }
+      })
+      await flushPromises()
+
+      options.datesSet({
+        view: {
+          type: 'timeGridWeek',
+          currentStart: new Date(2026, 2, 15),
+          activeStart: new Date(2026, 2, 15),
+          activeEnd: new Date(2026, 2, 22)
+        }
+      })
+      await flushPromises()
+
+      expect(wrapper.find('.calendar-sidebar').classes()).not.toContain('no-date-selection')
+      expect(wrapper.find('.fc-daygrid-day[data-date="2026-03-15"]').classes()).toContain('fc-selected-date')
+      expect(wrapper.find('.fc-daygrid-day[data-date="2026-03-15"] .fc-daygrid-day-number').classes()).toContain('fc-selected-date-link')
+    })
+
+    it('clears the selected day when navigating to a range that no longer contains it', async () => {
+      const wrapper = mountFull()
+      const datePicker = wrapper.findComponent({ name: 'DatePicker' })
+      const fc = wrapper.findComponent({ name: 'FullCalendar' })
+      const options = fc.props('options')
+
+      await datePicker.vm.$emit('date-select', new Date(2026, 2, 15))
+      await flushPromises()
+
+      options.datesSet({
+        view: {
+          type: 'dayGridMonth',
+          currentStart: new Date(2026, 2, 1),
+          activeStart: new Date(2026, 2, 1),
+          activeEnd: new Date(2026, 3, 1)
+        }
+      })
+      await flushPromises()
+
+      options.datesSet({
+        view: {
+          type: 'dayGridMonth',
+          currentStart: new Date(2026, 3, 1),
+          activeStart: new Date(2026, 3, 1),
+          activeEnd: new Date(2026, 4, 1)
+        }
+      })
+      await flushPromises()
+
+      const currentDate = wrapper.findComponent({ name: 'DatePicker' }).props('modelValue') as Date
+
+      expect(wrapper.find('.calendar-sidebar').classes()).toContain('no-date-selection')
+      expect(wrapper.find('.fc-daygrid-day[data-date="2026-03-15"]').classes()).not.toContain('fc-selected-date')
+      expect(currentDate.getTime()).toBe(new Date(2026, 3, 1).getTime())
     })
   })
 

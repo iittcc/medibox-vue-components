@@ -26,7 +26,40 @@ vi.mock('@/composables/useCalendarEvents', () => ({
 const fullCalendarStub = {
   name: 'FullCalendar',
   props: ['options'],
-  template: '<div data-testid="fullcalendar"></div>',
+  template: `
+    <div data-testid="fullcalendar" class="fc">
+      <table>
+        <thead>
+          <tr>
+            <th class="fc-col-header-cell" data-date="2026-03-15">
+              <div class="fc-scrollgrid-sync-inner">
+                <a class="fc-col-header-cell-cushion">15. mar.</a>
+              </div>
+            </th>
+            <th class="fc-col-header-cell" data-date="2026-03-16">
+              <div class="fc-scrollgrid-sync-inner">
+                <a class="fc-col-header-cell-cushion">16. mar.</a>
+              </div>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="fc-daygrid-day" data-date="2026-03-15">
+              <div class="fc-daygrid-day-top">
+                <a class="fc-daygrid-day-number">15</a>
+              </div>
+            </td>
+            <td class="fc-daygrid-day" data-date="2026-03-16">
+              <div class="fc-daygrid-day-top">
+                <a class="fc-daygrid-day-number">16</a>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  `,
   methods: {
     getApi() {
       return fullCalendarApi
@@ -62,7 +95,7 @@ const dialogStub = {
 const datePickerStub = {
   name: 'DatePicker',
   props: ['modelValue', 'inline', 'showWeek', 'firstDayOfWeek', 'dateFormat', 'disabled', 'timeOnly', 'stepMinute', 'showIcon', 'fluid', 'iconDisplay'],
-  emits: ['update:modelValue'],
+  emits: ['update:modelValue', 'date-select', 'month-change'],
   template: '<div data-testid="datepicker"></div>'
 }
 
