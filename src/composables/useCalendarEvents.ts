@@ -10,7 +10,8 @@ import type { EventInput } from '@fullcalendar/core'
 
 // Why: CodeIgniter 3 CSRF protection rejects POST requests without a valid token.
 // jQuery's ajaxPrefilter handles this for $.ajax, but axios needs manual injection.
-const CSRF_TOKEN_NAME = 'csrf_test_name'
+// Why: Must match csrf_token_name in CI3 config (C4 - ITE-47: renamed from default csrf_test_name)
+const CSRF_TOKEN_NAME = 'mbx_csrf_token'
 
 function getCsrfToken(): string {
   const meta = document.querySelector('meta[name="csrf-token"]')

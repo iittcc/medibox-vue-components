@@ -135,7 +135,8 @@ const resolver = zodResolver(
 const onDialogHide = async () => {
   if (props.modalState === 1) {
     const formData = new URLSearchParams()
-    formData.append('csrf_test_name', getCsrfToken())
+    // Why: Must match csrf_token_name in CI3 config (C4 - ITE-47: renamed from default csrf_test_name)
+    formData.append('mbx_csrf_token', getCsrfToken())
 
     await fetch('/credentials/cancelPasswordReset', {
       method: 'POST',
@@ -155,7 +156,8 @@ const onFormSubmit = async (e: any) => {
     const formData = new URLSearchParams()
     formData.append('new_password', e.values.password)
     formData.append('repeat_password', e.values.confirm_password)
-    formData.append('csrf_test_name', getCsrfToken())
+    // Why: Must match csrf_token_name in CI3 config (C4 - ITE-47: renamed from default csrf_test_name)
+    formData.append('mbx_csrf_token', getCsrfToken())
 
     const response = await fetch('/credentials/changePassword', {
       method: 'POST',
